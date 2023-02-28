@@ -1,7 +1,4 @@
-const fs = require("fs");
-
-//TODO: export mock data to a mockupData file
-const vehicleEntityMock = {
+export const vehicleEntityMock = {
   id: "urn:ngsi-ld:Vehicle:vehicle:WasteManagement:1",
   type: "Vehicle",
   category: {
@@ -58,35 +55,3 @@ const vehicleEntityMock = {
     "https://schema.lab.fiware.org/ld/context",
   ],
 };
-
-const HEADER = '<?xml version="1.0" encoding="UTF-8"?>';
-const GENERATED_ON = `<!-- automatically generated on ${new Date()} by jsonToXML script (by Francisco Gonçalves) -->`;
-
-const jsonToXML = (json) => {
-  // If json is not valid return with error
-  if (!json || !json.id) {
-    return console.error(
-      `Parsing Error: Invalid JSON, ${JSON.stringify(json)}`
-    );
-  }
-
-  let buffer = "";
-  buffer += HEADER + "\n\n";
-  buffer += GENERATED_ON + "\n\n";
-
-  buffer += "<routes>\n";
-  buffer += `<vType id="${json.vehicleType.value}" accel="${
-    json.accel?.value ?? 0
-  }"/>\n`;
-  buffer += `<vehicle id="${json.id}" type="${json.vehicleType?.value}">\n`;
-  buffer += "</vehicle>\n\n";
-  buffer += "</routes>\n";
-  try {
-    fs.writeFileSync(`${json.id}.rou.xml`, buffer);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-// Test runner
-jsonToXML(vehicleEntityMock);
