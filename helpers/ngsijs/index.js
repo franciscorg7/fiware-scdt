@@ -31,17 +31,60 @@ const multiSensor = {
   },
 };
 
-// List all entities registered in the Context Broker Service
+const multiSensorSubscription = {
+  description: "A subscription to get surrounding info from the sensors.",
+  subject: {
+    id: "Subscription:MultipleSensor1",
+    type: "Subscription",
+    entities: [
+      {
+        id: "MultipleSensor1",
+        type: "Sensor",
+      },
+    ],
+    condition: {
+      attrs: [],
+    },
+  },
+  notification: {
+    http: {
+      url: "http://localhost:1026/accumulate",
+    },
+    attrs: ["airQuality", "humidity", "noise", "pressure", "temperature"],
+  },
+  expires: "2040-01-01T14:00:00.00Z",
+};
+
+const attrUpdate = {
+  id: "MultipleSensor1",
+  temperature: {
+    type: "Float",
+    value: 17.8,
+  },
+};
+
+// List all entities registered in the context broker server
 const listEntities = () =>
   connection.v2.listEntities().then((response) =>
     response.results.forEach((entity) => {
-      console.log(entity.id);
+      console.log(entity);
     })
   );
 
 // Create a new entity
 const createEntity = (entity) =>
   connection.v2.createEntity(entity).then(
+    (response) => {
+      console.log(response);
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
+
+// Update attributes from an existing entity
+const updateEntity = (changes) =>
+  connection.v2.updateEntityAttributes(changes).then(
     (response) => {
       console.log(response);
     },
@@ -61,4 +104,17 @@ const deleteEntity = (entityId) =>
     }
   );
 
+// Creates a new subscription to the context broker server
+const createSubscription = (subscription) =>
+  connection.v2.createSubscription(subscription).then(
+    (response) => {
+      console.log(response);
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
+
+// createSubscription(multiSensorSubscription);
 listEntities();
+// updateEntity(attrUpdate);
