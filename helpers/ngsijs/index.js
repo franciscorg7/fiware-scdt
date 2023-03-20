@@ -2,7 +2,7 @@ const NGSI = require("ngsijs");
 const connection = new NGSI.Connection("http://localhost:1026");
 
 const multiSensor = {
-  id: "MultipleSensor1",
+  id: "sensor:MultipleSensor:1",
   type: "Sensor",
   airQuality: {
     type: "Integer",
@@ -56,7 +56,7 @@ const multiSensorSubscription = {
 };
 
 const attrUpdate = {
-  id: "MultipleSensor1",
+  id: "sensor:MultipleSensor:1",
   temperature: {
     type: "Float",
     value: 17.8,
@@ -97,7 +97,7 @@ const updateEntity = (changes) =>
 const deleteEntity = (entityId) =>
   connection.v2.deleteEntity(entityId).then(
     (response) => {
-      console.log(response);
+      console.log("Successfully removed, " + response);
     },
     (error) => {
       console.log(error);
@@ -115,6 +115,8 @@ const createSubscription = (subscription) =>
     }
   );
 
-// createSubscription(multiSensorSubscription);
-listEntities();
+createEntity(multiSensor);
+// listEntities();
+// deleteEntity("MultipleSensor1");
 // updateEntity(attrUpdate);
+// createSubscription(multiSensorSubscription);

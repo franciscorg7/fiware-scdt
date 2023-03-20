@@ -1,194 +1,81 @@
 {
-  "id": "urn:ngsi-ld:Vehicle:001",
-  "dateCreated": {
-    "type": "Property",
-    "value": { "@type": "DateTime", "@value": "2012-09-08T21:36:40Z" }
+  "id": "vehicle:WasteManagement:1",
+  "type": "Vehicle",
+  "vehicleType": {
+    "type": "Text",
+    "value": "car"
   },
-  "dateModified": {
-    "type": "Property",
-    "value": { "@type": "DateTime", "@value": "2004-12-13T19:19:21Z" }
+  "throttle": {
+    "type": "Float",
+    "value": 0.0,
+    "description": "A scalar value to control the vehicle throttle [0.0, 1.0]"
   },
-  "source": {
-    "type": "Property",
-    "value": "On later control require bag. Hot rule their trade."
+  "steer": {
+    "type": "Float",
+    "value": 0.0,
+    "description": "scalar value to control the vehicle steering [-1.0, 1.0]"
   },
-  "name": {
-    "type": "Property",
-    "value": "Run move wear analysis. Leg health interest read."
+  "brake": {
+    "type": "Float",
+    "value": 0.0,
+    "description": "A scalar value to control the vehicle brake [0.0, 1.0]"
   },
-  "alternateName": {
-    "type": "Property",
-    "value": "Woman sport add here. Thousand live without offer special how. Person head fund."
+  "gear": {
+    "type": "Integer",
+    "value": 1,
+    "description": "States which gear the vehicle is running on"
   },
-  "description": {
-    "type": "Property",
-    "value": "Left use strong over half discuss idea example. Approach can time huge whose recently. Without different you body school left."
-  },
-  "dataProvider": {
-    "type": "Property",
-    "value": "Affect property national clear. Capital coach artist if agreement. Even dream son central loss."
-  },
-  "owner": {
-    "type": "Property",
-    "value": [
-      "urn:ngsi-ld:Vehicle:items:PKHG:66234317",
-      "urn:ngsi-ld:Vehicle:items:QHML:28767508"
-    ]
-  },
-  "seeAlso": {
-    "type": "Property",
-    "value": ["urn:ngsi-ld:Vehicle:items:UZRS:80305162"]
+  "lightState": {
+    "type": "array",
+    "value": ["NONE"],
+    "description": "List of flags that recap the state of the lights of a vehicle"
   },
   "location": {
-    "type": "Property",
-    "value": { "type": "Point", "coordinates": [-60.4998685, 12.636593] }
-  },
-  "address": {
-    "type": "Property",
+    "type": "geo:json",
     "value": {
-      "streetAddress": "New style Mr TV possible difference. Response skill decade his church detail might Democrat.",
-      "addressLocality": "Reveal cell where help range keep second. Share president practice growth everyone risk guess.",
-      "addressRegion": "Possible magazine program group across room.",
-      "addressCountry": "Make feeling other. Probably prepare important them safe.",
-      "postalCode": "Lead song person institution price. Off word before practice bar toward. Evening design husband.",
-      "postOfficeBoxNumber": "Rate word method next sea enter then. Wonder radio kid color. Much just from hair hear be purpose future.",
-      "streetNr": "Each color line police career piece hand. Face bank party likely significant give. Alone billion kitchen everybody realize. Environment determine realize democratic seem play yeah.",
-      "district": "Bar fight stay future prevent billion community. Little fear step sit."
+      "type": "Point",
+      "coordinates": [-3.164485591715449, 40.62785133667262]
+    },
+    "metadata": {
+      "timestamp": {
+        "type": "DateTime",
+        "value": "2018-09-27T12:00:00"
+      }
     }
   },
-  "areaServed": {
-    "type": "Property",
-    "value": "Mother boy red consumer show. Six crime study although few just explain food."
+  "mass": {
+    "type": "Float",
+    "value": 314,
+    "description": "The mass of the vehicle in kilograms"
   },
-  "color": {
-    "type": "Property",
-    "value": "Training improve data receive provide down black though. Instead much college nice."
+  "speed": {
+    "type": "Number",
+    "value": 50,
+    "metadata": {
+      "timestamp": {
+        "type": "DateTime",
+        "value": "2018-09-27T12:00:00"
+      }
+    }
   },
-  "image": {
-    "type": "Property",
-    "value": "urn:ngsi-ld:Vehicle:image:AEKB:09384392"
+  "fuelEfficiency": {
+    "type": "Number",
+    "value": 13
   },
-  "annotations": {
-    "type": "Property",
-    "value": [
-      "Within collection staff service their. Bill pretty break accept by friend. Statement miss third down be industry.",
-      "Hotel evening middle its. From black pull those sit after dog. Answer thank six huge both enough."
-    ]
+  "fuelType": {
+    "type": "Text",
+    "value": "Petrol"
   },
-  "type": "Vehicle",
-  "vehicleType": { "type": "Property", "value": "e-scooter" },
-  "category": {
-    "type": "Property",
-    "value": ["nonTracked", "municipalServices"]
+  "fuelFilled": {
+    "type": "Number",
+    "value": 6
   },
-  "previousLocation": {
-    "type": "Property",
-    "value": { "type": "Point", "coordinates": [21.920074, 71.697348] }
-  },
-  "speed": { "type": "Property", "value": 144.3 },
-  "heading": { "type": "Property", "value": 327.3 },
-  "cargoWeight": { "type": "Property", "value": 815.2 },
-  "vehicleIdentificationNumber": {
-    "type": "Property",
-    "value": "Art me type western. Catch number season road."
-  },
-  "vehiclePlateIdentifier": {
-    "type": "Property",
-    "value": "Cause thank nation. Away foreign seem building else rest popular."
-  },
-  "fleetVehicleId": {
-    "type": "Property",
-    "value": "Stand less voice charge. Friend eight research work PM these respond. Bad media score the garden word will."
-  },
-  "dateVehicleFirstRegistered": null,
-  "dateFirstUsed": null,
-  "purchaseDate": {
-    "type": "Property",
-    "value": { "@type": "DateTime", "@value": "2014-08-08T05:09:00Z" }
-  },
-  "mileageFromOdometer": { "type": "Property", "value": 706.7 },
-  "vehicleConfiguration": {
-    "type": "Property",
-    "value": "Baby seek strategy carry class push number. True plan those forward."
-  },
-  "feature": { "type": "Property", "value": ["gps", "disabledRamp"] },
-  "serviceProvided": {
-    "type": "Property",
-    "value": ["streetLighting", "goodsSelling"]
-  },
-  "vehicleSpecialUsage": { "type": "Property", "value": "taxi" },
-  "refVehicleModel": {
-    "type": "object",
-    "value": "urn:ngsi-ld:Vehicle:refVehicleModel:SGIK:59630379"
-  },
-  "serviceStatus": { "type": "Property", "value": "outOfService" },
-  "bearing": { "type": "Property", "value": 205.8 },
-  "wardId": {
-    "type": "Property",
-    "value": "Argue image girl type computer later. Have operation computer response understand sense. Republican find beautiful program expect protect increase want."
-  },
-  "tripNetWeightCollected": { "type": "Property", "value": 317.9 },
   "license_plate": {
-    "type": "Property",
-    "value": "Same sure quickly down blood everyone. Scene partner person quite explain."
-  },
-  "deviceBatteryStatus": { "type": "Property", "value": "disconnected" },
-  "ignitionStatus": { "type": "Property", "value": true },
-  "vehicleRunningStatus": { "type": "Property", "value": "waiting" },
-  "currentTripCount": { "type": "Property", "value": 829.3 },
-  "zoneName": {
-    "type": "Property",
-    "value": "Measure family however new about responsibility. Trip hard network inside million article."
-  },
-  "vehicleAltitude": {
-    "type": "Property",
-    "value": "Much likely sure run culture practice water. Right contain individual nation usually similar. Degree fish there small law include stop cause. Part chance sit lead rise."
+    "type": "Text",
+    "value": "KA052134"
   },
   "observationDateTime": {
-    "type": "Property",
-    "value": { "@type": "DateTime", "@value": "1991-04-10T06:51:19Z" }
-  },
-  "deviceSimNumber": {
-    "type": "Property",
-    "value": "Degree social public pull successful ago moment. Central sign media him call. Baby occur clearly suggest rise full."
-  },
-  "wardName": {
-    "type": "Property",
-    "value": "Radio north various for. Design education heavy."
-  },
-  "reportId": {
-    "type": "Property",
-    "value": "Capital imagine so simple. Pm doctor trip attention or the wonder style."
-  },
-  "vehicleTrackerDevice": {
-    "type": "Property",
-    "value": "Mr economy within. Long floor stock senior north nothing. Nearly pull back capital born."
-  },
-  "fuelFilled": { "type": "Property", "value": 135.2 },
-  "fuelEfficiency": { "type": "Property", "value": 527.6 },
-  "fuelType": {
-    "type": "Property",
-    "value": "Sing approach cup husband standard. Relate tree field account."
-  },
-  "serviceOnDuty": {
-    "type": "Property",
-    "value": "Wife start teach enough wear. Popular task walk owner two. Detail lead way citizen computer others suddenly."
-  },
-  "emergencyVehicleType": { "type": "Property", "value": "airAmbulance" },
-  "municipalityInfo": {
-    "type": "Property",
-    "value": {
-      "district": "Recognize example property adult key effort agent. Reality Congress go. Relationship site example significant point.",
-      "ulbName": "Discover edge PM discover exist despite popular. Bad two ground health find. Seat if point whose police school.",
-      "cityId": "Chair his surface animal worry point yeah. They affect western fall lay onto bit push. Name hour more before PM skill support. Control line front show establish team success seven.",
-      "wardId": "Would several finish stock project. Include book his floor tax change above. Green our just hand I commercial southern.",
-      "stateName": "Car lead give TV democratic. Eye common send environmental smile. Hard message parent final recently hard leave think.",
-      "cityName": "Interesting action worry into blood. Along listen clear check draw environment.",
-      "zoneName": "Buy middle image write.",
-      "zoneId": "Morning national television product affect. Reveal expect two center affect everybody television.",
-      "wardName": "Hundred effect group somebody front.",
-      "wardNum": 300.5
-    }
-  },
-  "@context": ["https://smartdatamodels.org/context.jsonld"]
+    "type": "DateTime",
+    "value": "2021-03-11T15:51:02+05:30"
+  }
 }
