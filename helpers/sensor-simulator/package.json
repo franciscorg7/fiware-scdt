@@ -11,6 +11,7 @@
   "author": "Francisco Gonçalves <franciscorg.dev@gmail.com>",
   "license": "ISC",
   "dependencies": {
+    "node-cron": "^3.0.0",
     "node-fetch": "^3.3.0"
   }
 }

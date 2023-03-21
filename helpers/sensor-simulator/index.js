@@ -1,7 +1,9 @@
 import fetch from "node-fetch";
+import cron from "node-cron";
 
-// Current hour for day split (24 format)
-const currentHour = new Date().getHours();
+// Orion Context Broker env variables
+const OCB_HOST = "http://localhost";
+const OCB_PORT = 8081;
 
 /**
  * Helper that generates the YYYY-MM-DD format string dates for today and tomorrow
@@ -43,11 +45,12 @@ function getTodayTomorrowStringDates() {
  * @param {number} lat
  * @param {number} long
  * @param {number} forecastNumOfDays
+ * @param {number} currentHour
  * @returns object with weather information for the current hour,
  * with temperature in Celsius, relative humidty in percentage and
  * surface pressure in Hectopascal.
  */
-async function getWeather(lat, long, forecastNumOfDays) {
+async function getWeather(lat, long, forecastNumOfDays, currentHour) {
   try {
     const parsedLat = lat && parseFloat(lat).toFixed(2);
     const parsedLong = long && parseFloat(long).toFixed(2);
@@ -60,11 +63,11 @@ async function getWeather(lat, long, forecastNumOfDays) {
     } else {
       let result = await response.json();
       const temperature = result.hourly.temperature_2m[currentHour];
-      const relHumidity = result.hourly.relativehumidity_2m[currentHour];
+      const humidity = result.hourly.relativehumidity_2m[currentHour];
       const pressure = result.hourly.surface_pressure[currentHour];
       return {
         temperature: temperature,
-        relativeHumidity: relHumidity,
+        humidity: humidity,
         pressure: pressure,
       };
     }
@@ -89,9 +92,10 @@ async function getWeather(lat, long, forecastNumOfDays) {
  *
  * @param {number} lat
  * @param {number} long
+ * @param {number} currentHour
  * @returns object with air quality information for the current hour in European AQI
  */
-async function getAirQuality(lat, long) {
+async function getAirQuality(lat, long, currentHour) {
   // Helper function that maps EAQI index into its corresponding label
   const eaqiToLabel = (index) => {
     if (index >= 0 && index <= 20) return "Good";
@@ -125,9 +129,10 @@ async function getAirQuality(lat, long) {
 
 /**
  * Random hourly dBA levels in a day generator function
+ * @param {number} currentHour
  * @returns list of hourly noise levels between minimum and maximum dBA levels for the current hour
  */
-function getNoiseLevels() {
+function getNoiseLevel(currentHour) {
   const MIN_NOISE_LEVEL = 55.8;
   const MAX_NOISE_LEVEL = 95.0;
 
@@ -143,6 +148,50 @@ function getNoiseLevels() {
   return noiseLevelAcc[currentHour];
 }
 
-console.log(await getWeather(41.15, -8.61, 1));
-console.log(await getAirQuality(41.15, -8.61));
-console.log(getNoiseLevels());
+// Schedule sensor simulation for triggering hourly
+cron.schedule("* * * * *", async function () {
+  // Current hour for day split (24 format)
+  const currentHour = new Date().getHours();
+
+  // Fetch sensor data for the instance hour
+  const weather = await getWeather(41.15, -8.61, 1, currentHour);
+  const airQuality = await getAirQuality(41.15, -8.61, currentHour);
+  const noiseLevel = getNoiseLevel(currentHour);
+
+  // Build entity instance with sensor data
+  const multiSensor = {
+    id: "sensor:MultipleSensor:1",
+    temperature: {
+      type: "Float",
+      value: weather.temperature,
+    },
+    humidity: {
+      type: "Float",
+      value: weather.humidity,
+    },
+    pressure: {
+      type: "Float",
+      value: weather.pressure,
+    },
+    noise: {
+      type: "Float",
+      value: noiseLevel,
+    },
+    airQuality: {
+      type: "Integer",
+      value: airQuality.europeanAQI,
+    },
+  };
+
+  // Call ngsiJS API to update sensor:multipleSensor:1 entity registered at FIWARE OCB
+  fetch(`${OCB_HOST}:${OCB_PORT}/entity/update`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(multiSensor),
+  })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((err) => console.log(err));
+});
+
+export default { getWeather, getAirQuality, getNoiseLevel };

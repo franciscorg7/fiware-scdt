@@ -5,16 +5,21 @@ const express = require("express");
 const app = express();
 const PORT = 8081;
 
-app.get("/", (req, res) => {
-  res.send("Hello, world!");
+// Configure express to parse the request body as JSON
+app.use(express.json({ extended: true }));
+
+app.listen(PORT, () => {
+  console.log(`ngsiJS server running at: http://localhost:${PORT}/`);
 });
 
+// Lists all entities registered in the context broker server
 app.get("/entity/list", (req, res) => {
   connection.v2.listEntities().then((response) => {
     res.send(response.results);
   });
 });
 
+// Creates a new entity
 app.post("/entity/create", (req, res) => {
   const entity = req.body;
   connection.v2.createEntity(entity).then(
@@ -27,6 +32,7 @@ app.post("/entity/create", (req, res) => {
   );
 });
 
+// Updates attributes from an existing entity
 app.post("/entity/update", (req, res) => {
   const changes = req.body;
   connection.v2.updateEntityAttributes(changes).then(
@@ -39,6 +45,7 @@ app.post("/entity/update", (req, res) => {
   );
 });
 
+// Removes an entity from the context broker server given its id
 app.delete("/entity/:id/delete", (req, res) => {
   const entityId = req.params.id;
   connection.v2.deleteEntity(entityId).then(
@@ -51,6 +58,7 @@ app.delete("/entity/:id/delete", (req, res) => {
   );
 });
 
+// Creates a new subscription to the context broker server
 app.post("/subscription/create", (req, res) => {
   const subscription = req.body;
   connection.v2.createSubscription(subscription).then(
@@ -63,160 +71,22 @@ app.post("/subscription/create", (req, res) => {
   );
 });
 
-app.listen(PORT, () => {
-  console.log(`ngsiJS server running at: http://localhost:${PORT}/`);
-});
-
-const multiSensor = {
-  id: "sensor:MultipleSensor:1",
-  type: "Sensor",
-  airQuality: {
-    type: "Integer",
-    value: 17,
-    metadata: {},
-  },
-  humidity: {
-    type: "Float",
-    value: 96,
-    metadata: {},
-  },
-  noise: {
-    type: "Float",
-    value: 73.2,
-    metadata: {},
-  },
-  pressure: {
-    type: "Float",
-    value: 1012.3,
-    metadata: {},
-  },
-  temperature: {
-    type: "Float",
-    value: 13.4,
-    metadata: {},
-  },
-};
-
-const multiSensorSubscription = {
-  description: "A subscription to get surrounding info from the sensors.",
-  subject: {
-    id: "Subscription:MultipleSensor1",
-    type: "Subscription",
-    entities: [
-      {
-        id: "sensor:MultipleSensor:1",
-        type: "Sensor",
-      },
-    ],
-    condition: {
-      attrs: ["airQuality", "humidity", "noise", "pressure", "temperature"],
-    },
-  },
-  notification: {
-    http: {
-      url: "http://localhost:1026/accumulate",
-    },
-    attrs: ["airQuality", "humidity", "noise", "pressure", "temperature"],
-  },
-  expires: "2040-01-01T14:00:00.00Z",
-};
-
-const attrUpdate = {
-  id: "sensor:MultipleSensor:1",
-  temperature: {
-    type: "Float",
-    value: 16.7,
-  },
-};
-
-const subscriptionUpdate = {
-  id: "64182ef2cdccc852000c87ca",
-  subject: {
-    entities: [{ id: "sensor:MultipleSensor:1", type: "Sensor" }],
-    condition: {
-      attrs: ["airQuality", "humidity", "noise", "pressure", "temperature"],
-    },
-  },
-};
-
-// List all entities registered in the context broker server
-const listEntities = () =>
-  connection.v2.listEntities().then((response) =>
-    response.results.forEach((entity) => {
-      console.log(entity);
-    })
-  );
-
-// Create a new entity
-const createEntity = (entity) =>
-  connection.v2.createEntity(entity).then(
-    (response) => {
-      console.log(response);
-    },
-    (error) => {
-      console.log(error);
-    }
-  );
-
-// Update attributes from an existing entity
-const updateEntity = (changes) =>
-  connection.v2.updateEntityAttributes(changes).then(
-    (response) => {
-      console.log(response);
-    },
-    (error) => {
-      console.log(error);
-    }
-  );
-
-// Removes an entity from the context broker server given its id
-const deleteEntity = (entityId) =>
-  connection.v2.deleteEntity(entityId).then(
-    (response) => {
-      console.log("Successfully removed, " + response);
-    },
-    (error) => {
-      console.log(error);
-    }
-  );
-
-// Creates a new subscription to the context broker server
-const createSubscription = (subscription) =>
-  connection.v2.createSubscription(subscription).then(
-    (response) => {
-      console.log(response);
-    },
-    (error) => {
-      console.log(error);
-    }
-  );
-
-// Update details from an existing subscription
-const updateSubscription = (changes) =>
+// Updates an existing subscription
+app.post("/subscription/update", (req, res) => {
+  const changes = req.body;
   connection.v2.updateSubscription(changes).then(
     (response) => {
-      console.log(response);
+      res.send(response);
     },
     (error) => {
-      console.log(error);
+      res.send(error.message);
     }
   );
+});
 
-// List all the subscriptions in the context broker server
-const listSubscriptions = () =>
-  connection.v2.listSubscriptions().then(
-    (response) => {
-      console.log(response.results);
-    },
-    (error) => {
-      console.log(error);
-    }
-  );
-
-// createEntity(multiSensor);
-listEntities();
-// deleteEntity("MultipleSensor1");
-// updateEntity(attrUpdate);
-// createSubscription(multiSensorSubscription);
-// updateSubscription(subscriptionUpdate);
-// listSubscriptions();
+// Lists all entities registered in the context broker server
+app.get("/subscription/list", (req, res) => {
+  connection.v2.listSubscriptions().then((response) => {
+    res.send(response.results);
+  });
+});
