@@ -1,5 +1,8 @@
 import fetch from "node-fetch";
 
+// Current hour for day split (24 format)
+const currentHour = new Date().getHours();
+
 /**
  * Helper that generates the YYYY-MM-DD format string dates for today and tomorrow
  *
@@ -40,7 +43,9 @@ function getTodayTomorrowStringDates() {
  * @param {number} lat
  * @param {number} long
  * @param {number} forecastNumOfDays
- * @returns object with weather information for today
+ * @returns object with weather information for the current hour,
+ * with temperature in Celsius, relative humidty in percentage and
+ * surface pressure in Hectopascal.
  */
 async function getWeather(lat, long, forecastNumOfDays) {
   try {
@@ -54,7 +59,14 @@ async function getWeather(lat, long, forecastNumOfDays) {
       throw new Error(`Error! status: ${response.status}`);
     } else {
       let result = await response.json();
-      return result;
+      const temperature = result.hourly.temperature_2m[currentHour];
+      const relHumidity = result.hourly.relativehumidity_2m[currentHour];
+      const pressure = result.hourly.surface_pressure[currentHour];
+      return {
+        temperature: temperature,
+        relativeHumidity: relHumidity,
+        pressure: pressure,
+      };
     }
   } catch (err) {
     console.log(err);
@@ -70,15 +82,26 @@ async function getWeather(lat, long, forecastNumOfDays) {
  * 50-100 	  Poor
  * 100-150    Very poor
  * 150-1200   Extremely poor
+ */
 
 /**
  * Fetch open-meteo API to get air quality information for today based on geo location.
  *
  * @param {number} lat
  * @param {number} long
- * @returns object with air quality information for today
+ * @returns object with air quality information for the current hour in European AQI
  */
 async function getAirQuality(lat, long) {
+  // Helper function that maps EAQI index into its corresponding label
+  const eaqiToLabel = (index) => {
+    if (index >= 0 && index <= 20) return "Good";
+    else if (index > 20 && index <= 40) return "Fair";
+    else if (index > 40 && index <= 50) return "Moderate";
+    else if (index > 50 && index <= 100) return "Poor";
+    else if (index > 100 && index <= 150) return "Very Poor";
+    else if (index > 150 && index <= 1200) return "Extremely Poor";
+    else return "Invalid value";
+  };
   try {
     const parsedLat = lat && parseFloat(lat).toFixed(2);
     const parsedLong = long && parseFloat(long).toFixed(2);
@@ -92,7 +115,8 @@ async function getAirQuality(lat, long) {
       throw new Error(`Error! status: ${response.status}`);
     } else {
       let result = await response.json();
-      return result;
+      const europeanAQI = result.hourly.european_aqi[currentHour];
+      return { europeanAQI: europeanAQI, label: eaqiToLabel(europeanAQI) };
     }
   } catch (err) {
     console.log(err);
@@ -101,7 +125,7 @@ async function getAirQuality(lat, long) {
 
 /**
  * Random hourly dBA levels in a day generator function
- * @returns list of hourly noise levels between minimum and maximum dBA levels for today
+ * @returns list of hourly noise levels between minimum and maximum dBA levels for the current hour
  */
 function getNoiseLevels() {
   const MIN_NOISE_LEVEL = 55.8;
@@ -116,7 +140,7 @@ function getNoiseLevels() {
     );
     i++;
   }
-  return noiseLevelAcc;
+  return noiseLevelAcc[currentHour];
 }
 
 console.log(await getWeather(41.15, -8.61, 1));

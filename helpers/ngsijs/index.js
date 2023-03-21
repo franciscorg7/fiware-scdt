@@ -38,12 +38,12 @@ const multiSensorSubscription = {
     type: "Subscription",
     entities: [
       {
-        id: "MultipleSensor1",
+        id: "sensor:MultipleSensor:1",
         type: "Sensor",
       },
     ],
     condition: {
-      attrs: [],
+      attrs: ["airQuality", "humidity", "noise", "pressure", "temperature"],
     },
   },
   notification: {
@@ -59,7 +59,17 @@ const attrUpdate = {
   id: "sensor:MultipleSensor:1",
   temperature: {
     type: "Float",
-    value: 17.8,
+    value: 16.7,
+  },
+};
+
+const subscriptionUpdate = {
+  id: "64182ef2cdccc852000c87ca",
+  subject: {
+    entities: [{ id: "sensor:MultipleSensor:1", type: "Sensor" }],
+    condition: {
+      attrs: ["airQuality", "humidity", "noise", "pressure", "temperature"],
+    },
   },
 };
 
@@ -115,8 +125,32 @@ const createSubscription = (subscription) =>
     }
   );
 
-createEntity(multiSensor);
+// Update details from an existing subscription
+const updateSubscription = (changes) =>
+  connection.v2.updateSubscription(changes).then(
+    (response) => {
+      console.log(response);
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
+
+// List all the subscriptions in the context broker server
+const listSubscriptions = () =>
+  connection.v2.listSubscriptions().then(
+    (response) => {
+      console.log(response.results);
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
+
+// createEntity(multiSensor);
 // listEntities();
 // deleteEntity("MultipleSensor1");
 // updateEntity(attrUpdate);
 // createSubscription(multiSensorSubscription);
+// updateSubscription(subscriptionUpdate);
+// listSubscriptions();
