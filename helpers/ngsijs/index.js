@@ -1,6 +1,72 @@
 const NGSI = require("ngsijs");
 const connection = new NGSI.Connection("http://localhost:1026");
 
+const express = require("express");
+const app = express();
+const PORT = 8081;
+
+app.get("/", (req, res) => {
+  res.send("Hello, world!");
+});
+
+app.get("/entity/list", (req, res) => {
+  connection.v2.listEntities().then((response) => {
+    res.send(response.results);
+  });
+});
+
+app.post("/entity/create", (req, res) => {
+  const entity = req.body;
+  connection.v2.createEntity(entity).then(
+    (response) => {
+      res.send(response);
+    },
+    (error) => {
+      res.send(error.message);
+    }
+  );
+});
+
+app.post("/entity/update", (req, res) => {
+  const changes = req.body;
+  connection.v2.updateEntityAttributes(changes).then(
+    (response) => {
+      res.send(response);
+    },
+    (error) => {
+      res.send(error.message);
+    }
+  );
+});
+
+app.delete("/entity/:id/delete", (req, res) => {
+  const entityId = req.params.id;
+  connection.v2.deleteEntity(entityId).then(
+    (response) => {
+      res.send(response);
+    },
+    (error) => {
+      res.send(error.message);
+    }
+  );
+});
+
+app.post("/subscription/create", (req, res) => {
+  const subscription = req.body;
+  connection.v2.createSubscription(subscription).then(
+    (response) => {
+      res.send(response);
+    },
+    (error) => {
+      res.send(error.message);
+    }
+  );
+});
+
+app.listen(PORT, () => {
+  console.log(`ngsiJS server running at: http://localhost:${PORT}/`);
+});
+
 const multiSensor = {
   id: "sensor:MultipleSensor:1",
   type: "Sensor",
@@ -148,7 +214,7 @@ const listSubscriptions = () =>
   );
 
 // createEntity(multiSensor);
-// listEntities();
+listEntities();
 // deleteEntity("MultipleSensor1");
 // updateEntity(attrUpdate);
 // createSubscription(multiSensorSubscription);
