@@ -1,5 +1,5 @@
 # FIWARE Service Provider
-## Smart-City Digital Twin: A Docus on Autonomous Driving
+## Smart-City Digital Twin: A Focus on Autonomous Driving
 
 
 ### fiware-orion 👨🏽‍💻
