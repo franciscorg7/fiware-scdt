@@ -5,6 +5,10 @@ import cron from "node-cron";
 const OCB_HOST = "http://localhost";
 const OCB_PORT = 8081;
 
+// Simulation env variables
+const SIMULATION_HOST = "http://192.168.1.101";
+const SIMULATION_PORT = 5000;
+
 /**
  * Helper that generates the YYYY-MM-DD format string dates for today and tomorrow
  *
@@ -55,7 +59,7 @@ async function getWeather(lat, long, forecastNumOfDays, currentHour) {
     const parsedLat = lat && parseFloat(lat).toFixed(2);
     const parsedLong = long && parseFloat(long).toFixed(2);
     const response = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${parsedLat}&longitude=${parsedLong}&hourly=temperature_2m,relativehumidity_2m,surface_pressure&current_weather=true&forecast_days=${forecastNumOfDays}`
+      `https://api.open-meteo.com/v1/forecast?latitude=${parsedLat}&longitude=${parsedLong}&hourly=temperature_2m,relativehumidity_2m,surface_pressure,precipitation,cloudcover,windspeed_10m&forecast_days=${forecastNumOfDays}`
     );
 
     if (!response.ok) {
@@ -65,10 +69,16 @@ async function getWeather(lat, long, forecastNumOfDays, currentHour) {
       const temperature = result.hourly.temperature_2m[currentHour];
       const humidity = result.hourly.relativehumidity_2m[currentHour];
       const pressure = result.hourly.surface_pressure[currentHour];
+      const precipitation = result.hourly.precipitation[currentHour];
+      const cloudcover = result.hourly.cloudcover[currentHour];
+      const windspeed_10m = result.hourly.windspeed_10m[currentHour];
       return {
         temperature: temperature,
         humidity: humidity,
         pressure: pressure,
+        precipitation: precipitation,
+        cloudcover: cloudcover,
+        windspeed_10m: windspeed_10m,
       };
     }
   } catch (err) {
@@ -173,6 +183,18 @@ cron.schedule("* * * * *", async function () {
       type: "Float",
       value: weather.pressure,
     },
+    precipitation: {
+      type: "Float",
+      value: weather.precipitation,
+    },
+    cloudcover: {
+      type: "Float",
+      value: weather.cloudcover,
+    },
+    windspeed: {
+      type: "Float",
+      value: weather.windspeed_10m,
+    },
     noise: {
       type: "Float",
       value: noiseLevel,
@@ -188,6 +210,25 @@ cron.schedule("* * * * *", async function () {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(multiSensor),
+  })
+    .then((response) => response.json())
+    .then((data) => console.log(data))
+    .catch((err) => console.log(err));
+
+  // Call simulation API to update current weather state
+  fetch(`${SIMULATION_HOST}:${SIMULATION_PORT}/setWeather`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      temperature: weather.temperature,
+      humidity: weather.humidity,
+      pressure: weather.pressure,
+      precipitation: weather.precipitation,
+      cloudcover: weather.cloudcover,
+      windspeed: weather.windspeed,
+      noiseLevel: noiseLevel,
+      airQuality: airQuality.europeanAQI,
+    }),
   })
     .then((response) => response.json())
     .then((data) => console.log(data))

@@ -29,6 +29,21 @@ const multiSensor = {
     value: 13.4,
     metadata: {},
   },
+  precipitation: {
+    type: "Float",
+    value: 70,
+    metadata: {},
+  },
+  cloudcover: {
+    type: "Float",
+    value: 50,
+    metadata: {},
+  },
+  windspeed: {
+    type: "Float",
+    value: 10.3,
+    metadata: {},
+  },
 };
 
 const multiSensorSubscription = {
