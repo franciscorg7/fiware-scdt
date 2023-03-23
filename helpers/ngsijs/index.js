@@ -71,6 +71,19 @@ app.post("/subscription/create", (req, res) => {
   );
 });
 
+// Removes a subscription from the context broker server given its id
+app.delete("/subscription/:id/delete", (req, res) => {
+  const subscriptionId = req.params.id;
+  connection.v2.deleteSubscription(subscriptionId).then(
+    (response) => {
+      res.send(response);
+    },
+    (error) => {
+      res.send(error.message);
+    }
+  );
+});
+
 // Updates an existing subscription
 app.post("/subscription/update", (req, res) => {
   const changes = req.body;

@@ -215,24 +215,25 @@ cron.schedule("* * * * *", async function () {
     .then((data) => console.log(data))
     .catch((err) => console.log(err));
 
-  // Call simulation API to update current weather state
-  fetch(`${SIMULATION_HOST}:${SIMULATION_PORT}/setWeather`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      temperature: weather.temperature,
-      humidity: weather.humidity,
-      pressure: weather.pressure,
-      precipitation: weather.precipitation,
-      cloudcover: weather.cloudcover,
-      windspeed: weather.windspeed,
-      noiseLevel: noiseLevel,
-      airQuality: airQuality.europeanAQI,
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => console.log(data))
-    .catch((err) => console.log(err));
-});
+    //TODO: check if subscription notifies CARLA well
+//   // Call simulation API to update current weather state
+//   fetch(`${SIMULATION_HOST}:${SIMULATION_PORT}/set-weather`, {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({
+//       temperature: weather.temperature,
+//       humidity: weather.humidity,
+//       pressure: weather.pressure,
+//       precipitation: weather.precipitation,
+//       cloudcover: weather.cloudcover,
+//       windspeed: weather.windspeed,
+//       noiseLevel: noiseLevel,
+//       airQuality: airQuality.europeanAQI,
+//     }),
+//   })
+//     .then((response) => response.json())
+//     .then((data) => console.log(data))
+//     .catch((err) => console.log(err));
+// });
 
 export default { getWeather, getAirQuality, getNoiseLevel };

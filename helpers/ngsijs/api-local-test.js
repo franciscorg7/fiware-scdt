@@ -58,7 +58,7 @@ const multiSensorSubscription = {
       },
     ],
     condition: {
-      attrs: ["airQuality", "humidity", "noise", "pressure", "temperature"],
+      attrs: [],
     },
   },
   notification: {
