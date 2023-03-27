@@ -1,9 +1,2 @@
-ORION-LD
-    - For now, Orion-LD only runs under Linux. 
-    No effort has been made so far to make Orion-LD run under any other platform. 
-    The obvious choice would be MacOS, and if anybody volunteers to investigate on this, 
-    it would be a very welcome contribution.
-
-    - According to the FIWARE Data Modelling Guidelines on linked data, when an entity attribute 
-    is used as a link to other entities it should be named with the prefix ref plus the name of 
-    the target (linked) entity type.
+To get mysql image instance running, run this command:
+docker exec -it  db-mysql mysql -h mysql-db -P 3306  -u root -p123
