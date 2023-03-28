@@ -2,6 +2,7 @@ const NGSI = require("ngsijs");
 const ngsiConnection = new NGSI.Connection("http://localhost:1026");
 const express = require("express");
 const mysql = require("mysql");
+const cygnusMySQLToolkit = require("./utils/cynus-mysql.toolkit");
 const app = express();
 const PORT = 8081;
 
@@ -124,22 +125,10 @@ var mysqlConnection = mysql.createConnection({
   database: "default",
 });
 
-// Given a string, an occurence and a replacement, returns the original string with all the ocurrences replaced.
-const replaceAll = (string, occurence, replacement) =>
-  string.split(occurence).join(replacement);
-
-const getEntityType = (entityId) => {
-  const type = entityId.split(":")[0];
-  return type.charAt(0).toUpperCase() + type.slice(1);
-};
-
-const matchMySQLTableName = (id) =>
-  replaceAll(id, ":", "_") + "_" + getEntityType(id);
-
 // Lists all entries registered by Cygnus for the entity given its NGSI id
 app.get("/history/entity/:id", (req, res) => {
   // Pre-process entity id to match mysql sink table name convention
-  const entityId = matchMySQLTableName(req.params.id);
+  const entityId = cygnusMySQLToolkit.matchMySQLTableName(req.params.id);
   const attrName = req.query.attrName;
 
   if (attrName)
