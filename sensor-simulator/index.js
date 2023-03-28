@@ -4,7 +4,7 @@ import config from "./config.js";
 import wToolkit from "./utils/weather.toolkit.js";
 
 // Get arguments and options from the command-line
-const args = minimist(process.argv.slice(2));
+const args = require("minimist")(process.argv.slice(2)); // FIXME: cannot import minimist inside an ES module
 
 // If there is an help flag in the options list
 if (args.help || args.h) {
@@ -95,5 +95,3 @@ cron.schedule("* * * * *", async function () {
       .then((data) => console.log(data))
       .catch((err) => console.log(err));
 });
-
-export default { getWeather, getAirQuality, getNoiseLevel };
