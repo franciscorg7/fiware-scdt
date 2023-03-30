@@ -1,12 +1,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/othneildrew/Best-README-Template">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
-
-  <h3 align="center">Smart-City Digital Twin for Autonomous Vehicles Support </h3>
-  <h5 align="center">(Fiware Based) </h5>
+  <img src="resources/images/smart-city.png" alt="smart-city-logo" width="100" height="100">
+  <h1 align="center">Smart-City Digital Twin for Autonomous Vehicles Support</h1>
 </div>
 
 <!-- ABOUT THE PROJECT -->
