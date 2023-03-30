@@ -2,18 +2,21 @@ import fetch from "node-fetch";
 import cron from "node-cron";
 import config from "./config.js";
 import wToolkit from "./utils/weather.toolkit.js";
+import minimist from "minimist";
 
 // Get arguments and options from the command-line
-const args = require("minimist")(process.argv.slice(2)); // FIXME: cannot import minimist inside an ES module
+const args = minimist(process.argv.slice(2));
 
 // If there is an help flag in the options list
 if (args.help || args.h) {
-  console.log(`Usage: node script.js [options]
+  console.log(`
+Usage: node script.js [options]
 
 Options:
   -h, --help          Show help options
   -s, --sensor <id>   Specify the id of the sensor to be updated (default: sensor:MultipleSensor:1)
   -c, --carla         Communicate directly with CARLA API (instead of using Context Broker notification)
+
 `);
   process.exit();
 }
@@ -24,7 +27,7 @@ cron.schedule("* * * * *", async function () {
   const currentHour = new Date().getHours();
 
   // Fetch sensor data for the instance hour
-  const weather = await wToolkit.getWeather(41.15, -8.61, 1, currentHour);
+  const weather = await wToolkit.getWeather(41.15, -8.61, 1, currentHour); // TODO: pass location through command-line arguments
   const airQuality = await wToolkit.getAirQuality(41.15, -8.61, currentHour);
   const noiseLevel = wToolkit.getNoiseLevel(currentHour);
 
