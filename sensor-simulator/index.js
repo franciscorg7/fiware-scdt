@@ -13,12 +13,18 @@ if (args.help || args.h) {
 Usage: node script.js [options]
 
 Options:
-  -h, --help          Show help options
-  -s, --sensor <id>   Specify the id of the sensor to be updated (default: sensor:MultipleSensor:1)
-  -c, --carla         Communicate directly with CARLA API (instead of using Context Broker notification)
+  -h, --help                  Show help options
+  -s, --sensor <id>           Specify the id of the sensor to be updated (default: sensor:MultipleSensor:1)
+  -c, --carla                 Communicate directly with CARLA API (instead of using Context Broker notification)
+  -l, --location <lat,long>   Specify the geo location for the sensor to fetch data from (default: 41.15,-8.61) 
 
 `);
   process.exit();
+}
+
+// Pre-process and validate the location option
+if (args.l || args.location) {
+  var geoLoc = (args.l || args.location).split(",");
 }
 
 // Schedule sensor simulation for triggering hourly
@@ -27,8 +33,17 @@ cron.schedule("* * * * *", async function () {
   const currentHour = new Date().getHours();
 
   // Fetch sensor data for the instance hour
-  const weather = await wToolkit.getWeather(41.15, -8.61, 1, currentHour); // TODO: pass location through command-line arguments
-  const airQuality = await wToolkit.getAirQuality(41.15, -8.61, currentHour);
+  const weather = await wToolkit.getWeather(
+    geoLoc[0] || 41.15,
+    geoLoc[1] || -8.61,
+    1,
+    currentHour
+  );
+  const airQuality = await wToolkit.getAirQuality(
+    geoLoc[0] || 41.15,
+    geoLoc[1] || -8.61,
+    currentHour
+  );
   const noiseLevel = wToolkit.getNoiseLevel(currentHour);
 
   // Build entity instance with sensor data
