@@ -1,3 +1,4 @@
+node_modules/
 /node_modules
-/related-work
-/smart-data-models
+related-work/
+smart-data-models/
