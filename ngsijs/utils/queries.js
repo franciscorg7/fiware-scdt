@@ -1,7 +1,7 @@
 const getEntityHistory = (mysqlConnection, entityId) =>
   new Promise((resolve, reject) => {
     mysqlConnection.query(
-      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName`,
+      `SELECT attrName, attrValue, recvTime FROM ${entityId}`,
       (err, results) => {
         if (err) reject(err);
         resolve(results);
