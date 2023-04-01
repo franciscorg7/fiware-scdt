@@ -4,13 +4,23 @@ const express = require("express");
 const mysql = require("mysql");
 const cygnusMySQLToolkit = require("./utils/cynus-mysql.toolkit");
 const app = express();
-const PORT = 8081;
+const { mySQLConfig, API_PORT } = require("./config.js");
+const {
+  getEntityHistory,
+  getEntityHistoryFromAttribute,
+  getEntityHistoryFromLimit,
+  getEntityHistoryFromDateRanges,
+  getEntityHistoryFromAttributeAndLimit,
+  getEntityHistoryFromAttributeAndDateRanges,
+  getEntityHistoryFromDateRangesAndLimit,
+  getEntityHistoryFromAttributeAndDateRangesAndLimit,
+} = require("./utils/queries.js");
 
 // Configure express to parse the request body as JSON
 app.use(express.json({ extended: true }));
 
-app.listen(PORT, () => {
-  console.log(`ngsiJS server running at: http://localhost:${PORT}/`);
+app.listen(API_PORT, () => {
+  console.log(`ngsiJS server running at: http://localhost:${API_PORT}/`);
 });
 
 /**
@@ -18,7 +28,7 @@ app.listen(PORT, () => {
  */
 
 // Lists all entities registered in the context broker server
-app.get("/entity/list", (req, res) => {
+app.get("/entity/list", (_, res) => {
   ngsiConnection.v2.listEntities().then((response) => {
     res.send(response.results);
   });
@@ -107,7 +117,7 @@ app.post("/subscription/update", (req, res) => {
 });
 
 // Lists all entities registered in the context broker server
-app.get("/subscription/list", (req, res) => {
+app.get("/subscription/list", (_, res) => {
   ngsiConnection.v2.listSubscriptions().then((response) => {
     res.send(response.results);
   });
@@ -118,30 +128,84 @@ app.get("/subscription/list", (req, res) => {
  */
 
 // Create a mysql connection to cygnus-mysql sink
-var mysqlConnection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "123",
-  database: "default",
-});
+var mysqlConnection = mysql.createConnection(mySQLConfig);
 
 // Lists all entries registered by Cygnus for the entity given its NGSI id
 app.get("/history/entity/:id", (req, res) => {
   // Pre-process entity id to match mysql sink table name convention
   const entityId = cygnusMySQLToolkit.matchMySQLTableName(req.params.id);
   const attrName = req.query.attrName;
+  const startDate = req.query.startDate;
+  const endDate = req.query.endDate;
+  const limit = req.query.limit;
 
-  if (attrName)
-    mysqlConnection.query(
-      `SELECT * FROM ${entityId} WHERE attrName = '${attrName}'`,
-      (err, results) => {
-        if (err) res.send(err);
-        res.send(results);
-      }
+  if (attrName && startDate && endDate && limit)
+    getEntityHistoryFromAttributeAndDateRangesAndLimit(
+      mysqlConnection,
+      entityId,
+      attrName,
+      startDate,
+      endDate,
+      limit
+    ).then(
+      (results) => res.send(results),
+      (err) => res.send(err)
+    );
+  else if (attrName && startDate && endDate)
+    getEntityHistoryFromAttributeAndDateRanges(
+      mysqlConnection,
+      entityId,
+      attrName,
+      startDate,
+      endDate
+    ).then(
+      (results) => res.send(results),
+      (err) => res.send(err)
+    );
+  else if (attrName && limit)
+    getEntityHistoryFromAttributeAndLimit(
+      mysqlConnection,
+      entityId,
+      attrName,
+      limit
+    ).then(
+      (results) => res.send(results),
+      (err) => res.send(err)
+    );
+  else if (startDate && endDate && limit)
+    getEntityHistoryFromDateRangesAndLimit(
+      mysqlConnection,
+      entityId,
+      startDate,
+      endDate,
+      limit
+    ).then(
+      (results) => res.send(results),
+      (err) => res.send(err)
+    );
+  else if (attrName)
+    getEntityHistoryFromAttribute(mysqlConnection, entityId, attrName).then(
+      (results) => res.send(results),
+      (err) => res.send(err)
+    );
+  else if (startDate && endDate)
+    getEntityHistoryFromDateRanges(
+      mysqlConnection,
+      entityId,
+      startDate,
+      endDate
+    ).then(
+      (results) => res.send(results),
+      (err) => res.send(err)
+    );
+  else if (limit)
+    getEntityHistoryFromLimit(mysqlConnection, entityId, limit).then(
+      (results) => res.send(results),
+      (err) => res.send(err)
     );
   else
-    mysqlConnection.query(`SELECT * FROM ${entityId}`, (err, results) => {
-      if (err) res.send(err);
-      res.send(results);
-    });
+    getEntityHistory(mysqlConnection, entityId).then(
+      (results) => res.send(results),
+      (err) => res.send(err)
+    );
 });
