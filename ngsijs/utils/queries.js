@@ -39,7 +39,7 @@ const getEntityHistoryFromDateRanges = (
 ) =>
   new Promise((resolve, reject) => {
     mysqlConnection.query(
-      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE recvTime BETWEEN ${startDate} AND ${endDate}`,
+      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE recvTime BETWEEN '${startDate}' AND '${endDate}'`,
       (err, results) => {
         if (err) reject(err);
         resolve(results);
@@ -72,7 +72,7 @@ const getEntityHistoryFromAttributeAndDateRanges = (
 ) =>
   new Promise((resolve, reject) => {
     mysqlConnection.query(
-      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN ${startDate} AND ${endDate}`,
+      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN '${startDate}' AND '${endDate}'`,
       (err, results) => {
         if (err) reject(err);
         resolve(results);
@@ -89,7 +89,7 @@ const getEntityHistoryFromDateRangesAndLimit = (
 ) =>
   new Promise((resolve, reject) => {
     mysqlConnection.query(
-      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE recvTime BETWEEN ${startDate} AND ${endDate} LIMIT ${limit}`,
+      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`,
       (err, results) => {
         if (err) reject(err);
         resolve(results);
@@ -107,7 +107,7 @@ const getEntityHistoryFromAttributeAndDateRangesAndLimit = (
 ) =>
   new Promise((resolve, reject) => {
     mysqlConnection.query(
-      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN ${startDate} AND ${endDate} LIMIT ${limit}`,
+      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`,
       (err, results) => {
         if (err) reject(err);
         resolve(results);

@@ -134,6 +134,8 @@ var mysqlConnection = mysql.createConnection(mySQLConfig);
 app.get("/history/entity/:id", (req, res) => {
   // Pre-process entity id to match mysql sink table name convention
   const entityId = cygnusMySQLToolkit.matchMySQLTableName(req.params.id);
+
+  // Possible query parameters
   const attrName = req.query.attrName;
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
@@ -208,4 +210,43 @@ app.get("/history/entity/:id", (req, res) => {
       (results) => res.send(results),
       (err) => res.send(err)
     );
+});
+
+// Notify orion context broker and cygnus of an history repetition
+app.post("/history/repeat", (req, res) => {
+  const entitiesModified = req.body.entities;
+  // const startDate = req.body.startDate;
+
+  // Extract ids from given entities in the request
+  const entitiesModifiedIds = entitiesModified.map((entity) => entity.id);
+
+  let globalEntities = [];
+  let globalEntitiesIds = [];
+
+  // Get all simulation involved entities ids
+  ngsiConnection.v2.listEntities().then((response) => {
+    globalEntities = response.results;
+    globalEntitiesIds = globalEntities.map((entity) => entity.id);
+
+    console.log(globalEntities);
+
+    // Loop through
+    entitiesModifiedIds.forEach((id) => {
+      if (globalEntitiesIds.includes(id)) {
+        const entityMod = entitiesModified.find((e) => e.id === id);
+        const attrsMod = Object.keys(entityMod).filter((key) => key !== "id");
+        globalEntities.map((entity) => {
+          if (entity.id === id) {
+            for (const attr of attrsMod) {
+              entity[attr].value = entityMod[attr].value;
+            }
+          }
+          return entity;
+        });
+      }
+    });
+    res.send(globalEntities);
+  });
+  // cygnusMySQLToolkit.matchMySQLTableName(id);
+  // getEntityHistoryFromDateRanges();
 });
