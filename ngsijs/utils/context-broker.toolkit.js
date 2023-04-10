@@ -5,7 +5,6 @@
  * @returns {Object} modified dummy entity
  */
 const buildEntityDummy = (entity) => {
-  // Create a copy of the given entity
   const build = { ...entity };
   build["id"] = `${build["id"]}:dummy`;
   build["repetition"] = { value: null, type: "Integer" };

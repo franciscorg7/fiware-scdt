@@ -40,10 +40,12 @@ app.post("/entity/create", (req, res) => {
   const entity = req.body;
   const dummy = contextBrokerToolkit.buildEntityDummy(entity);
   ngsiConnection.v2.createEntity(entity).then(
-    (response) => {
+    () => {
       ngsiConnection.v2.createEntity(dummy).then(
-        (dummyResponse) =>
-          res.send("Both entity and its repetition dummy were created"),
+        () =>
+          res.send(
+            "Both entity and its repetition dummy were successfuly created."
+          ),
         (dummyError) => res.send(dummyError.message)
       );
     },
@@ -69,9 +71,18 @@ app.post("/entity/update", (req, res) => {
 // Removes an entity from the context broker server given its id
 app.delete("/entity/:id/delete", (req, res) => {
   const entityId = req.params.id;
+  const dummyEntityId = entityId + ":dummy";
   ngsiConnection.v2.deleteEntity(entityId).then(
-    (response) => {
-      res.send(response);
+    () => {
+      ngsiConnection.v2.deleteEntity(dummyEntityId).then(
+        () =>
+          res.send(
+            "Both entity and its repetition dummy were successfuly deleted."
+          ),
+        (dummyError) => {
+          res.send(dummyError.message);
+        }
+      );
     },
     (error) => {
       res.send(error.message);
