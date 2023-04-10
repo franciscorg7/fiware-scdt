@@ -2,6 +2,7 @@ const NGSI = require("ngsijs");
 const ngsiConnection = new NGSI.Connection("http://localhost:1026");
 const express = require("express");
 const mysql = require("mysql");
+const contextBrokerToolkit = require("./utils/context-broker.toolkit");
 const cygnusMySQLToolkit = require("./utils/cynus-mysql.toolkit");
 const app = express();
 const { mySQLConfig, API_PORT } = require("./config.js");
@@ -37,9 +38,14 @@ app.get("/entity/list", (_, res) => {
 // Creates a new entity
 app.post("/entity/create", (req, res) => {
   const entity = req.body;
+  const dummy = contextBrokerToolkit.buildEntityDummy(entity);
   ngsiConnection.v2.createEntity(entity).then(
     (response) => {
-      res.send(response);
+      ngsiConnection.v2.createEntity(dummy).then(
+        (dummyResponse) =>
+          res.send("Both entity and its repetition dummy were created"),
+        (dummyError) => res.send(dummyError.message)
+      );
     },
     (error) => {
       res.send(error.message);
@@ -220,17 +226,16 @@ app.post("/history/repeat", (req, res) => {
   // Extract ids from given entities in the request
   const entitiesModifiedIds = entitiesModified.map((entity) => entity.id);
 
+  // Initialize auxiliar entity lists
   let globalEntities = [];
   let globalEntitiesIds = [];
 
-  // Get all simulation involved entities ids
+  // Get all simulation involved entities
   ngsiConnection.v2.listEntities().then((response) => {
     globalEntities = response.results;
     globalEntitiesIds = globalEntities.map((entity) => entity.id);
 
-    console.log(globalEntities);
-
-    // Loop through
+    // Loop through the list of requested entity modifications to the repetition
     entitiesModifiedIds.forEach((id) => {
       if (globalEntitiesIds.includes(id)) {
         const entityMod = entitiesModified.find((e) => e.id === id);
