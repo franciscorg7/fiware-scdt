@@ -21,7 +21,7 @@ const {
 app.use(express.json({ extended: true }));
 
 app.listen(API_PORT, () => {
-  console.log(`ngsiJS server running at: http://localhost:${API_PORT}/`);
+  console.log(`ngsiJS server is running at: http://localhost:${API_PORT}/`);
 });
 
 /**

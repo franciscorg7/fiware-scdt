@@ -1,3 +1,7 @@
+/**
+ * Cygnus Entity Query List
+ */
+
 const getEntityHistory = (mysqlConnection, entityId) =>
   new Promise((resolve, reject) => {
     mysqlConnection.query(
@@ -114,6 +118,22 @@ const getEntityHistoryFromAttributeAndDateRangesAndLimit = (
       }
     );
   });
+
+/**
+ * Cygnus Repetitions List
+ */
+const makeRepetition = (mysqlConnection) => {
+  // TODO: continue with makeRepetition flow. first create repetitions table if doesn't exist, then create a new repetition entry and then update entity dummies repetition attribute
+  new Promise((resolve, reject) => {
+    mysqlConnection.query(
+      "CREATE TABLE IF NOT EXISTS `repetitions` (`id` int(11) NOT NULL AUTO_INCREMENT, `startDate` datetime NOT NULL, `endDate` datetime NOT NULL, PRIMARY KEY (`id`))",
+      (err, results) => {
+        if (err) reject(err);
+        resolve(results);
+      }
+    );
+  });
+};
 
 module.exports = {
   getEntityHistory,
