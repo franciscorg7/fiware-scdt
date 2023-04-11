@@ -6,16 +6,7 @@ const contextBrokerToolkit = require("./utils/context-broker.toolkit");
 const cygnusMySQLToolkit = require("./utils/cynus-mysql.toolkit");
 const app = express();
 const { mySQLConfig, API_PORT } = require("./config.js");
-const {
-  getEntityHistory,
-  getEntityHistoryFromAttribute,
-  getEntityHistoryFromLimit,
-  getEntityHistoryFromDateRanges,
-  getEntityHistoryFromAttributeAndLimit,
-  getEntityHistoryFromAttributeAndDateRanges,
-  getEntityHistoryFromDateRangesAndLimit,
-  getEntityHistoryFromAttributeAndDateRangesAndLimit,
-} = require("./utils/queries.js");
+const cygnusMySQLQueries = require("./utils/queries.js");
 
 // Configure express to parse the request body as JSON
 app.use(express.json({ extended: true }));
@@ -159,71 +150,85 @@ app.get("/history/entity/:id", (req, res) => {
   const limit = req.query.limit;
 
   if (attrName && startDate && endDate && limit)
-    getEntityHistoryFromAttributeAndDateRangesAndLimit(
-      mysqlConnection,
-      entityId,
-      attrName,
-      startDate,
-      endDate,
-      limit
-    ).then(
-      (results) => res.send(results),
-      (err) => res.send(err)
-    );
+    cygnusMySQLQueries
+      .getEntityHistoryFromAttributeAndDateRangesAndLimit(
+        mysqlConnection,
+        entityId,
+        attrName,
+        startDate,
+        endDate,
+        limit
+      )
+      .then(
+        (results) => res.send(results),
+        (err) => res.send(err)
+      );
   else if (attrName && startDate && endDate)
-    getEntityHistoryFromAttributeAndDateRanges(
-      mysqlConnection,
-      entityId,
-      attrName,
-      startDate,
-      endDate
-    ).then(
-      (results) => res.send(results),
-      (err) => res.send(err)
-    );
+    cygnusMySQLQueries
+      .getEntityHistoryFromAttributeAndDateRanges(
+        mysqlConnection,
+        entityId,
+        attrName,
+        startDate,
+        endDate
+      )
+      .then(
+        (results) => res.send(results),
+        (err) => res.send(err)
+      );
   else if (attrName && limit)
-    getEntityHistoryFromAttributeAndLimit(
-      mysqlConnection,
-      entityId,
-      attrName,
-      limit
-    ).then(
-      (results) => res.send(results),
-      (err) => res.send(err)
-    );
+    cygnusMySQLQueries
+      .getEntityHistoryFromAttributeAndLimit(
+        mysqlConnection,
+        entityId,
+        attrName,
+        limit
+      )
+      .then(
+        (results) => res.send(results),
+        (err) => res.send(err)
+      );
   else if (startDate && endDate && limit)
-    getEntityHistoryFromDateRangesAndLimit(
-      mysqlConnection,
-      entityId,
-      startDate,
-      endDate,
-      limit
-    ).then(
-      (results) => res.send(results),
-      (err) => res.send(err)
-    );
+    cygnusMySQLQueries
+      .getEntityHistoryFromDateRangesAndLimit(
+        mysqlConnection,
+        entityId,
+        startDate,
+        endDate,
+        limit
+      )
+      .then(
+        (results) => res.send(results),
+        (err) => res.send(err)
+      );
   else if (attrName)
-    getEntityHistoryFromAttribute(mysqlConnection, entityId, attrName).then(
-      (results) => res.send(results),
-      (err) => res.send(err)
-    );
+    cygnusMySQLQueries
+      .getEntityHistoryFromAttribute(mysqlConnection, entityId, attrName)
+      .then(
+        (results) => res.send(results),
+        (err) => res.send(err)
+      );
   else if (startDate && endDate)
-    getEntityHistoryFromDateRanges(
-      mysqlConnection,
-      entityId,
-      startDate,
-      endDate
-    ).then(
-      (results) => res.send(results),
-      (err) => res.send(err)
-    );
+    cygnusMySQLQueries
+      .getEntityHistoryFromDateRanges(
+        mysqlConnection,
+        entityId,
+        startDate,
+        endDate
+      )
+      .then(
+        (results) => res.send(results),
+        (err) => res.send(err)
+      );
   else if (limit)
-    getEntityHistoryFromLimit(mysqlConnection, entityId, limit).then(
-      (results) => res.send(results),
-      (err) => res.send(err)
-    );
+    cygnusMySQLQueries
+      .getEntityHistoryFromLimit(mysqlConnection, entityId, limit)
+      .then(
+        (results) => res.send(results),
+        (err) => res.send(err)
+      );
   else
-    getEntityHistory(mysqlConnection, entityId).then(
+    cygnusMySQLQueries.getEntityHistory(mysqlConnection, entityId).then(
       (results) => res.send(results),
       (err) => res.send(err)
     );
@@ -232,37 +237,74 @@ app.get("/history/entity/:id", (req, res) => {
 // Notify orion context broker and cygnus of an history repetition
 app.post("/history/repeat", (req, res) => {
   const entitiesModified = req.body.entities;
-  // const startDate = req.body.startDate;
+  const startDate = req.body.startDate;
 
-  // Extract ids from given entities in the request
+  // Extract ids from given modified entities in the request
   const entitiesModifiedIds = entitiesModified.map((entity) => entity.id);
 
   // Initialize auxiliar entity lists
   let globalEntities = [];
   let globalEntitiesIds = [];
+  let currentRepetition = 0;
 
-  // Get all simulation involved entities
-  ngsiConnection.v2.listEntities().then((response) => {
-    globalEntities = response.results;
-    globalEntitiesIds = globalEntities.map((entity) => entity.id);
+  // Create a new repetition around the simulation state at a current time
+  if (startDate) {
+    // TODO: make endpoint work for the simulation state at a given start date
+  }
+  // Create a new repetition around current simulation state
+  else {
+    // Get all simulation involved entities
+    ngsiConnection.v2.listEntities().then((response) => {
+      globalEntities = response.results;
+      globalEntitiesIds = globalEntities.map((entity) => entity.id);
 
-    // Loop through the list of requested entity modifications to the repetition
-    entitiesModifiedIds.forEach((id) => {
-      if (globalEntitiesIds.includes(id)) {
-        const entityMod = entitiesModified.find((e) => e.id === id);
-        const attrsMod = Object.keys(entityMod).filter((key) => key !== "id");
-        globalEntities.map((entity) => {
-          if (entity.id === id) {
-            for (const attr of attrsMod) {
-              entity[attr].value = entityMod[attr].value;
+      // Loop through the list of requested modified entities
+      entitiesModifiedIds.forEach((id) => {
+        if (globalEntitiesIds.includes(id)) {
+          const entityMod = entitiesModified.find((e) => e.id === id);
+          const attrsMod = Object.keys(entityMod).filter((key) => key !== "id");
+
+          // Get current repetition index
+          currentRepetition = globalEntities.find((entity) =>
+            entity.id.includes(":dummy")
+          ).repetition.value;
+
+          // Select only the original entities (and not their dummies since we want the original entity current state)
+          globalEntities = globalEntities.filter(
+            (entity) => !entity.id.includes(":dummy")
+          );
+
+          // Get each entity original state, mirror it to its dummy and update current repetition index
+          globalEntities = globalEntities.map((entity) => {
+            if (entity.id === id) {
+              // Loop through the modified attributes in order to update entity original ones
+              for (const attr of attrsMod) {
+                entity[attr].value = entityMod[attr].value;
+              }
+              // Associate original entity current state with its dummy
+              entity.id += ":dummy";
+              // Increment entity dummy repetition index
+              entity.repetition = {
+                type: "Integer",
+                value: currentRepetition + 1,
+                metadata: {},
+              };
             }
-          }
-          return entity;
-        });
-      }
+            return entity;
+          });
+        }
+      });
+
+      // After processing simulation state, propagate the repetition to Context Broker and historical sink
+      cygnusMySQLQueries
+        .makeRepetition(mysqlConnection, ngsiConnection, globalEntities)
+        .then(
+          (results) => res.send(results),
+          (error) => res.send(error)
+        );
     });
-    res.send(globalEntities);
-  });
+  }
+
   // cygnusMySQLToolkit.matchMySQLTableName(id);
   // getEntityHistoryFromDateRanges();
 });
