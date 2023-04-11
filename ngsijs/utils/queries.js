@@ -1,39 +1,25 @@
+const cygnusMySQLToolkit = require("./cynus-mysql.toolkit");
+
 /**
  * Cygnus Entity Query List
  */
-
 const getEntityHistory = (mysqlConnection, entityId) =>
-  new Promise((resolve, reject) => {
-    mysqlConnection.query(
-      `SELECT attrName, attrValue, recvTime FROM ${entityId}`,
-      (err, results) => {
-        if (err) reject(err);
-        resolve(results);
-      }
-    );
-  });
+  cygnusMySQLToolkit.runQuery(
+    mysqlConnection,
+    `SELECT attrName, attrValue, recvTime FROM ${entityId}`
+  );
 
 const getEntityHistoryFromAttribute = (mysqlConnection, entityId, attrName) =>
-  new Promise((resolve, reject) => {
-    mysqlConnection.query(
-      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}'`,
-      (err, results) => {
-        if (err) reject(err);
-        resolve(results);
-      }
-    );
-  });
+  cygnusMySQLToolkit.runQuery(
+    mysqlConnection,
+    `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}'`
+  );
 
 const getEntityHistoryFromLimit = (mysqlConnection, entityId, limit) =>
-  new Promise((resolve, reject) => {
-    mysqlConnection.query(
-      `SELECT attrName, attrValue, recvTime FROM ${entityId} LIMIT ${limit}`,
-      (err, results) => {
-        if (err) reject(err);
-        resolve(results);
-      }
-    );
-  });
+  cygnusMySQLToolkit.runQuery(
+    mysqlConnection,
+    `SELECT attrName, attrValue, recvTime FROM ${entityId} LIMIT ${limit}`
+  );
 
 const getEntityHistoryFromDateRanges = (
   mysqlConnection,
@@ -41,15 +27,10 @@ const getEntityHistoryFromDateRanges = (
   startDate,
   endDate
 ) =>
-  new Promise((resolve, reject) => {
-    mysqlConnection.query(
-      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE recvTime BETWEEN '${startDate}' AND '${endDate}'`,
-      (err, results) => {
-        if (err) reject(err);
-        resolve(results);
-      }
-    );
-  });
+  cygnusMySQLToolkit.runQuery(
+    mysqlConnection,
+    `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE recvTime BETWEEN '${startDate}' AND '${endDate}'`
+  );
 
 const getEntityHistoryFromAttributeAndLimit = (
   mysqlConnection,
@@ -57,15 +38,10 @@ const getEntityHistoryFromAttributeAndLimit = (
   attrName,
   limit
 ) =>
-  new Promise((resolve, reject) => {
-    mysqlConnection.query(
-      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}' LIMIT ${limit}`,
-      (err, results) => {
-        if (err) reject(err);
-        resolve(results);
-      }
-    );
-  });
+  cygnusMySQLToolkit.runQuery(
+    mysqlConnection,
+    `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}' LIMIT ${limit}`
+  );
 
 const getEntityHistoryFromAttributeAndDateRanges = (
   mysqlConnection,
@@ -74,15 +50,10 @@ const getEntityHistoryFromAttributeAndDateRanges = (
   startDate,
   endDate
 ) =>
-  new Promise((resolve, reject) => {
-    mysqlConnection.query(
-      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN '${startDate}' AND '${endDate}'`,
-      (err, results) => {
-        if (err) reject(err);
-        resolve(results);
-      }
-    );
-  });
+  cygnusMySQLToolkit.runQuery(
+    mysqlConnection,
+    `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN '${startDate}' AND '${endDate}'`
+  );
 
 const getEntityHistoryFromDateRangesAndLimit = (
   mysqlConnection,
@@ -91,15 +62,10 @@ const getEntityHistoryFromDateRangesAndLimit = (
   endDate,
   limit
 ) =>
-  new Promise((resolve, reject) => {
-    mysqlConnection.query(
-      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`,
-      (err, results) => {
-        if (err) reject(err);
-        resolve(results);
-      }
-    );
-  });
+  cygnusMySQLToolkit.runQuery(
+    mysqlConnection,
+    `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`
+  );
 
 const getEntityHistoryFromAttributeAndDateRangesAndLimit = (
   mysqlConnection,
@@ -109,31 +75,55 @@ const getEntityHistoryFromAttributeAndDateRangesAndLimit = (
   endDate,
   limit
 ) =>
-  new Promise((resolve, reject) => {
-    mysqlConnection.query(
-      `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`,
-      (err, results) => {
-        if (err) reject(err);
-        resolve(results);
-      }
-    );
-  });
+  cygnusMySQLToolkit.runQuery(
+    mysqlConnection,
+    `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`
+  );
 
 /**
- * Cygnus Repetitions List
+ * Cygnus Repetitions Query List
  */
-const makeRepetition = (mysqlConnection) => {
-  // TODO: continue with makeRepetition flow. first create repetitions table if doesn't exist, then create a new repetition entry and then update entity dummies repetition attribute
-  new Promise((resolve, reject) => {
-    mysqlConnection.query(
-      "CREATE TABLE IF NOT EXISTS `repetitions` (`id` int(11) NOT NULL AUTO_INCREMENT, `startDate` datetime NOT NULL, `endDate` datetime NOT NULL, PRIMARY KEY (`id`))",
-      (err, results) => {
-        if (err) reject(err);
-        resolve(results);
-      }
+const makeRepetition = (mysqlConnection, ngsiConnection, globalEntities) =>
+  new Promise(async (resolve, reject) => {
+    // Make sure repetitions table exists
+    try {
+      await cygnusMySQLToolkit.runQuery(
+        mysqlConnection,
+        "CREATE TABLE IF NOT EXISTS `repetitions` (`id` int(11) NOT NULL AUTO_INCREMENT, `startDate` datetime, `endDate` datetime, PRIMARY KEY (`id`))"
+      );
+    } catch (error) {
+      reject(error);
+    }
+
+    // Register a new repetition entry with current datetime and undefined endDate
+    try {
+      await cygnusMySQLToolkit.runQuery(
+        mysqlConnection,
+        `INSERT INTO repetitions (startDate, endDate) VALUES ('${cygnusMySQLToolkit.dateToSQLDateTime(
+          new Date()
+        )}', NULL)`
+      );
+    } catch (error) {
+      reject(error);
+    }
+
+    // Update all the entities given the repetition configuration
+    await Promise.all(
+      globalEntities.map((entity) =>
+        ngsiConnection.v2.updateEntityAttributes(entity).then(
+          (response) => {},
+          (error) => {
+            reject(error.message);
+          }
+        )
+      )
+    );
+
+    // If previous operations were successful, promise can resolve
+    resolve(
+      "Repetition successfully propagated through the Context Broker and the historical sink."
     );
   });
-};
 
 module.exports = {
   getEntityHistory,
@@ -144,4 +134,5 @@ module.exports = {
   getEntityHistoryFromAttributeAndDateRanges,
   getEntityHistoryFromDateRangesAndLimit,
   getEntityHistoryFromAttributeAndDateRangesAndLimit,
+  makeRepetition,
 };

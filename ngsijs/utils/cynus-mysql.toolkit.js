@@ -30,4 +30,36 @@ const getEntityType = (entityId) => {
 const matchMySQLTableName = (id) =>
   replaceAll(id, ":", "_") + "_" + getEntityType(id);
 
-module.exports = { replaceAll, getEntityType, matchMySQLTableName };
+/**
+ * Given a mysqlConnection instance and a SQL query returns a promise with that query result
+ *
+ * @param {mysql.Connection} mysqlConnection
+ * @param {string} query
+ * @returns query result
+ */
+const runQuery = (mysqlConnection, query) =>
+  new Promise((resolve, reject) => {
+    mysqlConnection.query(query, (error, results, fields) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(results);
+      }
+    });
+  });
+
+/**
+ * Given a date, convert it to a SQL datetime
+ * @param {Date} date
+ * @returns SQL datetime format
+ */
+const dateToSQLDateTime = (date) =>
+  date.toISOString().slice(0, 19).replace("T", " ");
+
+module.exports = {
+  replaceAll,
+  getEntityType,
+  matchMySQLTableName,
+  runQuery,
+  dateToSQLDateTime,
+};
