@@ -234,8 +234,8 @@ app.get("/history/entity/:id", (req, res) => {
     );
 });
 
-// Notify orion context broker and cygnus of an history repetition
-app.post("/history/repeat", (req, res) => {
+// Notify Orion Context Broker and Cygnus of a simulation repetition
+app.post("/history/repetition", (req, res) => {
   const entitiesModified = req.body.entities;
   const startDate = req.body.startDate;
 
@@ -297,7 +297,7 @@ app.post("/history/repeat", (req, res) => {
 
       // After processing simulation state, propagate the repetition to Context Broker and historical sink
       cygnusMySQLQueries
-        .makeRepetition(mysqlConnection, ngsiConnection, globalEntities)
+        .startRepetition(mysqlConnection, ngsiConnection, globalEntities)
         .then(
           (results) => res.send(results),
           (error) => res.send(error)
@@ -307,4 +307,21 @@ app.post("/history/repeat", (req, res) => {
 
   // cygnusMySQLToolkit.matchMySQLTableName(id);
   // getEntityHistoryFromDateRanges();
+});
+
+// Notify Orion Context Broker and Cygnus of the ending of a simulation repetition
+app.patch("/history/repetition/end", (req, res) => {
+  const repetitionId = req.body.repetitionId;
+
+  // Id validation safety check
+  if (!repetitionId) res.send("Repetition id must be provided.");
+
+  cygnusMySQLQueries.endRepetition(mysqlConnection, repetitionId).then(
+    (results) => {
+      res.send(results);
+    },
+    (error) => {
+      res.send(error);
+    }
+  );
 });
