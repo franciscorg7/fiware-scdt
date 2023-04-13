@@ -33,15 +33,19 @@ app.post("/entity/create", (req, res) => {
   ngsiConnection.v2.createEntity(entity).then(
     () => {
       ngsiConnection.v2.createEntity(dummy).then(
-        () =>
-          res.send(
-            "Both entity and its repetition dummy were successfuly created."
-          ),
-        (dummyError) => res.send(dummyError.message)
+        (result) =>
+          res.send({
+            data: {
+              ...result,
+              message:
+                "Both entity and its repetition dummy were successfuly created.",
+            },
+          }),
+        (dummyError) => res.send(dummyError)
       );
     },
     (error) => {
-      res.send(error.message);
+      res.send(error);
     }
   );
 });
