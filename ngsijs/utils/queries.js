@@ -85,6 +85,8 @@ const getEntityHistoryFromAttributeAndDateRangesAndLimit = (
  */
 const startRepetition = (mySQLConnection, ngsiConnection, globalEntities) =>
   new Promise(async (resolve, reject) => {
+    let insertResult;
+
     // Make sure repetitions table exists
     try {
       await cygnusMySQLToolkit.runQuery(
@@ -97,7 +99,7 @@ const startRepetition = (mySQLConnection, ngsiConnection, globalEntities) =>
 
     // Register a new repetition entry with current datetime and undefined endDate
     try {
-      await cygnusMySQLToolkit.runQuery(
+      insertResult = await cygnusMySQLToolkit.runQuery(
         mySQLConnection,
         `INSERT INTO repetitions (startDate, endDate) VALUES ('${cygnusMySQLToolkit.dateToSQLDateTime(
           new Date()
@@ -119,10 +121,18 @@ const startRepetition = (mySQLConnection, ngsiConnection, globalEntities) =>
       )
     );
 
+    // Response body
+    const response = {
+      data: {
+        id: insertResult.insertId,
+        message:
+          "Repetition successfully propagated through the Context Broker and the historical sink.",
+        startDate: cygnusMySQLToolkit.dateToSQLDateTime(new Date()),
+      },
+    };
+
     // If previous operations were successful, promise can resolve
-    resolve(
-      "Repetition successfully propagated through the Context Broker and the historical sink."
-    );
+    resolve(response);
   });
 
 const endRepetition = (mySQLConnection, repetitionId) =>
