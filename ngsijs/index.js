@@ -38,6 +38,23 @@ app.get("/entity/list", (_, res) => {
   );
 });
 
+// Lists all entities registered in the context broker server
+app.get("/entity/:id", (req, res) => {
+  const entityId = req.params.id;
+  ngsiConnection.v2.getEntity(entityId).then(
+    (response) => {
+      res.send({
+        data: {
+          ...response,
+          message:
+            "Entity was successfully retrieved from the Context Broker Server.",
+        },
+      });
+    },
+    (error) => res.send(error)
+  );
+});
+
 // Creates a new entity
 app.post("/entity/create", (req, res) => {
   const entity = req.body;
@@ -119,10 +136,12 @@ app.post("/subscription/create", (req, res) => {
   const subscription = req.body;
   ngsiConnection.v2.createSubscription(subscription).then(
     (response) => {
-      res.send(response);
+      res.send({
+        data: { ...response, message: "Subscription created successfully." },
+      });
     },
     (error) => {
-      res.send(error.message);
+      res.send(error);
     }
   );
 });
@@ -132,10 +151,12 @@ app.delete("/subscription/:id/delete", (req, res) => {
   const subscriptionId = req.params.id;
   ngsiConnection.v2.deleteSubscription(subscriptionId).then(
     (response) => {
-      res.send(response);
+      res.send({
+        data: { ...response, message: "Subscription deleted successfully." },
+      });
     },
     (error) => {
-      res.send(error.message);
+      res.send(error);
     }
   );
 });
