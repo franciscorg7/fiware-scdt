@@ -59,21 +59,51 @@ app.get("/entity/:id", (req, res) => {
 app.post("/entity/create", (req, res) => {
   const entity = contextBrokerToolkit.buildEntity(req.body);
   const dummy = contextBrokerToolkit.buildEntityDummy(entity);
+  // Call the create method for the new entity
   ngsiConnection.v2.createEntity(entity).then(
     (result) => {
+      // After being created the new entity, replicate the process for its dummy clone
       ngsiConnection.v2.createEntity(dummy).then(
-        (dummyResult) =>
-          res.send({
-            data: {
-              entityResult: result,
-              dummyResult: dummyResult,
-              message:
-                "Both entity and its repetition dummy were successfuly created.",
-            },
-          }),
+        async (dummyResult) => {
+          // Try to build subscriptions for the entity and its dummy replication and register them in the Context Broker Server
+          try {
+            const entityCygnusSubscription =
+              await contextBrokerToolkit.buildCygnusSubscription(
+                entity,
+                `${entity.id} updates listener`
+              );
+            const dummyCygnusSubscription =
+              await contextBrokerToolkit.buildCygnusSubscription(
+                dummy,
+                `${dummy.id} updates listener`
+              );
+
+            // Create both entity and dummy subscription in parallel and once they both finish, resolve the promise with all the data
+            Promise.all([
+              ngsiConnection.v2.createSubscription(entityCygnusSubscription),
+              ngsiConnection.v2.createSubscription(dummyCygnusSubscription),
+            ]).then((subscriptionResults) => {
+              res.send({
+                data: {
+                  entityResult: result,
+                  entitySubscriptionResult: subscriptionResults[0], // entity subscription result
+                  dummyResult: dummyResult,
+                  dummySubscriptionResult: subscriptionResults[1], // dummy subscription result
+                  message:
+                    "Both entity and its repetition dummy were successfuly created. Cygnus is now listening to their changes.",
+                },
+              });
+            });
+          } catch (error) {
+            // Catch any possible error related to the subscriptions process
+            res.send(error);
+          }
+        },
+        // Catch any possible error related to the entity dummy replication process
         (dummyError) => res.send(dummyError)
       );
     },
+    // Catch any possible error related to the entity creation process
     (error) => {
       res.send(error);
     }
@@ -103,9 +133,9 @@ app.post("/entity/update", (req, res) => {
 app.delete("/entity/:id/delete", (req, res) => {
   const entityId = req.params.id;
   const dummyEntityId = entityId + ":dummy";
-
   ngsiConnection.v2.deleteEntity(entityId).then(
     async (result) => {
+      // TODO: Check if the subscription removal is working properly
       // After deleting the entity, also remove associated subscriptions
       try {
         const entity = await ngsiConnection.v2.getEntity(entityId);
