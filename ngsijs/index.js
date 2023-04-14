@@ -15,15 +15,27 @@ app.listen(API_PORT, () => {
   console.log(`ngsiJS server is running at: http://localhost:${API_PORT}/`);
 });
 
+// TODO: Review endpoint responses and uniformize them
+
 /**
  * ORION CONTEXT BROKER ENTITIES
  */
 
 // Lists all entities registered in the context broker server
 app.get("/entity/list", (_, res) => {
-  ngsiConnection.v2.listEntities().then((response) => {
-    res.send(response.results);
-  });
+  ngsiConnection.v2.listEntities().then(
+    (response) => {
+      res.send({
+        data: {
+          results: response.results,
+          numOfEntitiesFound: response.results.length,
+          message:
+            "Entity list was successfully retrieved from the Context Broker Server.",
+        },
+      });
+    },
+    (error) => res.send(error)
+  );
 });
 
 // Creates a new entity
@@ -31,12 +43,13 @@ app.post("/entity/create", (req, res) => {
   const entity = req.body;
   const dummy = contextBrokerToolkit.buildEntityDummy(entity);
   ngsiConnection.v2.createEntity(entity).then(
-    () => {
+    (result) => {
       ngsiConnection.v2.createEntity(dummy).then(
-        (result) =>
+        (dummyResult) =>
           res.send({
             data: {
-              ...result,
+              entityResult: result,
+              dummyResult: dummyResult,
               message:
                 "Both entity and its repetition dummy were successfuly created.",
             },
@@ -55,10 +68,16 @@ app.post("/entity/update", (req, res) => {
   const changes = req.body;
   ngsiConnection.v2.updateEntityAttributes(changes).then(
     (response) => {
-      res.send(response);
+      res.send({
+        data: {
+          ...response,
+          changes: changes,
+          message: "Entity successfully updated.",
+        },
+      });
     },
     (error) => {
-      res.send(error.message);
+      res.send(error);
     }
   );
 });
@@ -67,20 +86,26 @@ app.post("/entity/update", (req, res) => {
 app.delete("/entity/:id/delete", (req, res) => {
   const entityId = req.params.id;
   const dummyEntityId = entityId + ":dummy";
+
   ngsiConnection.v2.deleteEntity(entityId).then(
-    () => {
+    (result) => {
       ngsiConnection.v2.deleteEntity(dummyEntityId).then(
-        () =>
-          res.send(
-            "Both entity and its repetition dummy were successfuly deleted."
-          ),
+        (dummyResult) =>
+          res.send({
+            data: {
+              entityCorrelator: result.correlator,
+              dummyCorrelator: dummyResult.correlator,
+              message:
+                "Both entity and its repetition dummy were successfuly deleted.",
+            },
+          }),
         (dummyError) => {
-          res.send(dummyError.message);
+          res.send(dummyError);
         }
       );
     },
     (error) => {
-      res.send(error.message);
+      res.send(error);
     }
   );
 });
