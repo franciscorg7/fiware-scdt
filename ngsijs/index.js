@@ -38,7 +38,7 @@ app.get("/entity/list", (_, res) => {
   );
 });
 
-// Lists all entities registered in the context broker server
+// Gets an entity from the context broker server given its id
 app.get("/entity/:id", (req, res) => {
   const entityId = req.params.id;
   ngsiConnection.v2.getEntity(entityId).then(
@@ -57,7 +57,7 @@ app.get("/entity/:id", (req, res) => {
 
 // Creates a new entity
 app.post("/entity/create", (req, res) => {
-  const entity = req.body;
+  const entity = contextBrokerToolkit.buildEntity(req.body);
   const dummy = contextBrokerToolkit.buildEntityDummy(entity);
   ngsiConnection.v2.createEntity(entity).then(
     (result) => {
@@ -105,7 +105,17 @@ app.delete("/entity/:id/delete", (req, res) => {
   const dummyEntityId = entityId + ":dummy";
 
   ngsiConnection.v2.deleteEntity(entityId).then(
-    (result) => {
+    async (result) => {
+      // After deleting the entity, also remove associated subscriptions
+      try {
+        const entity = await ngsiConnection.v2.getEntity(entityId);
+        const subscriptionIds = await entity.data.subscriptions.value;
+        subscriptionIds.forEach(async (id) => {
+          await ngsiConnection.v2.deleteSubscription(id);
+        });
+      } catch (deleteSubscriptionError) {
+        res.send(deleteSubscriptionError);
+      }
       ngsiConnection.v2.deleteEntity(dummyEntityId).then(
         (dummyResult) =>
           res.send({
