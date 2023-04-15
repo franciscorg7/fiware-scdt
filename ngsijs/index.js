@@ -133,11 +133,13 @@ app.post("/entity/update", (req, res) => {
 
 // Removes an entity from the context broker server given its id
 app.delete("/entity/:id/delete", async (req, res) => {
+  // Get the entity id from the query parameters
   const entityId = req.params.id;
 
   // Catch case where the entity to be deleted is already a dummy
   if (entityId.includes(":dummy")) {
     try {
+      // Save entity state before deleting it from the context broker server
       const dummyResult = await ngsiConnection.v2.getEntity(entityId);
       const dummyDelResult = await ngsiConnection.v2.deleteEntity(entityId);
       subscriptionIds = dummyResult.entity.subscriptions.value;
@@ -157,12 +159,14 @@ app.delete("/entity/:id/delete", async (req, res) => {
   } else {
     const dummyEntityId = entityId + ":dummy";
     try {
+      // Save entity state before deleting it from the context broker server
       const entityResult = await ngsiConnection.v2.getEntity(entityId);
       const entityDelResult = await ngsiConnection.v2.deleteEntity(entityId);
       let subscriptionIds = entityResult.entity.subscriptions.value;
       subscriptionIds.forEach(async (id) => {
         await ngsiConnection.v2.deleteSubscription(id);
       });
+      // Save entity state before deleting it from the context broker server
       const dummyResult = await ngsiConnection.v2.getEntity(dummyEntityId);
       const dummyDelResult = await ngsiConnection.v2.deleteEntity(
         dummyEntityId
