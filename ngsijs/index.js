@@ -374,27 +374,36 @@ app.get("/history/entity/:id", (req, res) => {
 
 // Notify Orion Context Broker and Cygnus of a simulation repetition
 app.post("/history/repetition", (req, res) => {
-  const entitiesModified = req.body.entities;
+  const entitiesModified = req.body.entities || [];
   const startDate = req.body.startDate;
+  const fromRepetition = req.body.fromRepetition;
 
   // Initialize auxiliar entity lists
   let globalEntities = [];
 
-  // Create a new repetition around the simulation state at a current time
-  if (startDate) {
-    // TODO: make endpoint work for the simulation state at a given start date
-  }
-  // Create a new repetition around current simulation state
-  else {
-    // Get all simulation involved entities
-    ngsiConnection.v2.listEntities().then(async (response) => {
-      globalEntities = response.results;
+  // Get all simulation involved entities
+  ngsiConnection.v2.listEntities().then(async (response) => {
+    globalEntities = response.results;
 
+    // Create a new repetition around the simulation state at a current time
+    if (startDate) {
+      globalEntities =
+        await cygnusMySQLQueries.getContextOnRepetitionFromStartDate(
+          globalEntities,
+          entitiesModified,
+          cygnusMySQLToolkit.dateToSQLDateTime(startDate)
+        );
+    } else if (fromRepetition) {
+      // TODO: make endpoint work for the simulation state at a past repetition start
+    }
+    // Create a new repetition around current simulation context
+    else {
       // Get global dummy context after starting a repetition with entity modifications
-      globalEntities = await cygnusMySQLToolkit.getContextAfterRepetition(
-        globalEntities,
-        entitiesModified
-      );
+      globalEntities =
+        await cygnusMySQLToolkit.getContextOnRepetitionFromCurrentContext(
+          globalEntities,
+          entitiesModified
+        );
 
       // Update all the entities given the repetition configuration
       await Promise.all(
@@ -415,8 +424,8 @@ app.post("/history/repetition", (req, res) => {
           (results) => res.send(results),
           (error) => res.send(error)
         );
-    });
-  }
+    }
+  });
 });
 
 // Notify Orion Context Broker and Cygnus of the ending of a simulation repetition
@@ -424,7 +433,13 @@ app.patch("/history/repetition/end", (req, res) => {
   const repetitionId = req.body.repetitionId;
 
   // Id validation safety check
-  if (!repetitionId) res.send("Repetition id must be provided.");
+  if (!repetitionId)
+    res.send({
+      error: {
+        code: "MISSING_REP_ID",
+        message: "Repetition id must be provided.",
+      },
+    });
 
   cygnusMySQLQueries.endRepetition(mysqlConnection, repetitionId).then(
     (results) => {
