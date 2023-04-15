@@ -78,6 +78,8 @@ app.post("/entity/create", (req, res) => {
                 `${dummy.id} updates listener`
               );
 
+            // TODO: for each subscription created, update entity subscriptions attribute
+
             // Create both entity and dummy subscription in parallel and once they both finish, resolve the promise with all the data
             Promise.all([
               ngsiConnection.v2.createSubscription(entityCygnusSubscription),
@@ -130,41 +132,57 @@ app.post("/entity/update", (req, res) => {
 });
 
 // Removes an entity from the context broker server given its id
-app.delete("/entity/:id/delete", (req, res) => {
+app.delete("/entity/:id/delete", async (req, res) => {
   const entityId = req.params.id;
-  const dummyEntityId = entityId + ":dummy";
-  ngsiConnection.v2.deleteEntity(entityId).then(
-    async (result) => {
-      // TODO: Check if the subscription removal is working properly
-      // After deleting the entity, also remove associated subscriptions
-      try {
-        const entity = await ngsiConnection.v2.getEntity(entityId);
-        const subscriptionIds = await entity.data.subscriptions.value;
-        subscriptionIds.forEach(async (id) => {
-          await ngsiConnection.v2.deleteSubscription(id);
-        });
-      } catch (deleteSubscriptionError) {
-        res.send(deleteSubscriptionError);
-      }
-      ngsiConnection.v2.deleteEntity(dummyEntityId).then(
-        (dummyResult) =>
-          res.send({
-            data: {
-              entityCorrelator: result.correlator,
-              dummyCorrelator: dummyResult.correlator,
-              message:
-                "Both entity and its repetition dummy were successfuly deleted.",
-            },
-          }),
-        (dummyError) => {
-          res.send(dummyError);
-        }
-      );
-    },
-    (error) => {
+
+  // Catch case where the entity to be deleted is already a dummy
+  if (entityId.includes(":dummy")) {
+    try {
+      const dummyResult = await ngsiConnection.v2.getEntity(entityId);
+      const dummyDelResult = await ngsiConnection.v2.deleteEntity(entityId);
+      subscriptionIds = dummyResult.entity.subscriptions.value;
+      subscriptionIds.forEach(async (id) => {
+        await ngsiConnection.v2.deleteSubscription(id);
+      });
+      res.send({
+        data: {
+          dummyCorrelator: dummyDelResult.correlator,
+          message:
+            "The repetition dummy and its associated subscriptions were successfuly deleted.",
+        },
+      });
+    } catch (error) {
       res.send(error);
     }
-  );
+  } else {
+    const dummyEntityId = entityId + ":dummy";
+    try {
+      const entityResult = await ngsiConnection.v2.getEntity(entityId);
+      const entityDelResult = await ngsiConnection.v2.deleteEntity(entityId);
+      let subscriptionIds = entityResult.entity.subscriptions.value;
+      subscriptionIds.forEach(async (id) => {
+        await ngsiConnection.v2.deleteSubscription(id);
+      });
+      const dummyResult = await ngsiConnection.v2.getEntity(dummyEntityId);
+      const dummyDelResult = await ngsiConnection.v2.deleteEntity(
+        dummyEntityId
+      );
+      subscriptionIds = dummyResult.entity.subscriptions.value;
+      subscriptionIds.forEach(async (id) => {
+        await ngsiConnection.v2.deleteSubscription(id);
+      });
+      res.send({
+        data: {
+          entityCorrelator: entityDelResult.correlator,
+          dummyCorrelator: dummyDelResult.correlator,
+          message:
+            "Both entity, its repetition dummy and associated subscriptions were successfuly deleted.",
+        },
+      });
+    } catch (error) {
+      res.send(error);
+    }
+  }
 });
 
 /**
