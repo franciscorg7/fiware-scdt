@@ -195,7 +195,11 @@ app.delete("/entity/:id/delete", async (req, res) => {
       );
       subscriptionIds = dummyResult.entity.subscriptions.value;
       subscriptionIds.forEach(async (id) => {
-        await ngsiConnection.v2.deleteSubscription(id);
+        try {
+          await ngsiConnection.v2.deleteSubscription(id);
+        } catch (error) {
+          console.log(error);
+        }
       });
       res.send({
         data: {
@@ -373,13 +377,8 @@ app.post("/history/repetition", (req, res) => {
   const entitiesModified = req.body.entities;
   const startDate = req.body.startDate;
 
-  // Extract ids from given modified entities in the request
-  const entitiesModifiedIds = entitiesModified.map((entity) => entity.id);
-
   // Initialize auxiliar entity lists
   let globalEntities = [];
-  let globalEntitiesIds = [];
-  let currentRepetition = 0;
 
   // Create a new repetition around the simulation state at a current time
   if (startDate) {
@@ -388,54 +387,24 @@ app.post("/history/repetition", (req, res) => {
   // Create a new repetition around current simulation state
   else {
     // Get all simulation involved entities
-    ngsiConnection.v2.listEntities().then((response) => {
+    ngsiConnection.v2.listEntities().then(async (response) => {
       globalEntities = response.results;
-      globalEntitiesIds = globalEntities.map((entity) => entity.id);
 
       // Loop through the list of requested modified entities
-      entitiesModifiedIds.forEach((id) => {
-        if (globalEntitiesIds.includes(id)) {
-          const entityMod = entitiesModified.find((e) => e.id === id);
-          const attrsMod = Object.keys(entityMod).filter((key) => key !== "id");
+      globalEntities = await cygnusMySQLToolkit.getContextAfterRepetition(
+        globalEntities,
+        entitiesModified
+      );
 
-          // Get current repetition index
-          currentRepetition = globalEntities.find((entity) =>
-            entity.id.includes(":dummy")
-          ).repetition.value;
+      res.send(globalEntities);
 
-          // Select only the original entities (and not their dummies since we want the original entity current state)
-          globalEntities = globalEntities.filter(
-            (entity) => !entity.id.includes(":dummy")
-          );
-
-          // Get each entity original state, mirror it to its dummy and update current repetition index
-          globalEntities = globalEntities.map((entity) => {
-            if (entity.id === id) {
-              // Loop through the modified attributes in order to update entity original ones
-              for (const attr of attrsMod) {
-                entity[attr].value = entityMod[attr].value;
-              }
-              // Associate original entity current state with its dummy
-              entity.id += ":dummy";
-              // Increment entity dummy repetition index
-              entity.repetition = {
-                type: "Integer",
-                value: currentRepetition + 1,
-                metadata: {},
-              };
-            }
-            return entity;
-          });
-        }
-      });
-
-      // After processing simulation state, propagate the repetition to Context Broker and historical sink
-      cygnusMySQLQueries
-        .startRepetition(mysqlConnection, ngsiConnection, globalEntities)
-        .then(
-          (results) => res.send(results),
-          (error) => res.send(error)
-        );
+      // // After processing simulation state, propagate the repetition to Context Broker and historical sink
+      // cygnusMySQLQueries
+      //   .startRepetition(mysqlConnection, ngsiConnection, globalEntities)
+      //   .then(
+      //     (results) => res.send(results),
+      //     (error) => res.send(error)
+      //   );
     });
   }
 
