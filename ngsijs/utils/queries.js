@@ -6,19 +6,19 @@ const cygnusMySQLToolkit = require("./cynus-mysql.toolkit");
 const getEntityHistory = (mySQLConnection, entityId) =>
   cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, recvTime FROM ${entityId}`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId}`
   );
 
 const getEntityHistoryFromAttribute = (mySQLConnection, entityId, attrName) =>
   cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}'`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName = '${attrName}'`
   );
 
 const getEntityHistoryFromLimit = (mySQLConnection, entityId, limit) =>
   cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, recvTime FROM ${entityId} LIMIT ${limit}`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} LIMIT ${limit}`
   );
 
 const getEntityHistoryFromDateRanges = (
@@ -29,7 +29,7 @@ const getEntityHistoryFromDateRanges = (
 ) =>
   cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE recvTime BETWEEN '${startDate}' AND '${endDate}'`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE recvTime BETWEEN '${startDate}' AND '${endDate}'`
   );
 
 const getEntityHistoryFromAttributeAndLimit = (
@@ -40,7 +40,7 @@ const getEntityHistoryFromAttributeAndLimit = (
 ) =>
   cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}' LIMIT ${limit}`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName = '${attrName}' LIMIT ${limit}`
   );
 
 const getEntityHistoryFromAttributeAndDateRanges = (
@@ -52,7 +52,7 @@ const getEntityHistoryFromAttributeAndDateRanges = (
 ) =>
   cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN '${startDate}' AND '${endDate}'`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN '${startDate}' AND '${endDate}'`
   );
 
 const getEntityHistoryFromDateRangesAndLimit = (
@@ -64,7 +64,7 @@ const getEntityHistoryFromDateRangesAndLimit = (
 ) =>
   cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`
   );
 
 const getEntityHistoryFromAttributeAndDateRangesAndLimit = (
@@ -77,7 +77,7 @@ const getEntityHistoryFromAttributeAndDateRangesAndLimit = (
 ) =>
   cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`
   );
 
 /**
@@ -156,7 +156,7 @@ const endRepetition = (mySQLConnection, repetitionId) =>
 const getClosestRecvTime = (mySQLConnection, entityId, dateTime) =>
   cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT recvTime FROM ${entityId} ORDER BY ABS(DATEDIFF(recvTime, ${dateTime})) LIMIT 1`
+    `SELECT recvTime FROM ${entityId} ORDER BY ABS(DATEDIFF(recvTime, '${dateTime}')) LIMIT 1`
   );
 
 module.exports = {
@@ -168,7 +168,7 @@ module.exports = {
   getEntityHistoryFromAttributeAndDateRanges,
   getEntityHistoryFromDateRangesAndLimit,
   getEntityHistoryFromAttributeAndDateRangesAndLimit,
+  getClosestRecvTime,
   startRepetition,
   endRepetition,
-  getClosestRecvTime,
 };
