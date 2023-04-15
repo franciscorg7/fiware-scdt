@@ -78,13 +78,35 @@ app.post("/entity/create", (req, res) => {
                 `${dummy.id} updates listener`
               );
 
-            // TODO: for each subscription created, update entity subscriptions attribute
-
             // Create both entity and dummy subscription in parallel and once they both finish, resolve the promise with all the data
             Promise.all([
               ngsiConnection.v2.createSubscription(entityCygnusSubscription),
               ngsiConnection.v2.createSubscription(dummyCygnusSubscription),
-            ]).then((subscriptionResults) => {
+            ]).then(async (subscriptionResults) => {
+              // After creating the subscriptions, update its reference inside the entity instance
+              await ngsiConnection.v2.updateEntityAttributes({
+                id: entity.id,
+                subscriptions: {
+                  type: "Array",
+                  value: [subscriptionResults[0].subscription.id],
+                },
+              });
+              // Do the same for its repetition dummy
+              await ngsiConnection.v2.updateEntityAttributes({
+                id: dummy.id,
+                subscriptions: {
+                  type: "Array",
+                  value: [subscriptionResults[1].subscription.id],
+                },
+              });
+
+              // Map entities subscription attribute response to match last context updates (prior to entity creation)
+              result.entity.subscriptions.value = [
+                subscriptionResults[0].subscription.id,
+              ];
+              dummyResult.entity.subscriptions.value = [
+                subscriptionResults[1].subscription.id,
+              ];
               res.send({
                 data: {
                   entityResult: result,
