@@ -390,26 +390,33 @@ app.post("/history/repetition", (req, res) => {
     ngsiConnection.v2.listEntities().then(async (response) => {
       globalEntities = response.results;
 
-      // Loop through the list of requested modified entities
+      // Get global dummy context after starting a repetition with entity modifications
       globalEntities = await cygnusMySQLToolkit.getContextAfterRepetition(
         globalEntities,
         entitiesModified
       );
 
-      res.send(globalEntities);
+      // Update all the entities given the repetition configuration
+      await Promise.all(
+        globalEntities.map((entity) =>
+          ngsiConnection.v2.updateEntityAttributes(entity).then(
+            () => {},
+            (error) => {
+              reject(error.message);
+            }
+          )
+        )
+      );
 
-      // // After processing simulation state, propagate the repetition to Context Broker and historical sink
-      // cygnusMySQLQueries
-      //   .startRepetition(mysqlConnection, ngsiConnection, globalEntities)
-      //   .then(
-      //     (results) => res.send(results),
-      //     (error) => res.send(error)
-      //   );
+      // After processing simulation state, propagate the repetition to Context Broker and historical sink
+      cygnusMySQLQueries
+        .startRepetition(mysqlConnection, ngsiConnection, globalEntities)
+        .then(
+          (results) => res.send(results),
+          (error) => res.send(error)
+        );
     });
   }
-
-  // cygnusMySQLToolkit.matchMySQLTableName(id);
-  // getEntityHistoryFromDateRanges();
 });
 
 // Notify Orion Context Broker and Cygnus of the ending of a simulation repetition

@@ -83,7 +83,7 @@ const getEntityHistoryFromAttributeAndDateRangesAndLimit = (
 /**
  * Cygnus Repetitions Query List
  */
-const startRepetition = (mySQLConnection, ngsiConnection, globalEntities) =>
+const startRepetition = (mySQLConnection) =>
   new Promise(async (resolve, reject) => {
     let insertResult;
 
@@ -109,19 +109,7 @@ const startRepetition = (mySQLConnection, ngsiConnection, globalEntities) =>
       reject(error);
     }
 
-    // Update all the entities given the repetition configuration
-    await Promise.all(
-      globalEntities.map((entity) =>
-        ngsiConnection.v2.updateEntityAttributes(entity).then(
-          (response) => {},
-          (error) => {
-            reject(error.message);
-          }
-        )
-      )
-    );
-
-    // Response body
+    // Build response body
     const response = {
       data: {
         id: insertResult.insertId,
@@ -131,7 +119,6 @@ const startRepetition = (mySQLConnection, ngsiConnection, globalEntities) =>
       },
     };
 
-    // If previous operations were successful, promise can resolve
     resolve(response);
   });
 
