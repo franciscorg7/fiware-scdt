@@ -65,17 +65,12 @@ const dateToSQLDateTime = (date) =>
  * @returns an array of all the dummy entities on repetition changes
  */
 const getContextOnRepetitionFromStartDate = async (
+  mySQLConnection,
   globalEntities,
   entitiesModified,
   startDate
 ) => {
-  // Extract ids from global entities
-  let globalEntitiesIds = globalEntities.map((entity) => entity.id);
-
-  // Extract ids from given modified entities
-  const entitiesModifiedIds = entitiesModified.map((entity) => entity.id);
-
-  return globalEntities;
+  return entityOnGivenDate;
 };
 
 /**
@@ -135,5 +130,6 @@ module.exports = {
   matchMySQLTableName,
   runQuery,
   dateToSQLDateTime,
+  getContextOnRepetitionFromStartDate,
   getContextOnRepetitionFromCurrentContext,
 };
