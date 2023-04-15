@@ -274,7 +274,7 @@ app.get("/subscription/list", (_, res) => {
  */
 
 // Create a mysql connection to cygnus-mysql sink
-var mysqlConnection = mysql.createConnection(mySQLConfig);
+var mySQLConnection = mysql.createConnection(mySQLConfig);
 
 // Lists all entries registered by Cygnus for the entity given its NGSI id
 app.get("/history/entity/:id", (req, res) => {
@@ -290,7 +290,7 @@ app.get("/history/entity/:id", (req, res) => {
   if (attrName && startDate && endDate && limit)
     cygnusMySQLQueries
       .getEntityHistoryFromAttributeAndDateRangesAndLimit(
-        mysqlConnection,
+        mySQLConnection,
         entityId,
         attrName,
         startDate,
@@ -304,7 +304,7 @@ app.get("/history/entity/:id", (req, res) => {
   else if (attrName && startDate && endDate)
     cygnusMySQLQueries
       .getEntityHistoryFromAttributeAndDateRanges(
-        mysqlConnection,
+        mySQLConnection,
         entityId,
         attrName,
         startDate,
@@ -317,7 +317,7 @@ app.get("/history/entity/:id", (req, res) => {
   else if (attrName && limit)
     cygnusMySQLQueries
       .getEntityHistoryFromAttributeAndLimit(
-        mysqlConnection,
+        mySQLConnection,
         entityId,
         attrName,
         limit
@@ -329,7 +329,7 @@ app.get("/history/entity/:id", (req, res) => {
   else if (startDate && endDate && limit)
     cygnusMySQLQueries
       .getEntityHistoryFromDateRangesAndLimit(
-        mysqlConnection,
+        mySQLConnection,
         entityId,
         startDate,
         endDate,
@@ -341,7 +341,7 @@ app.get("/history/entity/:id", (req, res) => {
       );
   else if (attrName)
     cygnusMySQLQueries
-      .getEntityHistoryFromAttribute(mysqlConnection, entityId, attrName)
+      .getEntityHistoryFromAttribute(mySQLConnection, entityId, attrName)
       .then(
         (results) => res.send(results),
         (err) => res.send(err)
@@ -349,7 +349,7 @@ app.get("/history/entity/:id", (req, res) => {
   else if (startDate && endDate)
     cygnusMySQLQueries
       .getEntityHistoryFromDateRanges(
-        mysqlConnection,
+        mySQLConnection,
         entityId,
         startDate,
         endDate
@@ -360,13 +360,13 @@ app.get("/history/entity/:id", (req, res) => {
       );
   else if (limit)
     cygnusMySQLQueries
-      .getEntityHistoryFromLimit(mysqlConnection, entityId, limit)
+      .getEntityHistoryFromLimit(mySQLConnection, entityId, limit)
       .then(
         (results) => res.send(results),
         (err) => res.send(err)
       );
   else
-    cygnusMySQLQueries.getEntityHistory(mysqlConnection, entityId).then(
+    cygnusMySQLQueries.getEntityHistory(mySQLConnection, entityId).then(
       (results) => res.send(results),
       (err) => res.send(err)
     );
@@ -387,12 +387,39 @@ app.post("/history/repetition", (req, res) => {
 
     // Create a new repetition around the simulation state at a current time
     if (startDate) {
-      globalEntities =
-        await cygnusMySQLQueries.getContextOnRepetitionFromStartDate(
-          globalEntities,
-          entitiesModified,
-          cygnusMySQLToolkit.dateToSQLDateTime(startDate)
+      // Get each entity original state, mirror it to its dummy and update current repetition index
+      globalEntities = globalEntities.map(async (entity) => {
+        const closestRecvTime = await cygnusMySQLQueries.getClosestRecvTime(
+          mySQLConnection,
+          cygnusMySQLToolkit.matchMySQLTableName(entity.id),
+          cygnusMySQLToolkit.dateToSQLDateTime(new Date(startDate))
         );
+
+        // Get history from date ranges where start date and end date are the same
+        const entityOnClosestRecvTime =
+          await cygnusMySQLQueries.getEntityHistoryFromDateRanges(
+            mySQLConnection,
+            cygnusMySQLToolkit.matchMySQLTableName(entity.id),
+            closestRecvTime[0].recvTime,
+            closestRecvTime[0].recvTime
+          );
+
+        let buildEntity = {
+          id: entity.id,
+          type: entity.type,
+        };
+        await entityOnClosestRecvTime.map(
+          (attr) =>
+            (buildEntity[attr.attrName] = {
+              value: attr.attrValue,
+              type: attr.attrType,
+            })
+        );
+        return buildEntity;
+      });
+
+      // TODO: I only want the endpoint to respond after globalEntities are all processed (note that I am not waiting for all entities to build on recvTime)
+      res.send(globalEntities);
     } else if (fromRepetition) {
       // TODO: make endpoint work for the simulation state at a past repetition start
     }
@@ -419,7 +446,7 @@ app.post("/history/repetition", (req, res) => {
 
       // After processing simulation state, propagate the repetition to Context Broker and historical sink
       cygnusMySQLQueries
-        .startRepetition(mysqlConnection, ngsiConnection, globalEntities)
+        .startRepetition(mySQLConnection, ngsiConnection, globalEntities)
         .then(
           (results) => res.send(results),
           (error) => res.send(error)
@@ -441,7 +468,7 @@ app.patch("/history/repetition/end", (req, res) => {
       },
     });
 
-  cygnusMySQLQueries.endRepetition(mysqlConnection, repetitionId).then(
+  cygnusMySQLQueries.endRepetition(mySQLConnection, repetitionId).then(
     (results) => {
       res.send(results);
     },
