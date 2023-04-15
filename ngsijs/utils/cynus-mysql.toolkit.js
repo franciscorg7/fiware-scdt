@@ -56,10 +56,63 @@ const runQuery = (mysqlConnection, query) =>
 const dateToSQLDateTime = (date) =>
   date.toISOString().slice(0, 19).replace("T", " ");
 
+/**
+ * Get global dummy context after starting a repetition with entity modifications
+ *
+ * @param {Array} globalEntities
+ * @param {Array} entitiesModified
+ * @returns an array of all the dummy entities after repetition changes
+ */
+const getContextAfterRepetition = async (globalEntities, entitiesModified) => {
+  // Extract ids from global entities
+  let globalEntitiesIds = globalEntities.map((entity) => entity.id);
+
+  // Extract ids from given modified entities
+  const entitiesModifiedIds = entitiesModified.map((entity) => entity.id);
+
+  entitiesModifiedIds.map(async (modifiedId) => {
+    if (globalEntitiesIds.includes(modifiedId)) {
+      const entityMod = entitiesModified.find((e) => e.id === modifiedId);
+      const attrsMod = Object.keys(entityMod).filter((key) => key !== "id");
+
+      // Get current repetition index (all dummies must share the same global repetition index)
+      currentRepetition = globalEntities.find((entity) =>
+        entity.id.includes(":dummy")
+      ).repetition.value;
+
+      // Select only the original entities (and not their dummies since we want the original entity current state)
+      globalEntities = globalEntities.filter(
+        (entity) => !entity.id.includes(":dummy")
+      );
+
+      // Get each entity original state, mirror it to its dummy and update current repetition index
+      globalEntities = globalEntities.map((entity) => {
+        // If modified, loop through entity attributes in order to update its original ones storing them in the dummy
+        if (entity.id === modifiedId) {
+          for (const attr of attrsMod) {
+            entity[attr].value = entityMod[attr].value;
+          }
+        }
+        // Associate original entity current state with its dummy
+        entity.id += ":dummy";
+        // Increment entity dummy repetition index
+        entity.repetition = {
+          type: "Integer",
+          value: currentRepetition ? currentRepetition + 1 : 1,
+          metadata: {},
+        };
+        return entity;
+      });
+    }
+  });
+  return globalEntities;
+};
+
 module.exports = {
   replaceAll,
   getEntityType,
   matchMySQLTableName,
   runQuery,
   dateToSQLDateTime,
+  getContextAfterRepetition,
 };
