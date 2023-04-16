@@ -381,10 +381,18 @@ app.post("/history/repetition", async (req, res) => {
   // Initialize auxiliar entity lists
   let globalEntities = [];
 
-  // Get the index to be used for this repetition
-  const nextRepetitionId = await cygnusMySQLQueries.getNextRepetitionIndex(
-    mySQLConnection
-  );
+  // Initialize nextRepetitionId
+  let nextRepetitionId;
+
+  try {
+    // Get the index to be used for this repetition
+    nextRepetitionId = await cygnusMySQLQueries.getNextRepetitionIndex(
+      mySQLConnection
+    );
+  } catch (error) {
+    // If there was an error with getting repetitions table, it means that there was no repetition already
+    nextRepetitionId = 1;
+  }
 
   // Get all simulation involved entities
   ngsiConnection.v2.listEntities().then(async (response) => {
