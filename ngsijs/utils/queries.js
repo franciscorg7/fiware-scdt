@@ -256,6 +256,25 @@ const getNextRepetitionIndex = (mySQLConnection) =>
     }
   });
 
+/**
+ *
+ * @param {*} mySQLConnection
+ * @param {*} repetitionId
+ * @returns
+ */
+const getRepetitionStartDate = (mySQLConnection, repetitionId) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const result = await cygnusMySQLToolkit.runQuery(
+        mySQLConnection,
+        `SELECT startDate FROM repetitions WHERE id = ${repetitionId}`
+      );
+      resolve(result[0].startDate);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
 module.exports = {
   getEntityHistory,
   getEntityHistoryFromAttribute,
@@ -266,6 +285,7 @@ module.exports = {
   getEntityHistoryFromDateRangesAndLimit,
   getEntityHistoryFromAttributeAndDateRangesAndLimit,
   getClosestRecvTime,
+  getRepetitionStartDate,
   getNextRepetitionIndex,
   startRepetition,
   endRepetition,
