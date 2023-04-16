@@ -57,20 +57,22 @@ const dateToSQLDateTime = (date) =>
   date.toISOString().slice(0, 19).replace("T", " ");
 
 /**
- * Get global dummy context on the given start date
+ * Since MySQL data comes in string format, parse it regarding the attribute type
  *
- * @param {Array} globalEntities
- * @param {Array} entitiesModified
- * @param {Date} startDate
- * @returns an array of all the dummy entities on repetition changes
+ * @param {String} attrValue
+ * @param {String} attrType
+ * @returns parsed attribute value
  */
-const getContextOnRepetitionFromStartDate = async (
-  mySQLConnection,
-  globalEntities,
-  entitiesModified,
-  startDate
-) => {
-  return entityOnGivenDate;
+const parseMySQLAttrValue = (attrValue, attrType) => {
+  attrType = attrType.toUpperCase();
+  switch (attrType) {
+    case "INTEGER":
+      return parseInt(attrValue);
+    case "FLOAT" || "DOUBLE":
+      return parseFloat(attrValue);
+    default:
+      return attrValue;
+  }
 };
 
 /**
@@ -78,11 +80,13 @@ const getContextOnRepetitionFromStartDate = async (
  *
  * @param {Array} globalEntities
  * @param {Array} entitiesModified
+ * @param {Integer} nextRepetitionId
  * @returns an array of all the dummy entities on the repetition modifications
  */
-const getContextOnRepetitionFromCurrentContext = async (
+const getContextOnRepetition = async (
   globalEntities,
-  entitiesModified
+  entitiesModified,
+  nextRepetitionId
 ) => {
   // Initialize modifications auxiliar variables
   let entityMod;
@@ -116,8 +120,7 @@ const getContextOnRepetitionFromCurrentContext = async (
     // Increment entity dummy repetition index
     entity.repetition = {
       type: "Integer",
-      value: currentRepetition ? currentRepetition + 1 : 1, // ? Should I increment repetition globally (context-broker based) or get the last repetition index from the table (cygnus based)
-      metadata: {},
+      value: nextRepetitionId,
     };
     return entity;
   });
@@ -130,6 +133,6 @@ module.exports = {
   matchMySQLTableName,
   runQuery,
   dateToSQLDateTime,
-  getContextOnRepetitionFromStartDate,
-  getContextOnRepetitionFromCurrentContext,
+  parseMySQLAttrValue,
+  getContextOnRepetition,
 };

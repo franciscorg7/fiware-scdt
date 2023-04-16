@@ -159,6 +159,20 @@ const getClosestRecvTime = (mySQLConnection, entityId, dateTime) =>
     `SELECT recvTime FROM ${entityId} ORDER BY ABS(DATEDIFF(recvTime, '${dateTime}')) LIMIT 1`
   );
 
+const getNextRepetitionIndex = (mySQLConnection) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const result = await cygnusMySQLToolkit.runQuery(
+        mySQLConnection,
+        `SELECT id FROM repetitions ORDER BY id DESC LIMIT 1`
+      );
+      // Increment last repetition index before resolving
+      resolve(result[0].id + 1);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
 module.exports = {
   getEntityHistory,
   getEntityHistoryFromAttribute,
@@ -169,6 +183,7 @@ module.exports = {
   getEntityHistoryFromDateRangesAndLimit,
   getEntityHistoryFromAttributeAndDateRangesAndLimit,
   getClosestRecvTime,
+  getNextRepetitionIndex,
   startRepetition,
   endRepetition,
 };
