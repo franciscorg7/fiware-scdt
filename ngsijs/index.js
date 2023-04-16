@@ -468,7 +468,78 @@ app.post("/history/repetition", async (req, res) => {
     }
     // Create a new repetition based on another past one
     else if (fromRepetition) {
-      // TODO: make endpoint work for the simulation state at a past repetition start
+      // Get the closest recvTime value of the current entity to the given startDate
+      const repetitionStartDate =
+        await cygnusMySQLQueries.getRepetitionStartDate(
+          mySQLConnection,
+          fromRepetition
+        );
+
+      // Loop through all entities and get their context in the beggining of given repetition (storing all the mapping promises in mappedGlobalEntities)
+      const mappedGlobalEntities = globalEntities.map(async (entity) => {
+        // Get closest recvTime value for the given entity and the given repetitionStartDate (make sure they don't mismatch over milliseconds)
+        const closestRecvTime = await cygnusMySQLQueries.getClosestRecvTime(
+          mySQLConnection,
+          cygnusMySQLToolkit.matchMySQLTableName(entity.id),
+          cygnusMySQLToolkit.dateToSQLDateTime(new Date(repetitionStartDate))
+        );
+
+        // Get entity history state from date ranges (start date and end date are the same)
+        const entityOnPastRepetition =
+          await cygnusMySQLQueries.getEntityHistoryFromDateRanges(
+            mySQLConnection,
+            cygnusMySQLToolkit.matchMySQLTableName(entity.id),
+            closestRecvTime[0].recvTime,
+            closestRecvTime[0].recvTime
+          );
+
+        // Base for the entity instance build
+        let buildEntity = {
+          id: entity.id,
+          type: entity.type,
+        };
+
+        // Update entity instance with past date historical data (regarding possibile input modifications)
+        entityOnPastRepetition.map(
+          (attr) =>
+            (buildEntity[attr.attrName] = {
+              value: cygnusMySQLToolkit.parseMySQLAttrValue(
+                attr.attrValue,
+                attr.attrType
+              ),
+              type: attr.attrType,
+            })
+        );
+        return buildEntity;
+      });
+
+      // Wait for all global entities mapping before returning the result
+      globalEntities = await Promise.all(mappedGlobalEntities);
+
+      // Get context after repetition modifications
+      globalEntities = await cygnusMySQLToolkit.getContextOnRepetition(
+        globalEntities,
+        entitiesModified,
+        nextRepetitionId
+      );
+
+      // Update all the entities given the repetition configuration
+      await Promise.all(
+        globalEntities.map((entity) =>
+          ngsiConnection.v2.updateEntityAttributes(entity).then(
+            () => {},
+            (error) => {
+              reject(error.message);
+            }
+          )
+        )
+      );
+
+      // After processing simulation state, propagate the repetition to Context Broker and historical sink
+      cygnusMySQLQueries.startRepetition(mySQLConnection).then(
+        (results) => res.send(results),
+        (error) => res.send(error)
+      );
     }
     // Create a new repetition around current simulation context
     else {
