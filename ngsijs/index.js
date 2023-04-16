@@ -387,15 +387,16 @@ app.post("/history/repetition", (req, res) => {
 
     // Create a new repetition around the simulation state at a current time
     if (startDate) {
-      // Get each entity original state, mirror it to its dummy and update current repetition index
-      globalEntities = globalEntities.map(async (entity) => {
+      // Loop through all entities and get their closest history state to the given startDate (storing all the mapping promises in mappedGlobalEntities)
+      const mappedGlobalEntities = globalEntities.map(async (entity) => {
+        // Get the closest recvTime value of the current entity to the given startDate
         const closestRecvTime = await cygnusMySQLQueries.getClosestRecvTime(
           mySQLConnection,
           cygnusMySQLToolkit.matchMySQLTableName(entity.id),
           cygnusMySQLToolkit.dateToSQLDateTime(new Date(startDate))
         );
 
-        // Get history from date ranges where start date and end date are the same
+        // Get entity history state from date ranges (start date and end date are the same)
         const entityOnClosestRecvTime =
           await cygnusMySQLQueries.getEntityHistoryFromDateRanges(
             mySQLConnection,
@@ -404,11 +405,12 @@ app.post("/history/repetition", (req, res) => {
             closestRecvTime[0].recvTime
           );
 
+        // Build entity instance
         let buildEntity = {
           id: entity.id,
           type: entity.type,
         };
-        await entityOnClosestRecvTime.map(
+        entityOnClosestRecvTime.map(
           (attr) =>
             (buildEntity[attr.attrName] = {
               value: attr.attrValue,
@@ -418,9 +420,19 @@ app.post("/history/repetition", (req, res) => {
         return buildEntity;
       });
 
-      // TODO: I only want the endpoint to respond after globalEntities are all processed (note that I am not waiting for all entities to build on recvTime)
-      res.send(globalEntities);
-    } else if (fromRepetition) {
+      // Wait for all global entities mapping before returning the result
+      globalEntities = await Promise.all(mappedGlobalEntities);
+
+      // After processing simulation state, propagate the repetition to Context Broker and historical sink
+      cygnusMySQLQueries
+        .startRepetition(mySQLConnection, ngsiConnection, globalEntities)
+        .then(
+          (results) => res.send(results),
+          (error) => res.send(error)
+        );
+    }
+    // Create a new repetition based on another past one
+    else if (fromRepetition) {
       // TODO: make endpoint work for the simulation state at a past repetition start
     }
     // Create a new repetition around current simulation context
