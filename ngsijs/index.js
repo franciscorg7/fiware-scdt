@@ -193,8 +193,8 @@ app.delete("/entity/:id/delete", async (req, res) => {
       const dummyDelResult = await ngsiConnection.v2.deleteEntity(
         dummyEntityId
       );
-      subscriptionIds = dummyResult.entity.subscriptions.value;
-      subscriptionIds.forEach(async (id) => {
+      let dummySubscriptionIds = dummyResult.entity.subscriptions.value;
+      dummySubscriptionIds.forEach(async (id) => {
         try {
           await ngsiConnection.v2.deleteSubscription(id);
         } catch (error) {
