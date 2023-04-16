@@ -373,13 +373,18 @@ app.get("/history/entity/:id", (req, res) => {
 });
 
 // Notify Orion Context Broker and Cygnus of a simulation repetition
-app.post("/history/repetition", (req, res) => {
+app.post("/history/repetition", async (req, res) => {
   const entitiesModified = req.body.entities || [];
   const startDate = req.body.startDate;
   const fromRepetition = req.body.fromRepetition;
 
   // Initialize auxiliar entity lists
   let globalEntities = [];
+
+  // Get the index to be used for this repetition
+  const nextRepetitionId = await cygnusMySQLQueries.getNextRepetitionIndex(
+    mySQLConnection
+  );
 
   // Get all simulation involved entities
   ngsiConnection.v2.listEntities().then(async (response) => {
@@ -405,15 +410,20 @@ app.post("/history/repetition", (req, res) => {
             closestRecvTime[0].recvTime
           );
 
-        // Build entity instance
+        // Base for the entity instance build
         let buildEntity = {
           id: entity.id,
           type: entity.type,
         };
+
+        // Update entity instance with past date historical data (regarding possibile input modifications)
         entityOnClosestRecvTime.map(
           (attr) =>
             (buildEntity[attr.attrName] = {
-              value: attr.attrValue,
+              value: cygnusMySQLToolkit.parseMySQLAttrValue(
+                attr.attrValue,
+                attr.attrType
+              ),
               type: attr.attrType,
             })
         );
@@ -423,26 +433,12 @@ app.post("/history/repetition", (req, res) => {
       // Wait for all global entities mapping before returning the result
       globalEntities = await Promise.all(mappedGlobalEntities);
 
-      // After processing simulation state, propagate the repetition to Context Broker and historical sink
-      cygnusMySQLQueries
-        .startRepetition(mySQLConnection, ngsiConnection, globalEntities)
-        .then(
-          (results) => res.send(results),
-          (error) => res.send(error)
-        );
-    }
-    // Create a new repetition based on another past one
-    else if (fromRepetition) {
-      // TODO: make endpoint work for the simulation state at a past repetition start
-    }
-    // Create a new repetition around current simulation context
-    else {
-      // Get global dummy context after starting a repetition with entity modifications
-      globalEntities =
-        await cygnusMySQLToolkit.getContextOnRepetitionFromCurrentContext(
-          globalEntities,
-          entitiesModified
-        );
+      // Get context after repetition modifications
+      globalEntities = await cygnusMySQLToolkit.getContextOnRepetition(
+        globalEntities,
+        entitiesModified,
+        nextRepetitionId
+      );
 
       // Update all the entities given the repetition configuration
       await Promise.all(
@@ -457,12 +453,41 @@ app.post("/history/repetition", (req, res) => {
       );
 
       // After processing simulation state, propagate the repetition to Context Broker and historical sink
-      cygnusMySQLQueries
-        .startRepetition(mySQLConnection, ngsiConnection, globalEntities)
-        .then(
-          (results) => res.send(results),
-          (error) => res.send(error)
-        );
+      cygnusMySQLQueries.startRepetition(mySQLConnection).then(
+        (results) => res.send(results),
+        (error) => res.send(error)
+      );
+    }
+    // Create a new repetition based on another past one
+    else if (fromRepetition) {
+      // TODO: make endpoint work for the simulation state at a past repetition start
+    }
+    // Create a new repetition around current simulation context
+    else {
+      // Get global dummy context after starting a repetition with entity modifications
+      globalEntities = await cygnusMySQLToolkit.getContextOnRepetition(
+        globalEntities,
+        entitiesModified,
+        nextRepetitionId
+      );
+
+      // Update all the entities given the repetition configuration
+      await Promise.all(
+        globalEntities.map((entity) =>
+          ngsiConnection.v2.updateEntityAttributes(entity).then(
+            () => {},
+            (error) => {
+              reject(error.message);
+            }
+          )
+        )
+      );
+
+      // After processing simulation state, propagate the repetition to Context Broker and historical sink
+      cygnusMySQLQueries.startRepetition(mySQLConnection).then(
+        (results) => res.send(results),
+        (error) => res.send(error)
+      );
     }
   });
 });
