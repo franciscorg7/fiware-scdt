@@ -230,11 +230,13 @@ const endRepetition = (mySQLConnection, repetitionId) =>
  * @param {Date} dateTime
  * @returns closest recvTime attribute value
  */
-const getClosestRecvTime = (mySQLConnection, entityId, dateTime) =>
-  cygnusMySQLToolkit.runQuery(
+const getClosestRecvTime = (mySQLConnection, entityId, dateTime) => {
+  console.log(dateTime);
+  return cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT recvTime FROM ${entityId} ORDER BY ABS(DATEDIFF(recvTime, '${dateTime}')) LIMIT 1`
+    `SELECT recvTime FROM ${entityId} ORDER BY ABS(TIMESTAMPDIFF(SECOND, recvTime, '${dateTime}')) LIMIT 1`
   );
+};
 
 /**
  *  Get the index to be used in the next repetition by incrementing the current one
