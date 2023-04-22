@@ -7,9 +7,11 @@ const cygnusMySQLToolkit = require("./utils/cynus-mysql.toolkit");
 const app = express();
 const { mySQLConfig, API_PORT } = require("./config.js");
 const cygnusMySQLQueries = require("./utils/queries.js");
+const cors = require("cors");
 
 // Configure express to parse the request body as JSON
 app.use(express.json({ extended: true }));
+app.use(cors()); // TODO: enable CORS just for my specific origin needs (security issues)
 
 app.listen(API_PORT, () => {
   console.log(`ngsiJS server is running at: http://localhost:${API_PORT}/`);
