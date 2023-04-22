@@ -4,25 +4,26 @@ import ngsijs from "../../services/ngsijs";
 import { useState } from "react";
 import EntityList from "../../components/EntityList";
 import NewEntityModal from "../../components/NewEntityModal";
+import { bgLightBlue } from "../../palette";
+import Navbar from "../../components/Navbar";
 
 const PageWrapper = styled.div`
-  width: 100%;
   height: 100vh;
 `;
-const TitleWrapper = styled.div`
-  width: 100%;
-  font-size: 3rem;
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
+const BodyWrapper = styled.div`
+  padding: 42px;
+  background: ${bgLightBlue};
+  height: 100%;
 `;
-const BodyWrapper = styled.div``;
 
 const HomePage = () => {
   const [entityList, setEntityList] = useState([]);
   const [showEntityModal, setShowEntityModal] = useState(false);
   const [onSaveEntityLoading, setOnSaveEntityLoading] = useState(false);
 
+  /**
+   * Call /entity/list whenever HomePage renders
+   */
   useEffect(() => {
     ngsijs.get(`/entity/list`).then((res) => {
       console.log(res.data.data.results);
@@ -30,6 +31,9 @@ const HomePage = () => {
     });
   }, []);
 
+  /**
+   * Sets the modal open flag to true
+   */
   const onNewEntity = () => {
     setShowEntityModal(true);
   };
@@ -38,9 +42,7 @@ const HomePage = () => {
 
   return (
     <PageWrapper>
-      <TitleWrapper>
-        <h1>FIWARE Context Consumer</h1>
-      </TitleWrapper>
+      <Navbar />
       <BodyWrapper>
         <EntityList entityList={entityList} onNewEntity={onNewEntity} />
       </BodyWrapper>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { CompassOutlined, IdcardOutlined } from "@ant-design/icons";
+import { JsonViewer } from "@textea/json-viewer";
 import { Input, Button } from "antd";
 
 const PageWrapper = styled.div`
@@ -35,6 +36,56 @@ const NewEntityPage = () => {
   const [id, setId] = useState(null);
   const [type, setType] = useState(null);
 
+  const object = {
+    id: "sensor:MultipleSensor:1",
+    type: "Sensor",
+    airQuality: {
+      type: "Integer",
+      value: 12,
+      metadata: {},
+    },
+    cloudcover: {
+      type: "Float",
+      value: 50,
+      metadata: {},
+    },
+    humidity: {
+      type: "Float",
+      value: 96,
+      metadata: {},
+    },
+    noise: {
+      type: "Float",
+      value: 90,
+      metadata: {},
+    },
+    precipitation: {
+      type: "Float",
+      value: 70,
+      metadata: {},
+    },
+    pressure: {
+      type: "Float",
+      value: 1012.3,
+      metadata: {},
+    },
+    subscriptions: {
+      type: "Array",
+      value: ["643c1accc3064b16770384dc"],
+      metadata: {},
+    },
+    temperature: {
+      type: "Float",
+      value: 10.2,
+      metadata: {},
+    },
+    windspeed: {
+      type: "Float",
+      value: 2.2,
+      metadata: {},
+    },
+  };
+
   return (
     <PageWrapper>
       <TitleWrapper>
@@ -55,6 +106,7 @@ const NewEntityPage = () => {
           onChange={(e) => setType(e.target.value)}
           prefix={<IdcardOutlined />}
         />
+        <JsonViewer value={object} />
 
         <CreateButton>CREATE</CreateButton>
       </FormWrapper>

@@ -2,8 +2,8 @@ import React from "react";
 import Entity from "../Entity";
 import { Row } from "antd";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
 import { PlusCircleFilled } from "@ant-design/icons";
+import { highlightOrange } from "../../palette";
 
 const ResponsiveGrid = styled(Row)`
   width: 100%;
@@ -11,8 +11,11 @@ const ResponsiveGrid = styled(Row)`
   gap: 16px;
 `;
 
-const ActionsWrapper = styled.div`
-  font-size: 42px;
+const StyledPlusCircleFilled = styled(PlusCircleFilled)`
+  display: flex;
+  align-items: center;
+  padding: 24px;
+  color: ${highlightOrange};
 `;
 
 const EntityList = ({ entityList, onNewEntity }) => {
@@ -21,9 +24,7 @@ const EntityList = ({ entityList, onNewEntity }) => {
       {entityList.map((entity) => (
         <Entity key={entity.id} entity={entity}></Entity>
       ))}
-      <ActionsWrapper>
-        <PlusCircleFilled onClick={onNewEntity} />
-      </ActionsWrapper>
+      <StyledPlusCircleFilled onClick={onNewEntity} style={{ fontSize: 42 }} />
     </ResponsiveGrid>
   );
 };
