@@ -1,8 +1,9 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
-import { Button } from "antd";
 import ngsijs from "../../services/ngsijs";
+import { useState } from "react";
+import EntityList from "../../components/EntityList";
+import NewEntityModal from "../../components/NewEntityModal";
 
 const PageWrapper = styled.div`
   width: 100%;
@@ -16,30 +17,39 @@ const TitleWrapper = styled.div`
   justify-content: flex-start;
 `;
 const BodyWrapper = styled.div``;
-const ActionsWrapper = styled.div``;
-const StyledButton = styled(Button)`
-  font-weight: bold;
-`;
 
 const HomePage = () => {
+  const [entityList, setEntityList] = useState([]);
+  const [showEntityModal, setShowEntityModal] = useState(false);
+  const [onSaveEntityLoading, setOnSaveEntityLoading] = useState(false);
+
   useEffect(() => {
     ngsijs.get(`/entity/list`).then((res) => {
-      const entities = res.data;
-      console.log(entities);
+      console.log(res.data.data.results);
+      setEntityList(res.data.data.results);
     });
   }, []);
+
+  const onNewEntity = () => {
+    setShowEntityModal(true);
+  };
+
+  const onSaveNewEntity = () => {};
+
   return (
     <PageWrapper>
       <TitleWrapper>
         <h1>FIWARE Context Consumer</h1>
       </TitleWrapper>
       <BodyWrapper>
-        <ActionsWrapper>
-          <Link to="/new-entity">
-            <StyledButton>Register Entity</StyledButton>
-          </Link>
-        </ActionsWrapper>
+        <EntityList entityList={entityList} onNewEntity={onNewEntity} />
       </BodyWrapper>
+      <NewEntityModal
+        show={showEntityModal}
+        setShow={setShowEntityModal}
+        onSave={onSaveNewEntity}
+        onSaveLoading={onSaveEntityLoading}
+      />
     </PageWrapper>
   );
 };
