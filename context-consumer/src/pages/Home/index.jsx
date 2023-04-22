@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { Button } from "antd";
-import axios from "axios";
+import ngsijs from "../../services/ngsijs";
 
 const PageWrapper = styled.div`
   width: 100%;
@@ -21,25 +21,12 @@ const StyledButton = styled(Button)`
   font-weight: bold;
 `;
 
-const ADDRESS = process.env.REACT_APP_API_HOST;
-const PORT = process.env.REACT_APP_API_PORT;
-
 const HomePage = () => {
   useEffect(() => {
-    axios
-      .get(`${ADDRESS}:${PORT}/entity/list`, {
-        mode: "no-cors",
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Credentials": true,
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
-        },
-      })
-      .then((res) => {
-        const entities = res.data;
-        console.log(entities);
-      });
+    ngsijs.get(`/entity/list`).then((res) => {
+      const entities = res.data;
+      console.log(entities);
+    });
   }, []);
   return (
     <PageWrapper>
