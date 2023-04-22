@@ -24,7 +24,7 @@ const StyledButton = styled(Button)`
 const ADDRESS = "http://localhost:1026";
 const GET_ENTITIES = "/v2/entities";
 
-const Home = () => {
+const HomePage = () => {
   useEffect(() => {
     axios
       .get(`${ADDRESS}${GET_ENTITIES}`, {
@@ -48,8 +48,8 @@ const Home = () => {
       </TitleWrapper>
       <BodyWrapper>
         <ActionsWrapper>
-          <Link to="/new-vehicle">
-            <StyledButton>Register Vehicle</StyledButton>
+          <Link to="/new-entity">
+            <StyledButton>Register Entity</StyledButton>
           </Link>
         </ActionsWrapper>
       </BodyWrapper>
@@ -57,4 +57,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default HomePage;
