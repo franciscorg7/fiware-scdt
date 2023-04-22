@@ -21,13 +21,13 @@ const StyledButton = styled(Button)`
   font-weight: bold;
 `;
 
-const ADDRESS = "http://localhost:1026";
-const GET_ENTITIES = "/v2/entities";
+const ADDRESS = process.env.REACT_APP_API_HOST;
+const PORT = process.env.REACT_APP_API_PORT;
 
 const HomePage = () => {
   useEffect(() => {
     axios
-      .get(`${ADDRESS}${GET_ENTITIES}`, {
+      .get(`${ADDRESS}:${PORT}/entity/list`, {
         mode: "no-cors",
         headers: {
           "Access-Control-Allow-Origin": "*",

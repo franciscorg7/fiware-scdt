@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import HomePage from "./pages/home.page.jsx";
-import NewEntityPage from "./pages/new-entity.page.jsx";
+import HomePage from "./pages/Home";
+import NewEntityPage from "./pages/NewEntity";
 
 const Main = () => {
   return (
