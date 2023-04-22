@@ -8,7 +8,8 @@ import {
 import { Input, Modal } from "antd";
 import { JsonViewer } from "@textea/json-viewer";
 import EntityAttribute from "../EntityAttribute";
-import { bgBlue, highlightOrange } from "../../palette";
+import { highlightOrange } from "../../palette";
+import { useDebounce } from "../../hooks/useDebounce";
 
 const StyledModal = styled(Modal)`
   max-width: 800px;
@@ -29,6 +30,7 @@ const ScrollableJsonViewer = styled(JsonViewer)`
   width: 50%;
   max-height: 600px;
   overflow: auto;
+  padding: 16px;
 `;
 const StyledPlusCircleFilled = styled(PlusCircleFilled)`
   font-size: 16px;
@@ -49,24 +51,32 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
 
   const [attrList, setAttrList] = useState([]);
 
-  let object = {
-    id: "sensor:MultipleSensor:1",
-    type: "Sensor",
-    airQuality: {
-      type: "Integer",
-      value: 12,
+  // Use 1000ms debouncing to update entity id
+  useDebounce(
+    () => {
+      id && setEntityObj({ ...entityObj, id: id });
     },
-    cloudcover: {},
-  };
+    1000,
+    [id]
+  );
+
+  // Use 1000ms debouncing to update entity type
+  useDebounce(
+    () => {
+      type && setEntityObj({ ...entityObj, type: type });
+    },
+    1000,
+    [type]
+  );
 
   useEffect(() => {
-    entityObjKeys.map(
-      (objKey, index) =>
-        (object[objKey] = {
-          type: entityObjKeysTypes[index],
-          value: entityObjKeysValues[index],
-        })
-    );
+    entityObjKeys.map((objKey, index) => {
+      const buildAttr = {
+        type: entityObjKeysTypes[index],
+        value: entityObjKeysValues[index],
+      };
+      setEntityObj({ ...entityObj, [objKey]: buildAttr });
+    });
   }, [entityObjKeys, entityObjKeysTypes, entityObjKeysValues]);
 
   /**
@@ -100,8 +110,7 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
    * @param {String} name
    */
   const onAddAttrName = (id, name) => {
-    console.log(id, name, entityObjKeys);
-    const clone = entityObjKeys;
+    let clone = entityObjKeys;
     clone[id] = name;
     setEntityObjKeys(clone);
   };
@@ -113,8 +122,7 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
    * @param {String} type
    */
   const onAddAttrType = (id, type) => {
-    console.log(id, type, entityObjKeysTypes);
-    const clone = entityObjKeysTypes;
+    let clone = entityObjKeysTypes;
     clone[id] = type;
     setEntityObjKeysTypes(clone);
   };
@@ -126,8 +134,7 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
    * @param {String} value
    */
   const onAddAttrValue = (id, value) => {
-    console.log(id, value, entityObjKeysValues);
-    const clone = entityObjKeysValues;
+    let clone = entityObjKeysValues;
     clone[id] = value;
     setEntityObjKeysValues(clone);
   };
@@ -177,7 +184,7 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
         <ScrollableJsonViewer
           theme={"dark"}
           highlightUpdates={true}
-          value={object}
+          value={entityObj}
         />
       </ModalContent>
     </StyledModal>
