@@ -1,5 +1,6 @@
 import React from "react";
 import { useState } from "react";
+import { useDebounce } from "../../hooks/useDebounce";
 import { Row, Input, Col } from "antd";
 import styled from "styled-components";
 import { DeleteOutlined } from "@ant-design/icons";
@@ -31,33 +32,46 @@ const RemoveButtonWrapper = styled(Col)`
   flex: 1;
 `;
 
-const EntityAttribute = ({ id, name, value, type, onRemove }) => {
+const EntityAttribute = ({
+  id,
+  name,
+  value,
+  type,
+  onRemove,
+  onAddName,
+  onAddType,
+  onAddValue,
+}) => {
   const [localName, setLocalName] = useState(name || "");
-  const [localValue, setLocalValue] = useState(value || "");
   const [localType, setLocalType] = useState(type || "");
+  const [localValue, setLocalValue] = useState(value || "");
+
+  useDebounce(() => onAddName(id, localName), 1000, [localName]);
+  useDebounce(() => onAddType(id, localType), 1000, [localType]);
+  useDebounce(() => onAddValue(id, localValue), 1000, [localValue]);
 
   return (
     <AttributeWrapper>
       <InputsWrapper>
         <Input
           size="medium"
-          placeholder="Name"
-          value={name}
+          placeholder="name"
+          value={localName}
           onChange={(e) => setLocalName(e.target.value)}
           bordered={false}
         />
         <ValueTypeForm>
           <Input
             size="medium"
-            placeholder="Value"
-            value={value}
-            onChange={(e) => setLocalValue(e.target.value)}
+            placeholder="type"
+            value={localType}
+            onChange={(e) => setLocalType(e.target.value)}
           />
           <Input
             size="medium"
-            placeholder="Type"
-            value={type}
-            onChange={(e) => setLocalType(e.target.value)}
+            placeholder="value"
+            value={localValue}
+            onChange={(e) => setLocalValue(e.target.value)}
           />
         </ValueTypeForm>
       </InputsWrapper>
