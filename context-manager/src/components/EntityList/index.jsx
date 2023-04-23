@@ -18,10 +18,9 @@ const StyledPlusCircleFilled = styled(PlusCircleFilled)`
 `;
 
 const EntityList = ({ entityList, onNewEntity }) => {
-  console.log(entityList);
   return (
     <>
-      {entityList.length !== 0 ? (
+      {entityList?.length !== 0 ? (
         <ResponsiveGrid>
           {entityList.map((entity) => (
             <Entity key={entity.id} entity={entity}></Entity>

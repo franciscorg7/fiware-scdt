@@ -7,11 +7,19 @@ const ngsijs = axios.create({
 const getEntityList = async () => {
   try {
     const response = await ngsijs.get(`/entity/list`);
-    setTimeout(() => {}, 2000);
-    return response.data.data.results;
+    return response.data.results;
   } catch (error) {
     return [];
   }
 };
 
-export default { getEntityList };
+const createEntity = async (entityObj) => {
+  try {
+    const response = await ngsijs.post(`/entity/create`, entityObj);
+    return response.data.results;
+  } catch (error) {
+    return [];
+  }
+};
+
+export default { getEntityList, createEntity };

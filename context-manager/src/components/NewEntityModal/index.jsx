@@ -69,6 +69,24 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
     [type]
   );
 
+  useEffect(() => {
+    id &&
+      setEntityObj((entityObj) => {
+        const clone = { ...entityObj };
+        clone["id"] = id;
+        return clone;
+      });
+  }, [id]);
+
+  useEffect(() => {
+    type &&
+      setEntityObj((entityObj) => {
+        const clone = { ...entityObj };
+        clone["type"] = type;
+        return clone;
+      });
+  }, [type]);
+
   /**
    * Listen to entityObjKeysTypes or entityObjKeysValues changes,
    * in order to synchronously update entityObj proper attribute with those changes.

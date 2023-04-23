@@ -5,6 +5,8 @@ import { useState } from "react";
 import EntityList from "../../components/EntityList";
 import NewEntityModal from "../../components/NewEntityModal";
 import { bgLightBlue } from "../../palette";
+import Lottie from "lottie-react";
+import loadingAnimation from "../../resources/lotties/loading.json";
 
 const BodyWrapper = styled.div`
   padding: 42px;
@@ -27,7 +29,7 @@ const HomePage = () => {
   }, []);
 
   /**
-   *
+   * Handle entity list getter by calling ngsiJSService
    */
   const handleGetEntityList = async () => {
     setGetEntityListLoading(true);
@@ -36,9 +38,16 @@ const HomePage = () => {
     setGetEntityListLoading(false);
   };
 
-  useEffect(() => {
-    console.log(getEntityListLoading);
-  }, [getEntityListLoading]);
+  /**
+   * Handle entity creation by calling ngsiJSService
+   * @param {Object} entityObj
+   */
+  const handleCreateEntity = async (entityObj) => {
+    setOnSaveEntityLoading(true);
+    const response = await ngsiJSService.createEntity(entityObj);
+    console.log(response);
+    setOnSaveEntityLoading(false);
+  };
 
   /**
    * Sets the modal open flag to true
@@ -47,15 +56,17 @@ const HomePage = () => {
     setShowEntityModal(true);
   };
 
-  const onSaveNewEntity = (entityObj) => {};
-
   return (
     <BodyWrapper>
-      <EntityList entityList={entityList} onNewEntity={onNewEntity} />
+      {getEntityListLoading ? (
+        <Lottie animationData={loadingAnimation} style={{ height: "40vh" }} />
+      ) : (
+        <EntityList entityList={entityList} onNewEntity={onNewEntity} />
+      )}
       <NewEntityModal
         show={showEntityModal}
         setShow={setShowEntityModal}
-        onSave={onSaveNewEntity}
+        onSave={handleCreateEntity}
         onSaveLoading={onSaveEntityLoading}
       />
     </BodyWrapper>
