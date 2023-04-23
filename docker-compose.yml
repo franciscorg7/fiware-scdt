@@ -10,7 +10,7 @@ services:
     networks:
       - default # use a local network (default)
     ports:
-      - "1026:1026" # match port 1026 on the machine to the one in the container
+      - 1026:1026 # match port 1026 on the machine to the one in the container
     command: -dbhost mongo-db -logLevel DEBUG -noCache
     healthcheck: # check if orion is healthy
       test: curl --fail -s http://orion:1026/version || exit 1
@@ -22,9 +22,9 @@ services:
     hostname: mongo-db # easier to find the container in the network
     container_name: db-mongo # easier to get information for the container "db-mongo"
     expose:
-      - "27017" # expose port 27017 to the network
+      - 27017 # expose port 27017 to the network
     ports:
-      - "27017:27017" # match port 27017 on the machine to the one in the container
+      - 27017:27017 # match port 27017 on the machine to the one in the container
     networks:
       - default # use a local network (default)
     volumes: # makes us of a volume to persist data in the database
@@ -42,9 +42,9 @@ services:
     hostname: mysql-db # easier to find the container in the network
     container_name: db-mysql # easier to get information for the container "db-mysql"
     expose:
-      - "3306" # expose port 3306 to the network
+      - 3306 # expose port 3306 to the network
     ports:
-      - "3306:3306" # match port 27017 on the machine to the one in the container
+      - 3306:3306 # match port 27017 on the machine to the one in the container
     networks:
       - default # use a local network (default)
     environment:
@@ -63,11 +63,11 @@ services:
     depends_on:
       - mysql-db # add container dependency
     expose:
-      - "5050" # expose port 5050 to the network
-      - "5080" # expose port 5080 to the network
+      - 5050 # expose port 5050 to the network
+      - 5080 # expose port 5080 to the network
     ports:
-      - "5050:5050" # match port 5050 on the machine to the one in the container
-      - "5080:5080" # match port 5050 on the machine to the one in the container
+      - 5050:5050 # match port 5050 on the machine to the one in the container
+      - 5080:5080 # match port 5050 on the machine to the one in the container
     environment:
       - "CYGNUS_MYSQL_SERVICE_PORT=5050" # notification port that Cygnus listens when subscribing to context data changes
       - "CYGNUS_MYSQL_HOST=mysql-db" # MySQL server hostname used to persist historical context data
@@ -88,7 +88,16 @@ services:
     depends_on:
       - mysql-db
     ports:
-      - "3000:3000"
+      - 3000:3000
+
+  # Context Manager
+  context-manager:
+    image: context-manager
+    container_name: app-context-manager
+    build:
+      context: ./context-manager
+    ports:
+      - 1909:1909
 
 networks:
   default:
