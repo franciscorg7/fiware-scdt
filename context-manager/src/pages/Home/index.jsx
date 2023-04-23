@@ -26,7 +26,6 @@ const HomePage = () => {
    */
   useEffect(() => {
     ngsijs.get(`/entity/list`).then((res) => {
-      console.log(res.data.data.results);
       setEntityList(res.data.data.results);
     });
   }, []);

@@ -42,8 +42,8 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
   const [type, setType] = useState(null);
   const [entityObj, setEntityObj] = useState({});
 
-  // entityObjKeys is an auxiliar list that helps us mapping entityObj attribute names
-  const [entityObjKeys, setEntityObjKeys] = useState([]);
+  // entityObjKeysNames is an auxiliar list that helps us mapping entityObj attribute names
+  const [entityObjKeysNames, setEntityObjKeysNames] = useState([]);
 
   // entityObjKeysTypes and entityObjKeysValues are auxiliar lists that helps us mapping each attribute corresponding type and value
   const [entityObjKeysTypes, setEntityObjKeysTypes] = useState([]);
@@ -69,15 +69,41 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
     [type]
   );
 
+  /**
+   * Listen to entityObjKeysTypes or entityObjKeysValues changes,
+   * in order to synchronously update entityObj proper attribute with those changes.
+   */
   useEffect(() => {
-    entityObjKeys.map((objKey, index) => {
+    entityObjKeysNames.forEach((objKeyName, index) => {
       const buildAttr = {
-        type: entityObjKeysTypes[index],
-        value: entityObjKeysValues[index],
+        type: entityObjKeysTypes[index] || "",
+        value: entityObjKeysValues[index] || "",
       };
-      setEntityObj({ ...entityObj, [objKey]: buildAttr });
+      setEntityObj((entityObj) => {
+        const clone = { ...entityObj };
+        clone[objKeyName] = buildAttr;
+        return clone;
+      });
     });
-  }, [entityObjKeys, entityObjKeysTypes, entityObjKeysValues]);
+  }, [entityObjKeysNames, entityObjKeysTypes, entityObjKeysValues]);
+
+  /**
+   * Listen to entityObjKeysNames changes, in order to synchronously update entityObj
+   * proper attribute with those changes (if attribute name changes, replace the old one).
+   */
+  useEffect(() => {
+    entityObjKeysNames.forEach((objKeyName, index) => {
+      setEntityObj((entityObj) => {
+        const clone = { ...entityObj };
+        const keys = Object.keys(entityObj);
+        if (keys[index] !== objKeyName) {
+          clone[keys[index]] = clone[objKeyName];
+          delete clone[keys[index]];
+        }
+        return clone;
+      });
+    });
+  }, [entityObjKeysNames]);
 
   /**
    * Adds a default attribute to the attribute list
@@ -87,19 +113,27 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
   };
 
   /**
-   * Removes the attribute indexed by idx and propagates this removal to
+   * Remove the attribute indexed by idx and propagate this removal to
    * every entity object auxiliar mapping structure for name, value and type.
    *
    * @param {Number} idx
    */
   const onRemoveAttr = (idx) => {
-    setAttrList(attrList.filter((_, index) => index !== idx));
-    setEntityObjKeys(entityObjKeys.filter((_, index) => index != idx));
-    setEntityObjKeysValues(
-      entityObjKeysValues.filter((_, index) => index != idx)
+    setAttrList((attrList) => attrList.filter((_, index) => index !== idx));
+    setEntityObj((entityObj) => {
+      let clone = { ...entityObj };
+      const keys = Object.keys(entityObj);
+      keys.length > 1 ? delete clone[keys[idx]] : (clone = {});
+      return clone;
+    });
+    setEntityObjKeysNames((entityObjKeysNames) =>
+      entityObjKeysNames.filter((_, index) => index !== idx)
     );
-    setEntityObjKeysTypes(
-      entityObjKeysTypes.filter((_, index) => index != idx)
+    setEntityObjKeysValues((entityObjKeysValues) =>
+      entityObjKeysValues.filter((_, index) => index !== idx)
+    );
+    setEntityObjKeysTypes((entityObjKeysTypes) =>
+      entityObjKeysTypes.filter((_, index) => index !== idx)
     );
   };
 
@@ -110,9 +144,11 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
    * @param {String} name
    */
   const onAddAttrName = (id, name) => {
-    let clone = entityObjKeys;
-    clone[id] = name;
-    setEntityObjKeys(clone);
+    setEntityObjKeysNames((entityObjKeysNames) => {
+      const clone = [...entityObjKeysNames];
+      clone[id] = name;
+      return clone;
+    });
   };
 
   /**
@@ -122,9 +158,11 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
    * @param {String} type
    */
   const onAddAttrType = (id, type) => {
-    let clone = entityObjKeysTypes;
-    clone[id] = type;
-    setEntityObjKeysTypes(clone);
+    setEntityObjKeysTypes((entityObjKeysTypes) => {
+      const clone = [...entityObjKeysTypes];
+      clone[id] = type;
+      return clone;
+    });
   };
 
   /**
@@ -134,9 +172,11 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
    * @param {String} value
    */
   const onAddAttrValue = (id, value) => {
-    let clone = entityObjKeysValues;
-    clone[id] = value;
-    setEntityObjKeysValues(clone);
+    setEntityObjKeysValues((entityObjKeysValues) => {
+      const clone = [...entityObjKeysValues];
+      clone[id] = value;
+      return clone;
+    });
   };
 
   return (
