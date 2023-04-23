@@ -1,23 +1,21 @@
 import React, { useEffect } from "react";
 import styled from "styled-components";
-import ngsijs from "../../services/ngsijs";
+import ngsiJSService from "../../services/ngsijs";
 import { useState } from "react";
 import EntityList from "../../components/EntityList";
 import NewEntityModal from "../../components/NewEntityModal";
 import { bgLightBlue } from "../../palette";
-import Navbar from "../../components/Navbar";
 
-const PageWrapper = styled.div`
-  height: 100vh;
-`;
 const BodyWrapper = styled.div`
   padding: 42px;
   background: ${bgLightBlue};
   height: 100%;
+  flex: 1;
 `;
 
 const HomePage = () => {
   const [entityList, setEntityList] = useState([]);
+  const [getEntityListLoading, setGetEntityListLoading] = useState(false);
   const [showEntityModal, setShowEntityModal] = useState(false);
   const [onSaveEntityLoading, setOnSaveEntityLoading] = useState(false);
 
@@ -25,10 +23,22 @@ const HomePage = () => {
    * Call /entity/list whenever HomePage renders
    */
   useEffect(() => {
-    ngsijs.get(`/entity/list`).then((res) => {
-      setEntityList(res.data.data.results);
-    });
+    handleGetEntityList();
   }, []);
+
+  /**
+   *
+   */
+  const handleGetEntityList = async () => {
+    setGetEntityListLoading(true);
+    const entityList = await ngsiJSService.getEntityList();
+    setEntityList(entityList);
+    setGetEntityListLoading(false);
+  };
+
+  useEffect(() => {
+    console.log(getEntityListLoading);
+  }, [getEntityListLoading]);
 
   /**
    * Sets the modal open flag to true
@@ -37,21 +47,18 @@ const HomePage = () => {
     setShowEntityModal(true);
   };
 
-  const onSaveNewEntity = () => {};
+  const onSaveNewEntity = (entityObj) => {};
 
   return (
-    <PageWrapper>
-      <Navbar />
-      <BodyWrapper>
-        <EntityList entityList={entityList} onNewEntity={onNewEntity} />
-      </BodyWrapper>
+    <BodyWrapper>
+      <EntityList entityList={entityList} onNewEntity={onNewEntity} />
       <NewEntityModal
         show={showEntityModal}
         setShow={setShowEntityModal}
         onSave={onSaveNewEntity}
         onSaveLoading={onSaveEntityLoading}
       />
-    </PageWrapper>
+    </BodyWrapper>
   );
 };
 

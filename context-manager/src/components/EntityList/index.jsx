@@ -10,7 +10,6 @@ const ResponsiveGrid = styled(Row)`
   display: flex;
   gap: 16px;
 `;
-
 const StyledPlusCircleFilled = styled(PlusCircleFilled)`
   display: flex;
   align-items: center;
@@ -19,13 +18,23 @@ const StyledPlusCircleFilled = styled(PlusCircleFilled)`
 `;
 
 const EntityList = ({ entityList, onNewEntity }) => {
+  console.log(entityList);
   return (
-    <ResponsiveGrid>
-      {entityList.map((entity) => (
-        <Entity key={entity.id} entity={entity}></Entity>
-      ))}
-      <StyledPlusCircleFilled onClick={onNewEntity} style={{ fontSize: 42 }} />
-    </ResponsiveGrid>
+    <>
+      {entityList.length !== 0 ? (
+        <ResponsiveGrid>
+          {entityList.map((entity) => (
+            <Entity key={entity.id} entity={entity}></Entity>
+          ))}
+          <StyledPlusCircleFilled
+            onClick={onNewEntity}
+            style={{ fontSize: 42 }}
+          />
+        </ResponsiveGrid>
+      ) : (
+        <span>Não foram encontrados resultados.</span>
+      )}
+    </>
   );
 };
 

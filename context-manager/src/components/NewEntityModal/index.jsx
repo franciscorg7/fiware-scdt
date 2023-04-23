@@ -183,10 +183,10 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
     <StyledModal
       title="New entity..."
       open={show}
-      onOk={onSave}
+      onOk={() => onSave(entityObj)}
       keyboard
       closable={false}
-      okText="SAVE"
+      okText="Create"
       confirmLoading={onSaveLoading}
       onCancel={() => setShow(false)}
     >
