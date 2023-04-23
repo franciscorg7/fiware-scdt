@@ -28,15 +28,15 @@ app.get("/entity/list", (_, res) => {
   ngsiConnection.v2.listEntities().then(
     (response) => {
       res.send({
-        data: {
-          results: response.results,
-          numOfEntitiesFound: response.results.length,
-          message:
-            "Entity list was successfully retrieved from the Context Broker Server.",
-        },
+        results: response.results,
+        numOfEntitiesFound: response.results.length,
+        message:
+          "Entity list was successfully retrieved from the Context Broker Server.",
       });
     },
-    (error) => res.send(error)
+    (error) => {
+      res.status(503).send({ error: { ...error } });
+    }
   );
 });
 
@@ -110,28 +110,26 @@ app.post("/entity/create", (req, res) => {
                 subscriptionResults[1].subscription.id,
               ];
               res.send({
-                data: {
-                  entityResult: result,
-                  entitySubscriptionResult: subscriptionResults[0], // entity subscription result
-                  dummyResult: dummyResult,
-                  dummySubscriptionResult: subscriptionResults[1], // dummy subscription result
-                  message:
-                    "Both entity and its repetition dummy were successfuly created. Cygnus is now listening to their changes.",
-                },
+                entityResult: result,
+                entitySubscriptionResult: subscriptionResults[0], // entity subscription result
+                dummyResult: dummyResult,
+                dummySubscriptionResult: subscriptionResults[1], // dummy subscription result
+                message:
+                  "Both entity and its repetition dummy were successfuly created. Cygnus is now listening to their changes.",
               });
             });
-          } catch (error) {
+          } catch (subscriptionError) {
             // Catch any possible error related to the subscriptions process
-            res.send(error);
+            res.status(500).send({ error: { ...subscriptionError } });
           }
         },
         // Catch any possible error related to the entity dummy replication process
-        (dummyError) => res.send(dummyError)
+        (dummyError) => res.status(500).send({ error: { ...dummyError } })
       );
     },
     // Catch any possible error related to the entity creation process
-    (error) => {
-      res.send(error);
+    (entityError) => {
+      res.status(500).send({ error: { ...entityError } });
     }
   );
 });
