@@ -10,11 +10,8 @@ COPY package*.json .
 # Install project dependencies
 RUN npm install --silent
 
-# Copy the rest of the app code to the container
+# Copy the rest of the server code to the container
 COPY . .
 
-# Build the app
-RUN npm run build
-
-# Run the app
-CMD [ "npm", "start"]
+# Run the server
+CMD [ "node", "index.js"]

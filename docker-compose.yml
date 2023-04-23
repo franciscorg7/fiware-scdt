@@ -1,86 +1,87 @@
-version: "3.8" # Version for the docker compose
+version: "3.8"
+
 services:
   # Orion Context Broker
   orion:
     image: fiware/orion
-    hostname: orion # easier to find the container in the network
-    container_name: fiware-orion # easier to get information for the container "fiware-orion"
+    hostname: orion # Easier to find the container in the network
+    container_name: fiware-orion
     depends_on:
-      - mongo-db # database for persinting entity information from the Context Broker
+      - mongo-db # For persisting entity information from the Context Broker
     networks:
-      - default # use a local network (default)
+      - default # Use a local network (default)
     ports:
-      - 1026:1026 # match port 1026 on the machine to the one in the container
+      - 1026:1026
     command: -dbhost mongo-db -logLevel DEBUG -noCache
-    healthcheck: # check if orion is healthy
+    healthcheck:
       test: curl --fail -s http://orion:1026/version || exit 1
       interval: 10s
 
-  # Short-term persistency database
+  # Short-term Persistency Database
   mongo-db:
     image: mongo:4.4
-    hostname: mongo-db # easier to find the container in the network
-    container_name: db-mongo # easier to get information for the container "db-mongo"
+    hostname: mongo-db # Easier to find the container in the network
+    container_name: db-mongo
     expose:
-      - 27017 # expose port 27017 to the network
+      - 27017 # Expose port 27017 to the network
     ports:
-      - 27017:27017 # match port 27017 on the machine to the one in the container
+      - 27017:27017
     networks:
-      - default # use a local network (default)
-    volumes: # makes us of a volume to persist data in the database
+      - default # Use a local network (default)
+    volumes: # Make use of a volume to persist short-term data in the database
       - mongo-db:/data
-    healthcheck: # check if MongoDB is healthy
+    healthcheck: # Check if MongoDB is healthy
       test: |
         host=`hostname --ip-address || echo '127.0.0.1'`; 
         mongo --quiet $host/test --eval 'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)' && echo 0 || echo 1
       interval: 5s
 
-  # Long-term persistency database
+  # Long-term Persistency Database
   mysql-db:
     restart: always
     image: mysql:5.7
-    hostname: mysql-db # easier to find the container in the network
-    container_name: db-mysql # easier to get information for the container "db-mysql"
+    hostname: mysql-db # Easier to find the container in the network
+    container_name: db-mysql
     expose:
-      - 3306 # expose port 3306 to the network
+      - 3306 # Expose port 3306 to the network
     ports:
-      - 3306:3306 # match port 27017 on the machine to the one in the container
+      - 3306:3306
     networks:
-      - default # use a local network (default)
+      - default # Use a local network (default)
     environment:
       - "MYSQL_ROOT_PASSWORD=123"
       - "MYSQL_ROOT_HOST=%"
     volumes:
       - mysql-db:/var/lib/mysql
 
-  # Long-term persistency manager
+  # Long-term Persistency Manager
   cygnus:
     image: fiware/cygnus-ngsi
-    hostname: cygnus # easier to find the container in the network
-    container_name: fiware-cygnus # easier to get information for the container "fiware-cygnus"
+    hostname: cygnus # Easier to find the container in the network
+    container_name: fiware-cygnus
     networks:
-      - default # use a local network (default)
+      - default # Use a local network (default)
     depends_on:
-      - mysql-db # add container dependency
+      - mysql-db # For persisting historical information about the entities
     expose:
-      - 5050 # expose port 5050 to the network
-      - 5080 # expose port 5080 to the network
+      - 5050 # Expose port 5050 to the network
+      - 5080 # Expose port 5080 to the network
     ports:
-      - 5050:5050 # match port 5050 on the machine to the one in the container
-      - 5080:5080 # match port 5050 on the machine to the one in the container
+      - 5050:5050
+      - 5080:5080
     environment:
-      - "CYGNUS_MYSQL_SERVICE_PORT=5050" # notification port that Cygnus listens when subscribing to context data changes
+      - "CYGNUS_MYSQL_SERVICE_PORT=5050" # Notification port that Cygnus listens when subscribing to context data changes
       - "CYGNUS_MYSQL_HOST=mysql-db" # MySQL server hostname used to persist historical context data
-      - "CYGNUS_MYSQL_PORT=3306" # port that the MySQL server uses to listen to commands
-      - "CYGNUS_MYSQL_USER=root" # username for the MySQL database user
-      - "CYGNUS_MYSQL_PASS=123" # password for the MySQL database user
-      - "CYGNUS_SERVICE_PORT=5050"
-      - "CYGNUS_API_PORT=5080" # port that Cygnus listens on for operational reasons
+      - "CYGNUS_MYSQL_PORT=3306" # Port that the MySQL server uses to listen to commands
+      - "CYGNUS_MYSQL_USER=root" # Username for the MySQL database user
+      - "CYGNUS_MYSQL_PASS=123" # Password for the MySQL database user
+      - "CYGNUS_SERVICE_PORT=5050" # Port on which Cygnus instance is running on
+      - "CYGNUS_API_PORT=5080" # Port that Cygnus listens on for operational reasons
       - "CYGNUS_LOG_LEVEL=DEBUG"
     healthcheck:
       test: curl --fail -s http://localhost:5080/v1/version || exit 1
 
-  # Data visualization
+  # Data Visualization
   grafana:
     image: grafana/grafana
     hostname: grafana
@@ -90,10 +91,19 @@ services:
     ports:
       - 3000:3000
 
+  # ngsiJS Proxy Server
+  ngsijs-proxy:
+    image: ngsijs-proxy
+    container_name: ngsijs-proxy
+    build:
+      context: ./ngsijs
+    ports:
+      - 8081:8081
+
   # Context Manager
   context-manager:
     image: context-manager
-    container_name: app-context-manager
+    container_name: context-manager
     build:
       context: ./context-manager
     ports:
