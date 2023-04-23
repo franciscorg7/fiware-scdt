@@ -13,13 +13,16 @@ const getEntityList = async () => {
   }
 };
 
-const createEntity = async (entityObj) => {
-  try {
-    const response = await ngsijs.post(`/entity/create`, entityObj);
-    return response.data.results;
-  } catch (error) {
-    return [];
-  }
-};
+const createEntity = (entityObj) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await ngsijs.post(`/entity/create`, entityObj);
+      resolve(response.data.results);
+    } catch (error) {
+      reject(error);
+    }
+  });
 
-export default { getEntityList, createEntity };
+const ngsiJSService = { getEntityList, createEntity };
+
+export default ngsiJSService;

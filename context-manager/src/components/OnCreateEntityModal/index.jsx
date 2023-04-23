@@ -15,7 +15,7 @@ const ModalContent = styled.div`
   column-gap: 42px;
 `;
 
-const OnSaveEntityModal = ({ show, setShow, entityObj, success }) => {
+const OnCreateEntityModal = ({ show, setShow, entityObj, success }) => {
   return (
     <StyledModal
       open={show}
@@ -26,15 +26,15 @@ const OnSaveEntityModal = ({ show, setShow, entityObj, success }) => {
     >
       {success ? (
         <ModalContent>
-          <img src={successSVG} />
+          <img src={successSVG} alt="success" />
         </ModalContent>
       ) : (
         <ModalContent>
-          <img src={errorSVG} />
+          <img src={errorSVG} alt="error" />
         </ModalContent>
       )}
     </StyledModal>
   );
 };
 
-export default OnSaveEntityModal;
+export default OnCreateEntityModal;

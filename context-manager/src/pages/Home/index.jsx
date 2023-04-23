@@ -4,7 +4,7 @@ import ngsiJSService from "../../services/ngsijs";
 import { useState } from "react";
 import EntityList from "../../components/EntityList";
 import NewEntityModal from "../../components/NewEntityModal";
-import OnSaveEntityModal from "../../components/OnSaveEntityModal";
+import OnSaveEntityModal from "../../components/OnCreateEntityModal";
 import { bgLightBlue } from "../../palette";
 import Lottie from "lottie-react";
 import loadingAnimation from "../../resources/lotties/loading.json";
@@ -19,9 +19,10 @@ const BodyWrapper = styled.div`
 const HomePage = () => {
   const [entityList, setEntityList] = useState([]);
   const [getEntityListLoading, setGetEntityListLoading] = useState(false);
-  const [showEntityModal, setShowEntityModal] = useState(false);
-  const [showOnSaveEntityModal, setShowOnSaveEntityModal] = useState(false);
-  const [onSaveEntityLoading, setOnSaveEntityLoading] = useState(false);
+  const [showNewEntityModal, setShowNewEntityModal] = useState(false);
+  const [onCreateEntityLoading, setOnCreateEntityLoading] = useState(false);
+  const [showOnCreateEntityModal, setShowOnCreateEntityModal] = useState(false);
+  const [createEntitySuccess, setCreateEntitySuccess] = useState(false);
 
   /**
    * Call /entity/list whenever HomePage renders
@@ -45,17 +46,31 @@ const HomePage = () => {
    * @param {Object} entityObj
    */
   const handleCreateEntity = async (entityObj) => {
-    setOnSaveEntityLoading(true);
-    const response = await ngsiJSService.createEntity(entityObj);
-    console.log(response);
-    setOnSaveEntityLoading(false);
+    setOnCreateEntityLoading(true);
+    ngsiJSService.createEntity(entityObj).then(
+      (response) => handleCreateEntitySuccess(),
+      (error) => handleCreateEntityError()
+    );
+    setOnCreateEntityLoading(false);
+  };
+
+  const handleCreateEntitySuccess = () => {
+    setCreateEntitySuccess(true);
+    setShowNewEntityModal(false);
+    setShowOnCreateEntityModal(true);
+  };
+
+  const handleCreateEntityError = () => {
+    setCreateEntitySuccess(false);
+    setShowNewEntityModal(false);
+    setShowOnCreateEntityModal(true);
   };
 
   /**
    * Sets the modal open flag to true
    */
   const onNewEntity = () => {
-    setShowEntityModal(true);
+    setShowNewEntityModal(true);
   };
 
   return (
@@ -66,15 +81,15 @@ const HomePage = () => {
         <EntityList entityList={entityList} onNewEntity={onNewEntity} />
       )}
       <NewEntityModal
-        show={showEntityModal}
-        setShow={setShowEntityModal}
+        show={showNewEntityModal}
+        setShow={setShowNewEntityModal}
         onSave={handleCreateEntity}
-        onSaveLoading={onSaveEntityLoading}
+        onSaveLoading={onCreateEntityLoading}
       />
       <OnSaveEntityModal
-        show={true}
-        setShow={setShowOnSaveEntityModal}
-        success={true}
+        show={showOnCreateEntityModal}
+        setShow={setShowOnCreateEntityModal}
+        success={createEntitySuccess}
       />
     </BodyWrapper>
   );
