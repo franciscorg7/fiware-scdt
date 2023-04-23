@@ -27,7 +27,7 @@ app.listen(API_PORT, () => {
 app.get("/entity/list", (_, res) => {
   ngsiConnection.v2.listEntities().then(
     (response) => {
-      res.send({
+      res.json({
         results: response.results,
         numOfEntitiesFound: response.results.length,
         message:
@@ -35,7 +35,7 @@ app.get("/entity/list", (_, res) => {
       });
     },
     (error) => {
-      res.status(503).send({ error: { ...error } });
+      res.status(503).json({ error: { ...error } });
     }
   );
 });
@@ -45,15 +45,9 @@ app.get("/entity/:id", (req, res) => {
   const entityId = req.params.id;
   ngsiConnection.v2.getEntity(entityId).then(
     (response) => {
-      res.send({
-        data: {
-          ...response,
-          message:
-            "Entity was successfully retrieved from the Context Broker Server.",
-        },
-      });
+      res.json(response);
     },
-    (error) => res.send(error)
+    (error) => res.status(404).json({ error: { ...error } })
   );
 });
 
@@ -109,7 +103,7 @@ app.post("/entity/create", (req, res) => {
               dummyResult.entity.subscriptions.value = [
                 subscriptionResults[1].subscription.id,
               ];
-              res.send({
+              res.json({
                 entityResult: result,
                 entitySubscriptionResult: subscriptionResults[0], // entity subscription result
                 dummyResult: dummyResult,
@@ -120,16 +114,16 @@ app.post("/entity/create", (req, res) => {
             });
           } catch (subscriptionError) {
             // Catch any possible error related to the subscriptions process
-            res.status(500).send({ error: { ...subscriptionError } });
+            res.status(500).json({ error: { ...subscriptionError } });
           }
         },
         // Catch any possible error related to the entity dummy replication process
-        (dummyError) => res.status(500).send({ error: { ...dummyError } })
+        (dummyError) => res.status(500).json({ error: { ...dummyError } })
       );
     },
     // Catch any possible error related to the entity creation process
     (entityError) => {
-      res.status(500).send({ error: { ...entityError } });
+      res.status(500).json({ error: { ...entityError } });
     }
   );
 });
