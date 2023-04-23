@@ -5,15 +5,19 @@ import {
   TagOutlined,
   PlusCircleFilled,
 } from "@ant-design/icons";
-import { Input, Modal } from "antd";
+import { Input, Modal, Button } from "antd";
 import { JsonViewer } from "@textea/json-viewer";
 import EntityAttribute from "../EntityAttribute";
-import { highlightOrange } from "../../palette";
+import { highlightOrange, textBlue } from "../../palette";
 import { useDebounce } from "../../hooks/useDebounce";
 
 const StyledModal = styled(Modal)`
   max-width: 800px;
   width: auto !important;
+`;
+const ModalTitle = styled.span`
+  color: ${textBlue};
+  font-size: 24px;
 `;
 const ModalContent = styled.div`
   width: 100%;
@@ -35,6 +39,15 @@ const ScrollableJsonViewer = styled(JsonViewer)`
 const StyledPlusCircleFilled = styled(PlusCircleFilled)`
   font-size: 16px;
   color: ${highlightOrange};
+`;
+const CreateButton = styled(Button)`
+  font-weight: bold;
+  background-color: ${highlightOrange} !important;
+  transition: opacity 0.3s ease-in-out;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
 const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
@@ -69,6 +82,7 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
     [type]
   );
 
+  // Listen to id changes, in order to synchronously update entityObj
   useEffect(() => {
     id &&
       setEntityObj((entityObj) => {
@@ -78,6 +92,7 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
       });
   }, [id]);
 
+  // Listen to type changes, in order to synchronously update entityObj
   useEffect(() => {
     type &&
       setEntityObj((entityObj) => {
@@ -199,13 +214,20 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
 
   return (
     <StyledModal
-      title="New entity..."
+      title={<ModalTitle>New entity...</ModalTitle>}
       open={show}
-      onOk={() => onSave(entityObj)}
       keyboard
       closable={false}
-      okText="Create"
       confirmLoading={onSaveLoading}
+      footer={[
+        <CreateButton
+          type="primary"
+          loading={onSaveLoading}
+          onClick={() => onSave(entityObj)}
+        >
+          Create
+        </CreateButton>,
+      ]}
       onCancel={() => setShow(false)}
     >
       <ModalContent>
@@ -226,7 +248,7 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
           />
           {attrList.map((attr, idx) => (
             <EntityAttribute
-              key={`attribute:${idx}`}
+              key={`attribute:${attr.name}:${idx}`}
               id={idx}
               name={attr.name}
               value={attr.value}

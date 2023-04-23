@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { Modal } from "antd";
+import { Modal, Button } from "antd";
 import successSVG from "../../resources/svg/success.svg";
 import errorSVG from "../../resources/svg/error.svg";
 
@@ -22,7 +22,9 @@ const OnCreateEntityModal = ({ show, setShow, entityObj, success }) => {
       onOk={() => setShow(false)}
       keyboard
       closable={false}
+      footer={[<Button>Ok</Button>]}
       okText="Ok"
+      onCancel={() => setShow(false)}
     >
       {success ? (
         <ModalContent>

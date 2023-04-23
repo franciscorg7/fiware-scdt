@@ -1,37 +1,52 @@
 import React from "react";
 import Entity from "../Entity";
-import { Row } from "antd";
+import { Empty, List } from "antd";
 import styled from "styled-components";
 import { PlusCircleFilled } from "@ant-design/icons";
 import { highlightOrange } from "../../palette";
 
-const ResponsiveGrid = styled(Row)`
-  width: 100%;
-  display: flex;
-  gap: 16px;
-`;
 const StyledPlusCircleFilled = styled(PlusCircleFilled)`
   display: flex;
   align-items: center;
-  padding: 24px;
+  margin: 64px;
   color: ${highlightOrange};
+  font-size: 64px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transition: opacity 0.3s ease-in-out;
+
+  &:hover {
+    opacity: 0.8;
+  }
 `;
 
 const EntityList = ({ entityList, onNewEntity }) => {
   return (
     <>
       {entityList?.length !== 0 ? (
-        <ResponsiveGrid>
-          {entityList.map((entity) => (
-            <Entity key={entity.id} entity={entity}></Entity>
-          ))}
-          <StyledPlusCircleFilled
-            onClick={onNewEntity}
-            style={{ fontSize: 42 }}
+        <>
+          <List
+            grid={{
+              gutter: 16,
+              xs: 1,
+              sm: 2,
+              md: 3,
+              lg: 4,
+              xl: 4,
+              xxl: 4,
+            }}
+            dataSource={entityList}
+            renderItem={(entity) => (
+              <List.Item key={entity.id}>
+                <Entity entity={entity}></Entity>
+              </List.Item>
+            )}
           />
-        </ResponsiveGrid>
+          <StyledPlusCircleFilled onClick={onNewEntity} />
+        </>
       ) : (
-        <span>Não foram encontrados resultados.</span>
+        <Empty />
       )}
     </>
   );

@@ -8,6 +8,7 @@ import OnSaveEntityModal from "../../components/OnCreateEntityModal";
 import { bgLightBlue } from "../../palette";
 import Lottie from "lottie-react";
 import loadingAnimation from "../../resources/lotties/loading.json";
+import { Empty } from "antd";
 
 const BodyWrapper = styled.div`
   padding: 42px;
@@ -17,7 +18,7 @@ const BodyWrapper = styled.div`
 `;
 
 const HomePage = () => {
-  const [entityList, setEntityList] = useState([]);
+  const [entityList, setEntityList] = useState(null);
   const [getEntityListLoading, setGetEntityListLoading] = useState(false);
   const [showNewEntityModal, setShowNewEntityModal] = useState(false);
   const [onCreateEntityLoading, setOnCreateEntityLoading] = useState(false);
@@ -74,24 +75,33 @@ const HomePage = () => {
   };
 
   return (
-    <BodyWrapper>
-      {getEntityListLoading ? (
-        <Lottie animationData={loadingAnimation} style={{ height: "40vh" }} />
+    <>
+      {entityList ? (
+        <BodyWrapper>
+          {getEntityListLoading ? (
+            <Lottie
+              animationData={loadingAnimation}
+              style={{ height: "40vh" }}
+            />
+          ) : (
+            <EntityList entityList={entityList} onNewEntity={onNewEntity} />
+          )}
+          <NewEntityModal
+            show={showNewEntityModal}
+            setShow={setShowNewEntityModal}
+            onSave={handleCreateEntity}
+            onSaveLoading={onCreateEntityLoading}
+          />
+          <OnSaveEntityModal
+            show={showOnCreateEntityModal}
+            setShow={setShowOnCreateEntityModal}
+            success={createEntitySuccess}
+          />
+        </BodyWrapper>
       ) : (
-        <EntityList entityList={entityList} onNewEntity={onNewEntity} />
+        <Empty />
       )}
-      <NewEntityModal
-        show={showNewEntityModal}
-        setShow={setShowNewEntityModal}
-        onSave={handleCreateEntity}
-        onSaveLoading={onCreateEntityLoading}
-      />
-      <OnSaveEntityModal
-        show={showOnCreateEntityModal}
-        setShow={setShowOnCreateEntityModal}
-        success={createEntitySuccess}
-      />
-    </BodyWrapper>
+    </>
   );
 };
 

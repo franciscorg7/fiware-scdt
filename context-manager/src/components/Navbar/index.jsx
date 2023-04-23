@@ -3,7 +3,7 @@ import { highlightOrange, textBlue } from "../../palette";
 import styled from "styled-components";
 
 const NavbarWrapper = styled.div`
-  font-size: 16px;
+  font-size: 12px;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
