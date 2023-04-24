@@ -33,6 +33,22 @@ const createEntity = (entityObj) =>
     }
   });
 
-const ngsiJSService = { getEntityList, getEntityById, createEntity };
+// TODO: apply filters (startDate, endDate, attrName, limit)
+const getEntityHistory = (id) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await ngsijs.get(`/history/entity/${id}`);
+      resolve(response.data.results);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+const ngsiJSService = {
+  getEntityList,
+  getEntityById,
+  createEntity,
+  getEntityHistory,
+};
 
 export default ngsiJSService;
