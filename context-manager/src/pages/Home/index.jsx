@@ -26,7 +26,7 @@ const HomePage = () => {
   const [createEntitySuccess, setCreateEntitySuccess] = useState(false);
 
   /**
-   * Call /entity/list whenever HomePage renders
+   * Fetch entity list whenever the page is mounted
    */
   useEffect(() => {
     handleGetEntityList();
@@ -55,12 +55,18 @@ const HomePage = () => {
     setOnCreateEntityLoading(false);
   };
 
+  /**
+   * Propagate createEntity success to modals visibility
+   */
   const handleCreateEntitySuccess = () => {
     setCreateEntitySuccess(true);
     setShowNewEntityModal(false);
     setShowOnCreateEntityModal(true);
   };
 
+  /**
+   * Propagate createEntity error to modals visibility
+   */
   const handleCreateEntityError = () => {
     setCreateEntitySuccess(false);
     setShowNewEntityModal(false);

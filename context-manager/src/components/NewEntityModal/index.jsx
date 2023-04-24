@@ -14,6 +14,17 @@ import { useDebounce } from "../../hooks/useDebounce";
 const StyledModal = styled(Modal)`
   max-width: 800px;
   width: auto !important;
+
+  & .ant-modal-content {
+    min-height: 500px;
+
+    & .ant-modal-footer{
+      position: absolute;
+      bottom 0;
+      right: 0;
+      margin: 24px;
+    }
+  }
 `;
 const ModalTitle = styled.span`
   color: ${textBlue};

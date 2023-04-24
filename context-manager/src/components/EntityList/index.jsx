@@ -1,10 +1,15 @@
 import React from "react";
 import Entity from "../Entity";
-import { Empty, List } from "antd";
+import { Empty, List, Row } from "antd";
 import styled from "styled-components";
-import { PlusCircleFilled } from "@ant-design/icons";
+import { PlusCircleFilled, EditFilled } from "@ant-design/icons";
 import { highlightOrange } from "../../palette";
 
+const EditRow = styled(Row)`
+  display: flex;
+  justify-content: flex-end;
+  padding: 24px 0;
+`;
 const StyledPlusCircleFilled = styled(PlusCircleFilled)`
   display: flex;
   align-items: center;
@@ -22,20 +27,25 @@ const StyledPlusCircleFilled = styled(PlusCircleFilled)`
 `;
 
 const EntityList = ({ entityList, onNewEntity }) => {
+  // List grid responsiveness configuration
+  const gridConfig = {
+    xs: 1,
+    sm: 2,
+    md: 3,
+    lg: 4,
+    xl: 4,
+    xxl: 4,
+    gutter: 16,
+  };
   return (
     <>
       {entityList?.length !== 0 ? (
         <>
+          <EditRow>
+            <EditFilled />
+          </EditRow>
           <List
-            grid={{
-              gutter: 16,
-              xs: 1,
-              sm: 2,
-              md: 3,
-              lg: 4,
-              xl: 4,
-              xxl: 4,
-            }}
+            grid={gridConfig}
             dataSource={entityList}
             renderItem={(entity) => (
               <List.Item key={entity.id}>
