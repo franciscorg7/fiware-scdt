@@ -31,8 +31,6 @@ app.get("/entity/list", (req, res) => {
       res.json({
         results: response.results,
         numOfEntitiesFound: response.results.length,
-        message:
-          "Entity list was successfully retrieved from the Context Broker Server.",
       });
     },
     (error) => {
@@ -259,9 +257,10 @@ app.post("/subscription/update", (req, res) => {
 
 // Lists all entities registered in the context broker server
 app.get("/subscription/list", (_, res) => {
-  ngsiConnection.v2.listSubscriptions().then((response) => {
-    res.send(response.results);
-  });
+  ngsiConnection.v2.listSubscriptions().then(
+    (response) => res.send({ results: response.results }),
+    (error) => res.status(500).send(error)
+  );
 });
 
 /**
@@ -548,7 +547,7 @@ app.post("/history/repetition", async (req, res) => {
       // After processing simulation state, propagate the repetition to Context Broker and historical sink
       cygnusMySQLQueries.startRepetition(mySQLConnection).then(
         (results) => res.send(results),
-        (error) => res.send(error)
+        (error) => res.status(500).send(error)
       );
     });
 });
@@ -559,7 +558,7 @@ app.patch("/history/repetition/end", (req, res) => {
 
   // Id validation safety check
   if (!repetitionId)
-    res.send({
+    res.status(400).send({
       error: {
         code: "MISSING_REP_ID",
         message: "Repetition id must be provided.",
@@ -571,7 +570,7 @@ app.patch("/history/repetition/end", (req, res) => {
       res.send(results);
     },
     (error) => {
-      res.send(error);
+      res.status(500).send(error);
     }
   );
 });

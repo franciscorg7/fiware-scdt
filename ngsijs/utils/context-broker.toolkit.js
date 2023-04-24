@@ -1,14 +1,27 @@
 const { CYGNUS_HOST, CYGNUS_PORT } = require("../config.js");
 
 /**
+ * Parse a string into a boolean value
+ *
+ * @param {String} string
+ * @returns {Boolean} true if the string matches true not caring about it's written
+ */
+const parseStringToBoolean = (string) => string.toLowerCase() === "true";
+
+/**
  * Receives a request query object and maps it into the appropriate options object
+ *
  * @param {Object} query
  * @returns entityList options
  */
 const buildEntityListOptions = (query) => {
   const options = {};
   const noDummies = parseStringToBoolean(query.noDummies);
-  if (noDummies) options["idPattern"] = "^(?!.*:dummy$).+$";
+  const idPattern = query.idPattern;
+  if (noDummies && idPattern)
+    options["idPattern"] = `^${idPattern}(?!.*:dummy$).*$`;
+  else if (noDummies) options["idPattern"] = `^(?!.*:dummy$).*$`;
+  else if (idPattern) options["idPattern"] = `^${idPattern}.*`;
   return options;
 };
 
@@ -70,14 +83,6 @@ const buildCygnusSubscription = async (entity, description) => {
   };
   return build;
 };
-
-/**
- * Parse a string into a boolean value
- *
- * @param {String} string
- * @returns {Boolean} true if the string matches true not caring about it's written
- */
-const parseStringToBoolean = (string) => string.toLowerCase() === "true";
 
 module.exports = {
   buildEntityListOptions,
