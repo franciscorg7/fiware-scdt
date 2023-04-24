@@ -6,9 +6,10 @@
 </div>
 
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
 
-Urban or city digital twins are a virtual representation of a city's physical assets, using data, data analytics and machine learning to build simulation models that can be updated and changed (real-time) as their physical equivalents change. This project is core for Theia's autonomous vehicles project for leveraging all the research being accomplished and its focus relies on using the FIWARE ecosystem and extending it to support the digital twin. 
+Urban or city digital twins are a virtual representation of a city's physical assets, using data, data analytics and machine learning to build simulation models that can be updated and changed (real-time) as their physical equivalents change. This project is core for Theia's autonomous vehicles project for leveraging all the research being accomplished and its focus relies on using the FIWARE ecosystem and extending it to support the digital twin.
 
 ### Built With
 
@@ -21,17 +22,31 @@ Urban or city digital twins are a virtual representation of a city's physical as
 ![Grafana](https://img.shields.io/badge/grafana-%23F46800.svg?style=for-the-badge&logo=grafana&logoColor=white)
 
 <!-- GETTING STARTED -->
+
 ## Getting Started
 
-To run this project locally, please follow these steps.
+This project is built upon several base components that rely on the FIWARE ecosystem. The installation process can be complex and time-consuming, and it's not always easy to reproduce the same environment across different machines.
+
+For this matter and to ensure consistency across different environments, I decided to use Docker to encapsulate and distribute all the services into interdependent containers.
 
 ### Prerequisites
-wip
+
+1. Docker 🐳
 
 ### Installation
-wip
+
+_Make sure you run the following commands in the root folder._
+
+1. Create and start containers for all the services needed:
+
+```sh
+docker-compose up -d
+```
+
+### Usage
 
 <!-- CONTACT -->
+
 ## Contact
 
 Francisco Gonçalves - franciscorg.dev@gmail.com
