@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ngsiJSService from "../../services/ngsijs";
-import { Row, Col, Empty, Tag, Descriptions } from "antd";
+import { Row, Col, Empty, Tag, Descriptions, Switch } from "antd";
 import styled from "styled-components";
 import { bgLightBlue } from "../../palette";
 import typeTagService from "../../services/type-tag";
+import EntityHistoryTable from "../../components/EntityHistoryTable";
+import AttributeTypeTag from "../../components/AttributeTypeTag";
 
 const BodyWrapper = styled(Col)`
   background: ${bgLightBlue};
@@ -13,9 +15,6 @@ const BodyWrapper = styled(Col)`
   flex: 1;
   text-align: left;
 `;
-const StyledRow = styled(Row)`
-  column-gap: 4px;
-`;
 const EntityTitle = styled(Row)`
   align-items: center;
   column-gap: 8px;
@@ -23,32 +22,40 @@ const EntityTitle = styled(Row)`
     height: fit-content;
   }
 `;
-
-const AttrLabel = ({ entity, attr }) => {
-  return (
-    <StyledRow>
-      {attr}
-      <Tag
-        bordered="false"
-        color={typeTagService.getTypeTagColor(entity[attr]?.type)}
-      >
-        {entity[attr]?.type}
-      </Tag>
-    </StyledRow>
-  );
-};
+const HistorySwitchWrapper = styled(Col)`
+  margin-left: auto;
+  & span {
+    font-weight: bold;
+    margin-right: 6px;
+  }
+`;
 
 const EntityPage = () => {
   const { id } = useParams();
   const [entity, setEntity] = useState(null);
-  const [entityAttrs, setEntityAttrs] = useState([]);
+  const [entityAttrs, setEntityAttrs] = useState(null);
+  const [entityHistory, setEntityHistory] = useState(null);
+  const [seeHistory, setSeeHistory] = useState(false);
+  const [getHistoryLoading, setGetHistoryLoading] = useState(false);
 
   /**
-   * Whenever id is available from the current URL params,
-   * fetch corresponding entity details.
+   * Whenever entity view changes, handle corresponding data
+   * to be presented in that view.
    */
   useEffect(() => {
-    id &&
+    if (id) {
+      seeHistory ? handleGetHistory() : handleGetEntityById();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id, seeHistory]);
+
+  /**
+   * Handle entity history getter by calling ngsiJSService
+   * and propagating it to affected components (only if entity
+   * details are not yet in state).
+   */
+  const handleGetEntityById = () => {
+    !entity &&
       ngsiJSService.getEntityById(id).then(
         (result) => {
           setEntity(result.entity);
@@ -58,9 +65,37 @@ const EntityPage = () => {
             )
           );
         },
-        (error) => {}
+        (error) => {
+          // TODO: deal with getEntityById error
+        }
       );
-  }, [id]);
+  };
+
+  /**
+   * Handle entity history getter by calling ngsiJSService
+   * and propagating it to affected components (only if entity
+   * history is not yet in state).
+   */
+  const handleGetHistory = () => {
+    !entityHistory &&
+      ngsiJSService.getEntityHistory(id).then(
+        (results) => {
+          console.log(results);
+          setEntityHistory(results);
+          setSeeHistory(true);
+        },
+        (error) => {
+          // TODO: deal with getHistory error
+        }
+      );
+  };
+
+  /**
+   * Switch between entity details and entity history view
+   */
+  const switchView = () => {
+    setSeeHistory(!seeHistory);
+  };
 
   return (
     <>
@@ -74,17 +109,31 @@ const EntityPage = () => {
             >
               {entity?.type}
             </Tag>
+            <HistorySwitchWrapper>
+              <span>History</span>
+              <Switch
+                loading={getHistoryLoading}
+                checked={seeHistory}
+                onClick={switchView}
+              />
+            </HistorySwitchWrapper>
           </EntityTitle>
-          <Descriptions layout="vertical" bordered>
-            {entityAttrs.map((attr, idx) => (
-              <Descriptions.Item
-                key={`${attr}:${idx}`}
-                label={<AttrLabel attr={attr} entity={entity} />}
-              >
-                {entity[attr].value ?? "-"}
-              </Descriptions.Item>
-            ))}
-          </Descriptions>
+          {seeHistory ? (
+            <EntityHistoryTable history={entityHistory} />
+          ) : (
+            <Descriptions layout="vertical" bordered>
+              {entityAttrs?.map((attr, idx) => (
+                <Descriptions.Item
+                  key={`${attr}:${idx}`}
+                  label={
+                    <AttributeTypeTag attr={attr} type={entity[attr]?.type} />
+                  }
+                >
+                  {entity[attr].value ?? "-"}
+                </Descriptions.Item>
+              ))}
+            </Descriptions>
+          )}
         </BodyWrapper>
       ) : (
         <Empty />
