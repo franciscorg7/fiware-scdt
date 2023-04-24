@@ -7,6 +7,7 @@ import { bgLightBlue } from "../../palette";
 import typeTagService from "../../services/type-tag";
 import EntityHistoryTable from "../../components/EntityHistoryTable";
 import AttributeTypeTag from "../../components/AttributeTypeTag";
+import { HistoryOutlined } from "@ant-design/icons";
 
 const BodyWrapper = styled(Col)`
   background: ${bgLightBlue};
@@ -27,6 +28,18 @@ const HistorySwitchWrapper = styled(Col)`
   & span {
     font-weight: bold;
     margin-right: 6px;
+  }
+
+  & .rotate-once {
+    animation-name: rotate;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes rotate {
+    100% {
+      transform: rotate(360deg);
+    }
   }
 `;
 
@@ -110,7 +123,10 @@ const EntityPage = () => {
               {entity?.type}
             </Tag>
             <HistorySwitchWrapper>
-              <span>History</span>
+              <span>
+                <HistoryOutlined className={seeHistory ? "rotate-once" : ""} />
+                History
+              </span>
               <Switch
                 loading={getHistoryLoading}
                 checked={seeHistory}
