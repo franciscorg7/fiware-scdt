@@ -292,8 +292,8 @@ app.get("/history/entity/:id", (req, res) => {
         limit
       )
       .then(
-        (results) => res.send(results),
-        (err) => res.send(err)
+        (results) => res.json({ results: results }),
+        (err) => res.status(500).send(err)
       );
   else if (attrName && startDate && endDate)
     cygnusMySQLQueries
@@ -305,8 +305,8 @@ app.get("/history/entity/:id", (req, res) => {
         endDate
       )
       .then(
-        (results) => res.send(results),
-        (err) => res.send(err)
+        (results) => res.json({ results: results }),
+        (err) => res.status(500).send(err)
       );
   else if (attrName && limit)
     cygnusMySQLQueries
@@ -317,8 +317,8 @@ app.get("/history/entity/:id", (req, res) => {
         limit
       )
       .then(
-        (results) => res.send(results),
-        (err) => res.send(err)
+        (results) => res.json({ results: results }),
+        (err) => res.status(500).send(err)
       );
   else if (startDate && endDate && limit)
     cygnusMySQLQueries
@@ -330,15 +330,15 @@ app.get("/history/entity/:id", (req, res) => {
         limit
       )
       .then(
-        (results) => res.send(results),
-        (err) => res.send(err)
+        (results) => res.json({ results: results }),
+        (err) => res.status(500).send(err)
       );
   else if (attrName)
     cygnusMySQLQueries
       .getEntityHistoryFromAttribute(mySQLConnection, entityId, attrName)
       .then(
-        (results) => res.send(results),
-        (err) => res.send(err)
+        (results) => res.json({ results: results }),
+        (err) => res.status(500).send(err)
       );
   else if (startDate && endDate)
     cygnusMySQLQueries
@@ -349,20 +349,20 @@ app.get("/history/entity/:id", (req, res) => {
         endDate
       )
       .then(
-        (results) => res.send(results),
-        (err) => res.send(err)
+        (results) => res.json({ results: results }),
+        (err) => res.status(500).send(err)
       );
   else if (limit)
     cygnusMySQLQueries
       .getEntityHistoryFromLimit(mySQLConnection, entityId, limit)
       .then(
-        (results) => res.send(results),
-        (err) => res.send(err)
+        (results) => res.json({ results: results }),
+        (err) => res.status(500).send(err)
       );
   else
     cygnusMySQLQueries.getEntityHistory(mySQLConnection, entityId).then(
-      (results) => res.send(results),
-      (err) => res.send(err)
+      (results) => res.json({ results: results }),
+      (err) => res.status(500).send(err)
     );
 });
 
