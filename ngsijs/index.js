@@ -24,8 +24,9 @@ app.listen(API_PORT, () => {
  */
 
 // Lists all entities registered in the context broker server
-app.get("/entity/list", (_, res) => {
-  ngsiConnection.v2.listEntities().then(
+app.get("/entity/list", (req, res) => {
+  const options = contextBrokerToolkit.buildEntityListOptions(req.query);
+  ngsiConnection.v2.listEntities(options).then(
     (response) => {
       res.json({
         results: response.results,
