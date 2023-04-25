@@ -4,9 +4,10 @@ const ngsijs = axios.create({
   baseURL: process.env.REACT_APP_API_BASE_URL,
 });
 
-const getEntityList = async () => {
+// TODO: getEntityList should return a promise (to show errors in UI)
+const getEntityList = async (options) => {
   try {
-    const response = await ngsijs.get(`/entity/list`);
+    const response = await ngsijs.get(`/entity/list`, { params: options });
     return response.data.results;
   } catch (error) {
     return [];
