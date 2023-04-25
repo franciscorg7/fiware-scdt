@@ -51,7 +51,6 @@ const EntityHistoryTable = ({ history }) => {
     entry["key"] = idx;
     return entry;
   });
-  console.log(keyedHistory);
   return <StyledTable dataSource={keyedHistory} columns={columns} />;
 };
 

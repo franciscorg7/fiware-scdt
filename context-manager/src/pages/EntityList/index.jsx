@@ -22,7 +22,7 @@ const EntityListPage = () => {
   const [createEntitySuccess, setCreateEntitySuccess] = useState(false);
 
   // Get current search value from the Navbar
-  const searchValue = useLocation().state ?? {};
+  const searchValue = useLocation().state;
 
   /**
    * Fetch entity list whenever the page is mounted
@@ -36,7 +36,8 @@ const EntityListPage = () => {
    * Listen to searchValue changes in order to update entity list
    */
   useEffect(() => {
-    handleGetEntityList();
+    console.log(searchValue);
+    searchValue && handleGetEntityList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue]);
 

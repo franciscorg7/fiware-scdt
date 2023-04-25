@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { highlightOrange, textBlue } from "../../palette";
 import styled from "styled-components";
 import { SearchOutlined } from "@ant-design/icons";
@@ -37,8 +37,16 @@ const SearchBar = styled(Input)``;
 const Navbar = () => {
   const [searchValue, setSearchValue] = useState("");
 
-  // Use 1000ms debouncing to handle onEntitySearch
-  useDebounce(() => onEntitySearch(searchValue), 1000, [searchValue]);
+  // Create a searchBar reference for focus check
+  const searchBarRef = useRef(null);
+  const isSearchBarFocused =
+    document.activeElement === searchBarRef?.current?.input;
+
+  // Use 500ms debouncing to handle onEntitySearch
+  useDebounce(() => isSearchBarFocused && onEntitySearch(searchValue), 500, [
+    searchValue,
+    isSearchBarFocused,
+  ]);
 
   // Initialize useNavigate hook
   const navigate = useNavigate();
@@ -50,6 +58,7 @@ const Navbar = () => {
    * @param {string} searchValue
    */
   const onEntitySearch = (searchValue) => {
+    console.log(isSearchBarFocused);
     navigate("/entity/list", { state: { idPattern: searchValue } });
   };
 
@@ -64,6 +73,7 @@ const Navbar = () => {
       </Link>
       <SearchBarWrapper>
         <SearchBar
+          ref={searchBarRef}
           size="medium"
           prefix={<SearchOutlined />}
           onChange={(e) => setSearchValue(e.target.value)}

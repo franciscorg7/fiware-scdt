@@ -101,7 +101,6 @@ const EntityPage = () => {
     !entityHistory &&
       ngsiJSService.getEntityHistory(id).then(
         (results) => {
-          console.log(results);
           setEntityHistory(results);
           setSeeHistory(true);
         },
