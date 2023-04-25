@@ -55,12 +55,23 @@ const getRepetitionList = () =>
     }
   });
 
+const getSubscriptionList = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await ngsijs.get(`/subscription/list`);
+      resolve(response.data.results);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
 const ngsiJSService = {
   getEntityList,
   getEntityById,
   createEntity,
   getEntityHistory,
   getRepetitionList,
+  getSubscriptionList,
 };
 
 export default ngsiJSService;

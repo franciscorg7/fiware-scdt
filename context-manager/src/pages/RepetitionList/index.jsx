@@ -29,7 +29,7 @@ const RepetitionListPage = () => {
   }, []);
 
   /**
-   * Handle entity history getter by calling ngsiJSService
+   * Handle repetitions getter by calling ngsiJSService
    */
   const handleGetRepetitionList = () => {
     ngsiJSService.getRepetitionList().then(

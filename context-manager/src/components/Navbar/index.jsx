@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { highlightOrange, textBlue } from "../../palette";
+import { highlightCyan, highlightOrange, textBlue } from "../../palette";
 import styled from "styled-components";
 import { SearchOutlined } from "@ant-design/icons";
 import { Input, Row, Col } from "antd";
@@ -27,12 +27,24 @@ const TitleWrapper = styled(Col)`
 `;
 const SearchBarWrapper = styled(Col)`
   position: absolute;
-  left: 50%;
   transform: translate(-50%, 0);
   width: 300px;
+  left: 50%;
+  transition: all 0.2s ease-in-out;
 
   & .ant-input-affix-wrapper {
     border-radius: 20px;
+
+    &:hover,
+    &:active {
+      border-width: 2px;
+      border-color: ${highlightCyan} !important;
+    }
+  }
+
+  & .ant-input-affix-wrapper-focused {
+    border-width: 1px;
+    border-color: ${highlightCyan} !important;
   }
 `;
 

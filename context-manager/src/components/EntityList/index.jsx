@@ -23,6 +23,12 @@ const StyledFloatButton = styled(FloatButton)`
     opacity: 1;
   }
 `;
+const CenteredEmpty = styled(Empty)`
+  top: 40%;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
 
 const EntityList = ({ entityList, onNewEntity }) => {
   // List grid responsiveness configuration
@@ -55,7 +61,7 @@ const EntityList = ({ entityList, onNewEntity }) => {
           />
         </>
       ) : (
-        <Empty />
+        <CenteredEmpty description="No entities found." />
       )}
     </>
   );

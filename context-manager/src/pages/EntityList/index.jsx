@@ -24,6 +24,12 @@ const Title = styled(Row)`
     height: fit-content;
   }
 `;
+const CenteredEmpty = styled(Empty)`
+  top: 40%;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
 
 const EntityListPage = () => {
   const [entityList, setEntityList] = useState(null);
@@ -121,7 +127,7 @@ const EntityListPage = () => {
           />
         </BodyWrapper>
       ) : (
-        <Empty />
+        <CenteredEmpty />
       )}
     </>
   );
