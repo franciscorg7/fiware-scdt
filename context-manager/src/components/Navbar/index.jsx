@@ -58,7 +58,6 @@ const Navbar = () => {
    * @param {string} searchValue
    */
   const onEntitySearch = (searchValue) => {
-    console.log(isSearchBarFocused);
     navigate("/entity/list", { state: { idPattern: searchValue } });
   };
 

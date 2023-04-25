@@ -36,7 +36,6 @@ const EntityListPage = () => {
    * Listen to searchValue changes in order to update entity list
    */
   useEffect(() => {
-    console.log(searchValue);
     searchValue && handleGetEntityList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue]);

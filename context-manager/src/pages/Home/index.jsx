@@ -1,28 +1,82 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import { Card } from "antd";
+import {
+  HistoryOutlined,
+  ExperimentOutlined,
+  IdcardOutlined,
+  WifiOutlined,
+} from "@ant-design/icons";
 
 const BodyWrapper = styled.div`
   padding: 42px;
   height: 100%;
   flex: 1;
+  align-items: center;
+  display: flex;
+  justify-content: center;
 `;
-const NavigationButton = styled.div``;
+const MenuGrid = styled.div`
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 14px;
+`;
+const NavigationButton = styled(Card)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 300px;
+  height: 300px;
+  cursor: pointer;
+  transition: transform 0.2s ease-in;
+  text-decoration: none !important;
+  font-size: 24px;
+
+  & .ant-card-body {
+    display: flex;
+    align-items: center;
+    column-gap: 6px;
+  }
+
+  &:hover {
+    transform: scale(1.04);
+  }
+`;
+const NoDecoratedLink = styled(Link)`
+  text-decoration: none;
+`;
 const HomePage = () => {
   return (
     <BodyWrapper>
-      <Link to="/entity/list">
-        <NavigationButton>Entities</NavigationButton>
-      </Link>
-      <Link to="/entity/list">
-        <NavigationButton></NavigationButton>
-      </Link>
-      <Link to="/entity/list">
-        <NavigationButton></NavigationButton>
-      </Link>
-      <Link to="/entity/list">
-        <NavigationButton></NavigationButton>
-      </Link>
+      <MenuGrid>
+        <NoDecoratedLink to="/entity/list">
+          <NavigationButton>
+            <IdcardOutlined />
+            Entities
+          </NavigationButton>
+        </NoDecoratedLink>
+        <NoDecoratedLink to="/entity/list">
+          <NavigationButton>
+            <HistoryOutlined />
+            Repetitions
+          </NavigationButton>
+        </NoDecoratedLink>
+        <NoDecoratedLink to="/entity/list">
+          <NavigationButton>
+            <ExperimentOutlined />
+            Compare
+          </NavigationButton>
+        </NoDecoratedLink>
+        <NoDecoratedLink to="/entity/list">
+          <NavigationButton>
+            <WifiOutlined />
+            Subscriptions
+          </NavigationButton>
+        </NoDecoratedLink>
+      </MenuGrid>
     </BodyWrapper>
   );
 };
