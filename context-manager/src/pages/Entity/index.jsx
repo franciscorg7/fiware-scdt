@@ -3,14 +3,13 @@ import { useParams } from "react-router-dom";
 import ngsiJSService from "../../services/ngsijs";
 import { Row, Col, Empty, Tag, Descriptions, Switch } from "antd";
 import styled from "styled-components";
-import { bgLightBlue } from "../../palette";
+import { highlightOrange, textBlue } from "../../palette";
 import typeTagService from "../../services/type-tag";
 import EntityHistoryTable from "../../components/EntityHistoryTable";
 import AttributeTypeTag from "../../components/AttributeTypeTag";
 import { HistoryOutlined } from "@ant-design/icons";
 
 const BodyWrapper = styled(Col)`
-  background: ${bgLightBlue};
   padding: 42px;
   height: 100%;
   flex: 1;
@@ -19,6 +18,9 @@ const BodyWrapper = styled(Col)`
 const EntityTitle = styled(Row)`
   align-items: center;
   column-gap: 8px;
+  & h1 {
+    color: ${textBlue};
+  }
   & .ant-tag {
     height: fit-content;
   }
@@ -28,6 +30,10 @@ const HistorySwitchWrapper = styled(Col)`
   & span {
     font-weight: bold;
     margin-right: 6px;
+  }
+
+  & .ant-switch-checked {
+    background-color: ${highlightOrange} !important;
   }
 
   & .rotate-once {
@@ -41,6 +47,9 @@ const HistorySwitchWrapper = styled(Col)`
       transform: rotate(360deg);
     }
   }
+`;
+const StyledTag = styled(Tag)`
+  user-select: none;
 `;
 
 const EntityPage = () => {
@@ -116,12 +125,12 @@ const EntityPage = () => {
         <BodyWrapper>
           <EntityTitle>
             <h1>{entity?.id}</h1>
-            <Tag
+            <StyledTag
               bordered="false"
               color={typeTagService.getTypeTagColor(entity?.type)}
             >
               {entity?.type}
-            </Tag>
+            </StyledTag>
             <HistorySwitchWrapper>
               <span>
                 <HistoryOutlined className={seeHistory ? "rotate-once" : ""} />

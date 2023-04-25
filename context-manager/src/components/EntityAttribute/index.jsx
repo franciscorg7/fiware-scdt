@@ -46,6 +46,7 @@ const EntityAttribute = ({
   const [localType, setLocalType] = useState(type || "");
   const [localValue, setLocalValue] = useState(value || "");
 
+  // Use 1000ms debouncing to update attribute properties
   useDebounce(() => onAddName(id, localName), 1000, [localName]);
   useDebounce(() => onAddType(id, localType), 1000, [localType]);
   useDebounce(() => onAddValue(id, localValue), 1000, [localValue]);

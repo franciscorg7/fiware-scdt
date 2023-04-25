@@ -1,28 +1,31 @@
 import React from "react";
-import Entity from "../Entity";
-import { Empty, List, Row } from "antd";
+import EntityCard from "../EntityCard";
+import { Empty, List, Row, FloatButton } from "antd";
 import styled from "styled-components";
-import { PlusCircleFilled, EditFilled } from "@ant-design/icons";
+import { PlusOutlined, UnorderedListOutlined } from "@ant-design/icons";
 import { highlightOrange } from "../../palette";
 
-const EditRow = styled(Row)`
+const SwitchViewRow = styled(Row)`
   display: flex;
   justify-content: flex-end;
   padding: 24px 0;
 `;
-const StyledPlusCircleFilled = styled(PlusCircleFilled)`
-  display: flex;
-  align-items: center;
-  margin: 64px;
-  color: ${highlightOrange};
-  font-size: 64px;
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  transition: opacity 0.3s ease-in-out;
-
-  &:hover {
+const StyledFloatButton = styled(FloatButton)`
+  width: 60px;
+  height: 60px;
+  & .ant-float-btn-body {
+    background: ${highlightOrange};
+    transition: opacity 0.1s ease-in-out;
     opacity: 0.8;
+
+    & .ant-float-btn-icon {
+      color: #fff !important;
+    }
+  }
+
+  & .ant-float-btn-body:hover {
+    background: ${highlightOrange};
+    opacity: 1;
   }
 `;
 
@@ -41,19 +44,23 @@ const EntityList = ({ entityList, onNewEntity }) => {
     <>
       {entityList?.length !== 0 ? (
         <>
-          <EditRow>
-            <EditFilled />
-          </EditRow>
+          <SwitchViewRow>
+            <UnorderedListOutlined />
+          </SwitchViewRow>
           <List
             grid={gridConfig}
             dataSource={entityList}
-            renderItem={(entity) => (
-              <List.Item key={entity.id}>
-                <Entity entity={entity}></Entity>
+            renderItem={(entity, idx) => (
+              <List.Item key={`${entity.id}:idx`}>
+                <EntityCard entity={entity}></EntityCard>
               </List.Item>
             )}
           />
-          <StyledPlusCircleFilled onClick={onNewEntity} />
+          <StyledFloatButton
+            icon={<PlusOutlined />}
+            tooltip={<div>New entity</div>}
+            onClick={onNewEntity}
+          />
         </>
       ) : (
         <Empty />

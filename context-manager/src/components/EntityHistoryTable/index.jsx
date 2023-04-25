@@ -2,6 +2,16 @@ import React from "react";
 import { Table, Tag } from "antd";
 import typeTagService from "../../services/type-tag";
 import moment from "moment";
+import styled from "styled-components";
+import { bgBlue, highlightCyan, highlightOrange } from "../../palette";
+
+const StyledTable = styled(Table)`
+  & th {
+    background: ${highlightCyan} !important;
+    color: #ffff !important;
+    font-weight: bold !important;
+  }
+`;
 
 const EntityHistoryTable = ({ history }) => {
   // History columns definition
@@ -42,7 +52,7 @@ const EntityHistoryTable = ({ history }) => {
     return entry;
   });
   console.log(keyedHistory);
-  return <Table dataSource={keyedHistory} columns={columns} />;
+  return <StyledTable dataSource={keyedHistory} columns={columns} />;
 };
 
 export default EntityHistoryTable;
