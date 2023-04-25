@@ -48,7 +48,7 @@ const EntityCardTitle = ({ entity }) => (
 const EntityCard = ({ entity }) => {
   // Select the first 4 attributes to preview
   const attributes = Object.keys(entity)
-    .filter((key) => key !== "id" && key != "type")
+    .filter((key) => key !== "id" && key !== "type")
     .slice(0, 4);
 
   return (

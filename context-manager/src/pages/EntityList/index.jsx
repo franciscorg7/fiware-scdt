@@ -5,8 +5,6 @@ import { useState } from "react";
 import EntityList from "../../components/EntityList";
 import NewEntityModal from "../../components/NewEntityModal";
 import OnSaveEntityModal from "../../components/OnCreateEntityModal";
-import Lottie from "lottie-react";
-import loadingAnimation from "../../resources/lotties/loading.json";
 import { Empty } from "antd";
 import { useLocation } from "react-router-dom";
 
@@ -18,7 +16,6 @@ const BodyWrapper = styled.div`
 
 const EntityListPage = () => {
   const [entityList, setEntityList] = useState(null);
-  const [getEntityListLoading, setGetEntityListLoading] = useState(false);
   const [showNewEntityModal, setShowNewEntityModal] = useState(false);
   const [onCreateEntityLoading, setOnCreateEntityLoading] = useState(false);
   const [showOnCreateEntityModal, setShowOnCreateEntityModal] = useState(false);
@@ -32,6 +29,7 @@ const EntityListPage = () => {
    */
   useEffect(() => {
     handleGetEntityList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -39,19 +37,18 @@ const EntityListPage = () => {
    */
   useEffect(() => {
     handleGetEntityList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue]);
 
   /**
    * Handle entity list getter by calling ngsiJSService
    */
   const handleGetEntityList = async () => {
-    setGetEntityListLoading(true);
     const entityList = await ngsiJSService.getEntityList({
       ...searchValue,
       noDummies: true,
     });
     setEntityList(entityList);
-    setGetEntityListLoading(false);
   };
 
   /**

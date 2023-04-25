@@ -3,7 +3,7 @@ import { Table, Tag } from "antd";
 import typeTagService from "../../services/type-tag";
 import moment from "moment";
 import styled from "styled-components";
-import { bgBlue, highlightCyan, highlightOrange } from "../../palette";
+import { highlightCyan } from "../../palette";
 
 const StyledTable = styled(Table)`
   & th {

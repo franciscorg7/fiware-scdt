@@ -58,7 +58,6 @@ const EntityPage = () => {
   const [entityAttrs, setEntityAttrs] = useState(null);
   const [entityHistory, setEntityHistory] = useState(null);
   const [seeHistory, setSeeHistory] = useState(false);
-  const [getHistoryLoading, setGetHistoryLoading] = useState(false);
 
   /**
    * Whenever entity view changes, handle corresponding data
@@ -136,11 +135,7 @@ const EntityPage = () => {
                 <HistoryOutlined className={seeHistory ? "rotate-once" : ""} />
                 History
               </span>
-              <Switch
-                loading={getHistoryLoading}
-                checked={seeHistory}
-                onClick={switchView}
-              />
+              <Switch checked={seeHistory} onClick={switchView} />
             </HistorySwitchWrapper>
           </EntityTitle>
           {seeHistory ? (
