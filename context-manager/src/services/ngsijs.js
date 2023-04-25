@@ -45,11 +45,22 @@ const getEntityHistory = (id) =>
     }
   });
 
+const getRepetitionList = () =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await ngsijs.get(`/history/repetition/list`);
+      resolve(response.data.results);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
 const ngsiJSService = {
   getEntityList,
   getEntityById,
   createEntity,
   getEntityHistory,
+  getRepetitionList,
 };
 
 export default ngsiJSService;
