@@ -8,6 +8,12 @@ import {
   IdcardOutlined,
   WifiOutlined,
 } from "@ant-design/icons";
+import {
+  bgBlue,
+  bgLightBlue,
+  highlightCyan,
+  highlightOrange,
+} from "../../palette";
 
 const BodyWrapper = styled.div`
   padding: 42px;
@@ -34,6 +40,14 @@ const NavigationButton = styled(Card)`
   transition: transform 0.2s ease-in;
   text-decoration: none !important;
   font-size: 24px;
+  background: ${(props) =>
+    props.context === "entities"
+      ? "orange"
+      : props.context === "repetitions"
+      ? highlightOrange
+      : props.context === "compare"
+      ? highlightCyan
+      : bgLightBlue};
 
   & .ant-card-body {
     display: flex;
@@ -53,25 +67,25 @@ const HomePage = () => {
     <BodyWrapper>
       <MenuGrid>
         <NoDecoratedLink to="/entity/list">
-          <NavigationButton>
+          <NavigationButton context={"entities"}>
             <IdcardOutlined />
             Entities
           </NavigationButton>
         </NoDecoratedLink>
-        <NoDecoratedLink to="/entity/list">
-          <NavigationButton>
+        <NoDecoratedLink to="/repetition/list">
+          <NavigationButton context={"repetitions"}>
             <HistoryOutlined />
             Repetitions
           </NavigationButton>
         </NoDecoratedLink>
-        <NoDecoratedLink to="/entity/list">
-          <NavigationButton>
+        <NoDecoratedLink to="/compare">
+          <NavigationButton context={"compare"}>
             <ExperimentOutlined />
             Compare
           </NavigationButton>
         </NoDecoratedLink>
-        <NoDecoratedLink to="/entity/list">
-          <NavigationButton>
+        <NoDecoratedLink to="/subscription/list">
+          <NavigationButton context={"subscriptions"}>
             <WifiOutlined />
             Subscriptions
           </NavigationButton>
