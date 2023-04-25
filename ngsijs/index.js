@@ -552,6 +552,13 @@ app.post("/history/repetition", async (req, res) => {
     });
 });
 
+app.get("/history/repetition/list", (_, res) => {
+  cygnusMySQLQueries.getRepetitionList(mySQLConnection).then(
+    (results) => res.json({ results: results }),
+    (error) => res.status(500).send({ error: error })
+  );
+});
+
 // Notify Orion Context Broker and Cygnus of the ending of a simulation repetition
 app.patch("/history/repetition/end", (req, res) => {
   const repetitionId = req.body.repetitionId;
@@ -566,9 +573,7 @@ app.patch("/history/repetition/end", (req, res) => {
     });
 
   cygnusMySQLQueries.endRepetition(mySQLConnection, repetitionId).then(
-    (results) => {
-      res.send(results);
-    },
+    (results) => res.json(results),
     (error) => {
       res.status(500).send(error);
     }
