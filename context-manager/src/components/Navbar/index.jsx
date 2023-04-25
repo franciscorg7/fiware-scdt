@@ -30,6 +30,10 @@ const SearchBarWrapper = styled(Col)`
   left: 50%;
   transform: translate(-50%, 0);
   width: 300px;
+
+  & .ant-input-affix-wrapper {
+    border-radius: 20px;
+  }
 `;
 
 const SearchBar = styled(Input)``;

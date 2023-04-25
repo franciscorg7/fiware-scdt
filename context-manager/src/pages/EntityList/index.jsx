@@ -5,13 +5,24 @@ import { useState } from "react";
 import EntityList from "../../components/EntityList";
 import NewEntityModal from "../../components/NewEntityModal";
 import OnSaveEntityModal from "../../components/OnCreateEntityModal";
-import { Empty } from "antd";
+import { Empty, Row } from "antd";
 import { useLocation } from "react-router-dom";
+import { textBlue } from "../../palette";
 
 const BodyWrapper = styled.div`
   padding: 42px;
   height: 100%;
   flex: 1;
+`;
+const Title = styled(Row)`
+  align-items: center;
+  column-gap: 8px;
+  & h1 {
+    color: ${textBlue};
+  }
+  & .ant-tag {
+    height: fit-content;
+  }
 `;
 
 const EntityListPage = () => {
@@ -93,6 +104,9 @@ const EntityListPage = () => {
     <>
       {entityList ? (
         <BodyWrapper>
+          <Title>
+            <h1>Entities</h1>
+          </Title>
           <EntityList entityList={entityList} onNewEntity={onNewEntity} />
           <NewEntityModal
             show={showNewEntityModal}

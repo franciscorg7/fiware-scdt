@@ -2,14 +2,9 @@ import React from "react";
 import EntityCard from "../EntityCard";
 import { Empty, List, Row, FloatButton } from "antd";
 import styled from "styled-components";
-import { PlusOutlined, UnorderedListOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { highlightOrange } from "../../palette";
 
-const SwitchViewRow = styled(Row)`
-  display: flex;
-  justify-content: flex-end;
-  padding: 24px 0;
-`;
 const StyledFloatButton = styled(FloatButton)`
   width: 60px;
   height: 60px;
@@ -44,9 +39,6 @@ const EntityList = ({ entityList, onNewEntity }) => {
     <>
       {entityList?.length !== 0 ? (
         <>
-          <SwitchViewRow>
-            <UnorderedListOutlined />
-          </SwitchViewRow>
           <List
             grid={gridConfig}
             dataSource={entityList}
