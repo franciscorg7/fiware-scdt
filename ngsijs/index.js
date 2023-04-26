@@ -263,15 +263,6 @@ app.get("/subscription/list", (_, res) => {
   );
 });
 
-// Get subscription given its id
-app.get("/subscription/:id", (_, res) => {
-  const id = req.params.id;
-  ngsiConnection.v2.getSubscription(id).then(
-    (response) => res.send({ results: response.results }),
-    (error) => res.status(500).send(error)
-  );
-});
-
 /**
  * CYGNUS MYSQL SINK
  */
