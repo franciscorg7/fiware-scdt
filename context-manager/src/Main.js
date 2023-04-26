@@ -6,6 +6,7 @@ import EntityListPage from "./pages/EntityList";
 import RepetitionListPage from "./pages/RepetitionList";
 import ComparePage from "./pages/Compare";
 import SubscriptionListPage from "./pages/SubscriptionList";
+import SubscriptionPage from "./pages/Subscription";
 
 const Main = () => {
   return (
@@ -19,6 +20,7 @@ const Main = () => {
         path="/subscription/list"
         element={<SubscriptionListPage />}
       />
+      <Route path="/subscription/details" element={<SubscriptionPage />} />
       <Route path="/entity/:id" element={<EntityPage />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>

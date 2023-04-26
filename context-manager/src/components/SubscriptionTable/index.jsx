@@ -3,6 +3,7 @@ import { Empty, Table, Badge, Row, Tooltip } from "antd";
 import moment from "moment";
 import styled from "styled-components";
 import { highlightCyan } from "../../palette";
+import { useNavigate } from "react-router-dom";
 
 const StyledTable = styled(Table)`
   & thead > tr > * {
@@ -20,8 +21,23 @@ const CenteredEmpty = styled(Empty)`
   left: 50%;
   transform: translate(-50%, -50%);
 `;
+const ViewMoreBtn = styled.span`
+  cursor: pointer;
+`;
 
 const SubscriptionTable = ({ subscriptions }) => {
+  // Initialize useNavigate hook
+  const navigate = useNavigate();
+  /**
+   * Navigates to Subscription page showing more details
+   * @param {Subscritpion} subscription
+   */
+  const viewMore = (subscription) => {
+    navigate(`/subscription/details`, {
+      state: { subscription: subscription },
+    });
+  };
+
   // Repetition columns definition
   const columns = [
     {
@@ -60,7 +76,9 @@ const SubscriptionTable = ({ subscriptions }) => {
     },
     {
       key: "actions",
-      render: () => <span>View more</span>,
+      render: (_, row) => (
+        <ViewMoreBtn onClick={() => viewMore(row)}>View more</ViewMoreBtn>
+      ),
     },
   ];
   // Apply a key value to each history entry (let React identify table rows)
