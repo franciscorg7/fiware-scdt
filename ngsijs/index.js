@@ -255,9 +255,18 @@ app.post("/subscription/update", (req, res) => {
   );
 });
 
-// Lists all entities registered in the context broker server
+// Lists all subscriptions registered in the context broker server
 app.get("/subscription/list", (_, res) => {
   ngsiConnection.v2.listSubscriptions().then(
+    (response) => res.send({ results: response.results }),
+    (error) => res.status(500).send(error)
+  );
+});
+
+// Get subscription given its id
+app.get("/subscription/:id", (_, res) => {
+  const id = req.params.id;
+  ngsiConnection.v2.getSubscription(id).then(
     (response) => res.send({ results: response.results }),
     (error) => res.status(500).send(error)
   );
