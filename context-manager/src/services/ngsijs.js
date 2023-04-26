@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const ngsijs = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL,
+  baseURL: process.env.REACT_APP_API_PORTO_BASE_URL,
 });
 
 // TODO: getEntityList should return a promise (to show errors in UI)
