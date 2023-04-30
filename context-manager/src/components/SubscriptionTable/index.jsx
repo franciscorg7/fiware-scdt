@@ -2,7 +2,7 @@ import React from "react";
 import { Empty, Table, Badge, Row, Tooltip } from "antd";
 import moment from "moment";
 import styled from "styled-components";
-import { highlightCyan } from "../../palette";
+import { highlightCyan, textBlue } from "../../palette";
 import { useNavigate } from "react-router-dom";
 
 const StyledTable = styled(Table)`
@@ -23,6 +23,8 @@ const CenteredEmpty = styled(Empty)`
 `;
 const ViewMoreBtn = styled.span`
   cursor: pointer;
+  font-weight: bold;
+  color: ${textBlue};
 `;
 
 const SubscriptionTable = ({ subscriptions }) => {

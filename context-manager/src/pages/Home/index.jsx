@@ -8,12 +8,7 @@ import {
   IdcardOutlined,
   WifiOutlined,
 } from "@ant-design/icons";
-import {
-  bgBlue,
-  bgLightBlue,
-  highlightCyan,
-  highlightOrange,
-} from "../../palette";
+import { bgLightBlue, highlightCyan, highlightOrange } from "../../palette";
 
 const BodyWrapper = styled.div`
   padding: 42px;

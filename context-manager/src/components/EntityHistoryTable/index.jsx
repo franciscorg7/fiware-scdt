@@ -13,6 +13,10 @@ const StyledTable = styled(Table)`
   }
 `;
 
+const InnerTypeTag = styled(Tag)`
+  border: 0px;
+`;
+
 const EntityHistoryTable = ({ history }) => {
   // History columns definition
   const columns = [
@@ -31,9 +35,12 @@ const EntityHistoryTable = ({ history }) => {
       dataIndex: "attrType",
       key: "attrType",
       render: (type) => (
-        <Tag bordered="false" color={typeTagService.getTypeTagColor(type)}>
+        <InnerTypeTag
+          bordered="false"
+          color={typeTagService.getTypeTagColor(type)}
+        >
           {type}
-        </Tag>
+        </InnerTypeTag>
       ),
     },
     {

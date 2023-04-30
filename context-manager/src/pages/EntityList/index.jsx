@@ -61,11 +61,19 @@ const EntityListPage = () => {
    * Handle entity list getter by calling ngsiJSService
    */
   const handleGetEntityList = async () => {
-    const entityList = await ngsiJSService.getEntityList({
-      ...searchValue,
-      noDummies: true,
-    });
-    setEntityList(entityList);
+    ngsiJSService
+      .getEntityList({
+        ...searchValue,
+        noDummies: true,
+      })
+      .then(
+        (results) => {
+          setEntityList(results);
+        },
+        (error) => {
+          //TODO: deal with entityList error
+        }
+      );
   };
 
   /**
