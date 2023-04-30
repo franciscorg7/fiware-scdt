@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { Row, Col, Empty } from "antd";
+import { Row, Col, Empty, Collapse } from "antd";
 import styled from "styled-components";
 import { textBlue } from "../../palette";
 import CompareCard from "../../components/CompareCard";
 import CompareEntitySearch from "../../components/CompareEntitySearch";
 import { useMemo } from "react";
 import ngsiJSService from "../../services/ngsijs";
+import { FilterFilled } from "@ant-design/icons";
 
+const { Panel } = Collapse;
 const BodyWrapper = styled(Col)`
   padding: 42px;
   height: 100%;
@@ -34,7 +36,6 @@ const ComparingContainer = styled(Col)`
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   padding: 42px;
-  row-gap: 6rem;
 `;
 const EntitySearchRow = styled(Row)`
   width: 100%;
@@ -57,6 +58,12 @@ const EntityCardWrapper = styled(Col)`
 const StyledEmpty = styled(Empty)`
   width: 100%;
   margin-top: 10rem;
+`;
+const FiltersCollapse = styled(Collapse)`
+  & .ant-collapse-header-text {
+    font-weight: bold;
+    color: ${textBlue};
+  }
 `;
 
 const ComparePage = () => {
@@ -152,6 +159,11 @@ const ComparePage = () => {
             />
           </SearchWrapper>
         </EntitySearchRow>
+        <FiltersCollapse ghost expandIcon={() => <FilterFilled />}>
+          <Panel header="Filters">
+            <p>hello</p>
+          </Panel>
+        </FiltersCollapse>
         <EntityCardsRow>
           {comparingEntitySet.map(
             (entityData, idx) =>
@@ -166,7 +178,7 @@ const ComparePage = () => {
           )}
           {comparingEntitySet.length === 0 ||
           !(comparingEntitySet[0] || comparingEntitySet[1]) ? (
-            <StyledEmpty description="Compare entities history." />
+            <StyledEmpty description="Compare repetitions history." />
           ) : null}
         </EntityCardsRow>
       </ComparingContainer>
