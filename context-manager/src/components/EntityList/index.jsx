@@ -1,28 +1,10 @@
 import React from "react";
 import EntityCard from "../EntityCard";
-import { Empty, List, Row, FloatButton } from "antd";
+import { Empty, List } from "antd";
 import styled from "styled-components";
 import { PlusOutlined } from "@ant-design/icons";
-import { highlightOrange } from "../../palette";
+import ActionFloatButton from "../ActionFloatButton";
 
-const StyledFloatButton = styled(FloatButton)`
-  width: 60px;
-  height: 60px;
-  & .ant-float-btn-body {
-    background: ${highlightOrange};
-    transition: opacity 0.1s ease-in-out;
-    opacity: 0.8;
-
-    & .ant-float-btn-icon {
-      color: #fff !important;
-    }
-  }
-
-  & .ant-float-btn-body:hover {
-    background: ${highlightOrange};
-    opacity: 1;
-  }
-`;
 const CenteredEmpty = styled(Empty)`
   top: 40%;
   position: absolute;
@@ -54,11 +36,10 @@ const EntityList = ({ entityList, onNewEntity }) => {
               </List.Item>
             )}
           />
-          <StyledFloatButton
-            icon={<PlusOutlined />}
-            tooltip={<div>New entity</div>}
-            onClick={onNewEntity}
-          />
+          <ActionFloatButton
+            onAction={onNewEntity}
+            actionLabel="New entity"
+          ></ActionFloatButton>
         </>
       ) : (
         <CenteredEmpty description="No entities found." />

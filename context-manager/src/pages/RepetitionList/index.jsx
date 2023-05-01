@@ -4,6 +4,8 @@ import { Row, Col } from "antd";
 import styled from "styled-components";
 import { textBlue } from "../../palette";
 import RepetitionTable from "../../components/RepetitionTable";
+import ActionFloatButton from "../../components/ActionFloatButton";
+import NewRepetitionModal from "../../components/NewRepetitionModal";
 
 const BodyWrapper = styled(Col)`
   padding: 42px;
@@ -24,6 +26,10 @@ const Title = styled(Row)`
 
 const RepetitionListPage = () => {
   const [repetitions, setRepetitions] = useState(null);
+  const [showNewRepetitionModal, setShowNewRepetitionModal] = useState(false);
+  const [onCreateRepetitionLoading, setOnCreateRepetitionLoading] =
+    useState(false);
+
   useEffect(() => {
     handleGetRepetitionList();
   }, []);
@@ -42,6 +48,15 @@ const RepetitionListPage = () => {
     );
   };
 
+  /**
+   * Sets the modal open flag to true
+   */
+  const onNewRepetition = () => {
+    setShowNewRepetitionModal(true);
+  };
+
+  const handleCreateRepetition = () => {};
+
   return (
     <>
       <BodyWrapper>
@@ -49,6 +64,16 @@ const RepetitionListPage = () => {
           <h1>Repetitions</h1>
         </Title>
         <RepetitionTable repetitions={repetitions} />
+        <NewRepetitionModal
+          show={showNewRepetitionModal}
+          setShow={setShowNewRepetitionModal}
+          onSave={handleCreateRepetition}
+          onSaveLoading={onCreateRepetitionLoading}
+        />
+        <ActionFloatButton
+          onAction={onNewRepetition}
+          actionLabel="New repetition"
+        ></ActionFloatButton>
       </BodyWrapper>
     </>
   );

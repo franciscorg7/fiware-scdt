@@ -55,7 +55,11 @@ const RepetitionTable = ({ repetitions }) => {
   return (
     <>
       {repetitions ? (
-        <StyledTable dataSource={keyedRepetitions} columns={columns} />
+        <StyledTable
+          dataSource={keyedRepetitions}
+          columns={columns}
+          pagination={{ position: ["none", "bottomCenter"] }}
+        />
       ) : (
         <CenteredEmpty description="No repetitions found." />
       )}
