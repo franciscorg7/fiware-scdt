@@ -18,6 +18,8 @@ const buildEntityListOptions = (query) => {
   const options = {};
   const noDummies = parseStringToBoolean(query.noDummies);
   const idPattern = query.idPattern;
+  const attrs = query.attrs;
+  if (attrs) options["attrs"] = attrs;
   if (noDummies && idPattern)
     options["idPattern"] = `^${idPattern}(?!.*:dummy$).*$`;
   else if (noDummies) options["idPattern"] = `^(?!.*:dummy$).*$`;
