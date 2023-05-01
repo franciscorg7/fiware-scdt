@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Row, Col, Empty, Collapse } from "antd";
+import React, { useState, useEffect } from "react";
+import { Row, Col, Empty, Collapse, DatePicker, Select } from "antd";
 import styled from "styled-components";
 import { textBlue } from "../../palette";
 import CompareCard from "../../components/CompareCard";
@@ -9,6 +9,7 @@ import ngsiJSService from "../../services/ngsijs";
 import { FilterFilled } from "@ant-design/icons";
 
 const { Panel } = Collapse;
+const { RangePicker } = DatePicker;
 const BodyWrapper = styled(Col)`
   padding: 42px;
   height: 100%;
@@ -64,12 +65,28 @@ const FiltersCollapse = styled(Collapse)`
     font-weight: bold;
     color: ${textBlue};
   }
+  & .ant-collapse-content-box {
+    display: flex;
+    column-gap: 24px;
+  }
+`;
+const FilterWrapper = styled(Col)`
+  display: flex;
+  flex-direction: column;
+`;
+const AttributeSelect = styled(Select)`
+  min-width: 200px;
 `;
 
 const ComparePage = () => {
   const [comparingEntityIds, setComparingEntityIds] = useState([]);
   const [comparingEntitySet, setComparingEntitySet] = useState([]);
+  const [attributeNameOptions, setAttributeNameOptions] = useState([]);
 
+  /**
+   * Each time the first entity to be compared gets selected,
+   * fetch its dummy historical data
+   */
   useMemo(() => {
     if (comparingEntityIds[0]) {
       ngsiJSService.getEntityHistory(`${comparingEntityIds[0]}:dummy`).then(
@@ -89,6 +106,10 @@ const ComparePage = () => {
     }
   }, [comparingEntityIds[0]]);
 
+  /**
+   * Each time the second entity to be compared gets selected,
+   * fetch its dummy historical data
+   */
   useMemo(() => {
     if (comparingEntityIds[1]) {
       ngsiJSService.getEntityHistory(`${comparingEntityIds[1]}:dummy`).then(
@@ -107,6 +128,35 @@ const ComparePage = () => {
       setComparingEntitySet(currentEntitySet);
     }
   }, [comparingEntityIds[1]]);
+
+  /**
+   * Each time the comparing entity set gets updated, update the attribute set
+   * involved in the comparison
+   */
+  useMemo(() => {
+    const attrNames = new Set();
+    if (comparingEntitySet[0])
+      comparingEntitySet[0].results.map((entity) => {
+        const attr = entity.attrName;
+        attrNames.add(attr);
+      });
+    else if (comparingEntitySet[1])
+      comparingEntitySet[1].results.map((entity) => {
+        const attr = entity.attrName;
+        attrNames.add(attr);
+      });
+    else return;
+
+    // Convert set of unique attrNames into an array and map it into options structure {label, value}
+    const attrNameOptions = Array.from(attrNames).map((attrName) => {
+      return { label: attrName, value: attrName };
+    });
+    setAttributeNameOptions(attrNameOptions);
+  }, [comparingEntitySet]);
+
+  useEffect(() => {
+    console.log(attributeNameOptions);
+  }, [attributeNameOptions]);
 
   /**
    * Handle component selection for comparing by updating
@@ -139,6 +189,10 @@ const ComparePage = () => {
     setComparingEntityIds(modifiedComparingIds);
   };
 
+  const handleAttributeChange = (value) => {
+    console.log(value);
+  };
+
   return (
     <BodyWrapper>
       <EntityTitle>
@@ -161,7 +215,19 @@ const ComparePage = () => {
         </EntitySearchRow>
         <FiltersCollapse ghost expandIcon={() => <FilterFilled />}>
           <Panel header="Filters">
-            <p>hello</p>
+            <FilterWrapper>
+              <span>Attributes</span>
+              <AttributeSelect
+                mode="multiple"
+                allowClear
+                onChange={handleAttributeChange}
+                options={attributeNameOptions}
+              />
+            </FilterWrapper>
+            <FilterWrapper>
+              <span>Date Interval</span>
+              <RangePicker format={"DD MMM YYYY"} />
+            </FilterWrapper>
           </Panel>
         </FiltersCollapse>
         <EntityCardsRow>
