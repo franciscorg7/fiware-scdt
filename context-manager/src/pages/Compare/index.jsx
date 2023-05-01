@@ -6,7 +6,7 @@ import CompareCard from "../../components/CompareCard";
 import CompareEntitySearch from "../../components/CompareEntitySearch";
 import { useMemo } from "react";
 import ngsiJSService from "../../services/ngsijs";
-import { FilterFilled } from "@ant-design/icons";
+import { FilterFilled, FilterOutlined } from "@ant-design/icons";
 
 const { Panel } = Collapse;
 const { RangePicker } = DatePicker;
@@ -62,8 +62,8 @@ const StyledEmpty = styled(Empty)`
 `;
 const FiltersCollapse = styled(Collapse)`
   & .ant-collapse-header-text {
-    font-weight: bold;
-    color: ${textBlue};
+    font-weight: ${(props) => (!props.disabled ? "bold" : "regular")};
+    color: ${(props) => (!props.disabled ? textBlue : "rgba(0, 0, 0, 0.25)")};
   }
   & .ant-collapse-content-box {
     display: flex;
@@ -79,6 +79,7 @@ const AttributeSelect = styled(Select)`
 `;
 
 const ComparePage = () => {
+  const [collapseFilters, setCollapseFilters] = useState(true);
   const [comparingEntityIds, setComparingEntityIds] = useState([]);
   const [comparingEntitySet, setComparingEntitySet] = useState([]);
   const [attributeNameOptions, setAttributeNameOptions] = useState([]);
@@ -143,30 +144,28 @@ const ComparePage = () => {
     startDateFilter && options.push({ startDate: startDateFilter });
     endDateFilter && options.push({ endDate: endDateFilter });
 
+    let currentEntitySet = [...comparingEntitySet];
+
     // Fetch filtered history for first component
     comparingEntityIds[0] &&
       ngsiJSService
         .getEntityHistory(`${comparingEntityIds[0]}:dummy`, options)
         .then(
           (results) => {
-            const currentEntitySet = [...comparingEntitySet];
             currentEntitySet[0] = { results: results };
-            setComparingEntitySet(currentEntitySet);
-          },
-          (error) => {
-            //TODO: handle error
-          }
-        );
-
-    // Fetch filtered history for second component
-    comparingEntityIds[1] &&
-      ngsiJSService
-        .getEntityHistory(`${comparingEntityIds[1]}:dummy`, options)
-        .then(
-          (results) => {
-            const currentEntitySet = [...comparingEntitySet];
-            currentEntitySet[1] = { results: results };
-            setComparingEntitySet(currentEntitySet);
+            // Fetch filtered history for second component
+            comparingEntityIds[1] &&
+              ngsiJSService
+                .getEntityHistory(`${comparingEntityIds[1]}:dummy`, options)
+                .then(
+                  (results) => {
+                    currentEntitySet[1] = { results: results };
+                    setComparingEntitySet(currentEntitySet);
+                  },
+                  (error) => {
+                    //TODO: handle error
+                  }
+                );
           },
           (error) => {
             //TODO: handle error
@@ -244,8 +243,19 @@ const ComparePage = () => {
             />
           </SearchWrapper>
         </EntitySearchRow>
-        <FiltersCollapse ghost expandIcon={() => <FilterFilled />}>
-          <Panel header="Filters">
+        <FiltersCollapse
+          disabled={!(comparingEntityIds[0] && comparingEntityIds[1])}
+          collapsible={
+            comparingEntityIds[0] && comparingEntityIds[1] ? "head" : "disabled"
+          }
+          activeKey={collapseFilters ? "-1" : "1"}
+          ghost
+          expandIcon={() =>
+            collapseFilters ? <FilterOutlined /> : <FilterFilled />
+          }
+          onChange={() => setCollapseFilters(!collapseFilters)}
+        >
+          <Panel key="1" header="Filters">
             <FilterWrapper>
               <span>Attributes</span>
               <AttributeSelect
