@@ -40,8 +40,12 @@ const getEntityHistory = (id, options) =>
     try {
       let response;
       if (options) {
-        console.log(options);
-        const queryString = buildHistoryOptionsQueryString(options);
+        let queryString;
+        try {
+          queryString = buildHistoryOptionsQueryString(options);
+        } catch (error) {
+          reject(error);
+        }
         response = await ngsijs.get(`/history/entity/${id}?${queryString}`);
       } else {
         response = await ngsijs.get(`/history/entity/${id}`);

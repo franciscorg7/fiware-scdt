@@ -7,8 +7,8 @@ const buildHistoryOptionsQueryString = (options) => {
   const attrNames = options
     .map((option) => option.attrName)
     .filter((attr) => attr);
-  const startDate = options.find((option) => option.startDate).startDate;
-  const endDate = options.find((option) => option.endDate).endDate;
+  const startDate = options.find((option) => option.startDate)?.startDate;
+  const endDate = options.find((option) => option.endDate)?.endDate;
   let queryString = "";
   attrNames.map((attr) => (queryString += `attrName=${attr}&`));
   if (startDate) queryString += `startDate=${startDate}&`;
