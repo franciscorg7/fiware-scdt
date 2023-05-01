@@ -30,6 +30,7 @@ const ViewMoreBtn = styled.span`
 const SubscriptionTable = ({ subscriptions }) => {
   // Initialize useNavigate hook
   const navigate = useNavigate();
+
   /**
    * Navigates to Subscription page showing more details
    * @param {Subscritpion} subscription
@@ -72,8 +73,8 @@ const SubscriptionTable = ({ subscriptions }) => {
       key: "expires",
       render: (expireDate) => {
         if (!expireDate) return "-";
-        const parsedExpireDate = moment(expireDate, "YYYY-MM-DD HH:mm:ss.SSS");
-        return parsedExpireDate.format("DD MMM YYYY (HH:mm:ss.SSS)");
+        const parsedExpireDate = moment(expireDate, "YYYY-MM-DD");
+        return parsedExpireDate.format("DD MMM YYYY");
       },
     },
     {

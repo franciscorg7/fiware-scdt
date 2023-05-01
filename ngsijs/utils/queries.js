@@ -243,7 +243,6 @@ const endRepetition = (mySQLConnection, repetitionId) =>
  * @returns closest recvTime attribute value
  */
 const getClosestRecvTime = (mySQLConnection, entityId, dateTime) => {
-  console.log(dateTime);
   return cygnusMySQLToolkit.runQuery(
     mySQLConnection,
     `SELECT recvTime FROM ${entityId} ORDER BY ABS(TIMESTAMPDIFF(SECOND, recvTime, '${dateTime}')) LIMIT 1`

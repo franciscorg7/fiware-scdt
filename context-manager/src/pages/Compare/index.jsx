@@ -61,6 +61,7 @@ const StyledEmpty = styled(Empty)`
   margin-top: 10rem;
 `;
 const FiltersCollapse = styled(Collapse)`
+  padding: 24px 0;
   & .ant-collapse-header-text {
     font-weight: ${(props) => (!props.disabled ? "bold" : "regular")};
     color: ${(props) => (!props.disabled ? textBlue : "rgba(0, 0, 0, 0.25)")};
@@ -248,7 +249,11 @@ const ComparePage = () => {
           collapsible={
             comparingEntityIds[0] && comparingEntityIds[1] ? "head" : "disabled"
           }
-          activeKey={collapseFilters ? "-1" : "1"}
+          activeKey={
+            !(comparingEntityIds[0] && comparingEntityIds[1]) || collapseFilters
+              ? "-1"
+              : "1"
+          }
           ghost
           expandIcon={() =>
             collapseFilters ? <FilterOutlined /> : <FilterFilled />

@@ -58,7 +58,6 @@ const StyledList = styled(List)`
 const SubscriptionPage = () => {
   // Get current search value from the Navbar
   const subscription = useLocation().state.subscription;
-  console.log(subscription);
 
   return (
     <>

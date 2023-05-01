@@ -32,8 +32,8 @@ const RepetitionTable = ({ repetitions }) => {
       key: "startDate",
       render: (startDate) => {
         if (!startDate) return "-";
-        const parsedStartDate = moment(startDate, "YYYY-MM-DD HH:mm:ss.SSS");
-        return parsedStartDate.format("DD MMM YYYY (HH:mm:ss.SSS)");
+        const parsedStartDate = moment(startDate, "YYYY-MM-DD HH:mm:ss");
+        return parsedStartDate.format("DD MMM YYYY (HH:mm:ss)");
       },
     },
     {
@@ -42,8 +42,8 @@ const RepetitionTable = ({ repetitions }) => {
       key: "endDate",
       render: (endDate) => {
         if (!endDate) return "-";
-        const parsedEndDate = moment(endDate, "YYYY-MM-DD HH:mm:ss.SSS");
-        return parsedEndDate.format("DD MMM YYYY (HH:mm:ss.SSS)");
+        const parsedEndDate = moment(endDate, "YYYY-MM-DD HH:mm:ss");
+        return parsedEndDate.format("DD MMM YYYY (HH:mm:ss)");
       },
     },
   ];
