@@ -1,4 +1,5 @@
 import axios from "axios";
+import { buildHistoryOptionsQueryString } from "./ngsijs-utils";
 
 const ngsijs = axios.create({
   baseURL: process.env.REACT_APP_API_PORTO_BASE_URL,
@@ -34,11 +35,17 @@ const createEntity = (entityObj) =>
     }
   });
 
-// TODO: apply filters (startDate, endDate, attrName, limit)
-const getEntityHistory = (id) =>
+const getEntityHistory = (id, options) =>
   new Promise(async (resolve, reject) => {
     try {
-      const response = await ngsijs.get(`/history/entity/${id}`);
+      let response;
+      if (options) {
+        console.log(options);
+        const queryString = buildHistoryOptionsQueryString(options);
+        response = await ngsijs.get(`/history/entity/${id}?${queryString}`);
+      } else {
+        response = await ngsijs.get(`/history/entity/${id}`);
+      }
       resolve(response.data.results);
     } catch (error) {
       reject(error);

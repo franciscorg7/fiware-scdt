@@ -82,6 +82,9 @@ const ComparePage = () => {
   const [comparingEntityIds, setComparingEntityIds] = useState([]);
   const [comparingEntitySet, setComparingEntitySet] = useState([]);
   const [attributeNameOptions, setAttributeNameOptions] = useState([]);
+  const [attributeNameFilters, setAttributeNameFilters] = useState([]);
+  const [startDateFilter, setStartDateFilter] = useState(null);
+  const [endDateFilter, setEndDateFilter] = useState(null);
 
   /**
    * Each time the first entity to be compared gets selected,
@@ -130,33 +133,46 @@ const ComparePage = () => {
   }, [comparingEntityIds[1]]);
 
   /**
-   * Each time the comparing entity set gets updated, update the attribute set
-   * involved in the comparison
+   * Each time the filters get updated, fetch filtered history for both components
    */
   useMemo(() => {
-    const attrNames = new Set();
-    if (comparingEntitySet[0])
-      comparingEntitySet[0].results.map((entity) => {
-        const attr = entity.attrName;
-        attrNames.add(attr);
-      });
-    else if (comparingEntitySet[1])
-      comparingEntitySet[1].results.map((entity) => {
-        const attr = entity.attrName;
-        attrNames.add(attr);
-      });
-    else return;
+    // Prepare options for filtering entity history
+    let options = [];
+    attributeNameFilters &&
+      attributeNameFilters.map((attr) => options.push({ attrName: attr }));
+    startDateFilter && options.push({ startDate: startDateFilter });
+    endDateFilter && options.push({ endDate: endDateFilter });
 
-    // Convert set of unique attrNames into an array and map it into options structure {label, value}
-    const attrNameOptions = Array.from(attrNames).map((attrName) => {
-      return { label: attrName, value: attrName };
-    });
-    setAttributeNameOptions(attrNameOptions);
-  }, [comparingEntitySet]);
+    // Fetch filtered history for first component
+    comparingEntityIds[0] &&
+      ngsiJSService
+        .getEntityHistory(`${comparingEntityIds[0]}:dummy`, options)
+        .then(
+          (results) => {
+            const currentEntitySet = [...comparingEntitySet];
+            currentEntitySet[0] = { results: results };
+            setComparingEntitySet(currentEntitySet);
+          },
+          (error) => {
+            //TODO: handle error
+          }
+        );
 
-  useEffect(() => {
-    console.log(attributeNameOptions);
-  }, [attributeNameOptions]);
+    // Fetch filtered history for second component
+    comparingEntityIds[1] &&
+      ngsiJSService
+        .getEntityHistory(`${comparingEntityIds[1]}:dummy`, options)
+        .then(
+          (results) => {
+            const currentEntitySet = [...comparingEntitySet];
+            currentEntitySet[1] = { results: results };
+            setComparingEntitySet(currentEntitySet);
+          },
+          (error) => {
+            //TODO: handle error
+          }
+        );
+  }, [attributeNameFilters, startDateFilter, endDateFilter]);
 
   /**
    * Handle component selection for comparing by updating
@@ -189,8 +205,23 @@ const ComparePage = () => {
     setComparingEntityIds(modifiedComparingIds);
   };
 
+  /**
+   * Handle attribute filter changes to update the comparison state
+   *
+   * @param {string[]} value
+   */
   const handleAttributeChange = (value) => {
-    console.log(value);
+    setAttributeNameFilters(value);
+  };
+
+  /**
+   * Handle date range filter changes to update the comparison state
+   *
+   * @param {dayjs[]} dates
+   */
+  const handleRangeChange = (dates) => {
+    setStartDateFilter(dates ? dates[0].format("YYYY-MM-DD") : null);
+    setEndDateFilter(dates ? dates[1].format("YYYY-MM-DD") : null);
   };
 
   return (
@@ -218,15 +249,19 @@ const ComparePage = () => {
             <FilterWrapper>
               <span>Attributes</span>
               <AttributeSelect
-                mode="multiple"
-                allowClear
+                mode="tags"
+                tokenSeparators={[","]}
                 onChange={handleAttributeChange}
                 options={attributeNameOptions}
               />
             </FilterWrapper>
             <FilterWrapper>
               <span>Date Interval</span>
-              <RangePicker format={"DD MMM YYYY"} />
+              <RangePicker
+                allowEmpty
+                format={"DD MMM YYYY"}
+                onChange={handleRangeChange}
+              />
             </FilterWrapper>
           </Panel>
         </FiltersCollapse>
