@@ -27,7 +27,7 @@ const getEntityHistoryFromAttribute = (
   const queryAttrNamesArray = `('${attrNames.join("', '")}')`;
   return cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName IN '${queryAttrNamesArray}'`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName IN ${queryAttrNamesArray}`
   );
 };
 
@@ -80,7 +80,7 @@ const getEntityHistoryFromAttributeAndLimit = (
   const queryAttrNamesArray = `('${attrNames.join("', '")}')`;
   return cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName IN '${queryAttrNamesArray}' LIMIT ${limit}`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName IN ${queryAttrNamesArray} LIMIT ${limit}`
   );
 };
 
@@ -103,7 +103,7 @@ const getEntityHistoryFromAttributeAndDateRanges = (
   const queryAttrNamesArray = `('${attrNames.join("', '")}')`;
   return cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName IN '${queryAttrNamesArray}' AND recvTime BETWEEN '${startDate}' AND '${endDate}'`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName IN ${queryAttrNamesArray} AND recvTime BETWEEN '${startDate}' AND '${endDate}'`
   );
 };
 
@@ -149,7 +149,7 @@ const getEntityHistoryFromAttributeAndDateRangesAndLimit = (
   const queryAttrNamesArray = `('${attrNames.join("', '")}')`;
   return cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName IN '${queryAttrNamesArray}' AND recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName IN ${queryAttrNamesArray} AND recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`
   );
 };
 

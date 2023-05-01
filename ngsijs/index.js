@@ -276,7 +276,9 @@ app.get("/history/entity/:id", (req, res) => {
   const entityId = cygnusMySQLToolkit.matchMySQLTableName(req.params.id);
 
   // Possible query parameters
-  const attrNames = req.query.attrNames;
+  const attrNames = Array.isArray(req.query.attrNames)
+    ? req.query.attrNames
+    : [req.query.attrNames];
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
   const limit = req.query.limit;
