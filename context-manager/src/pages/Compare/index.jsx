@@ -69,6 +69,12 @@ const FiltersCollapse = styled(Collapse)`
   & .ant-collapse-content-box {
     display: flex;
     column-gap: 24px;
+    justify-content: flex-end;
+  }
+
+  & .ant-collapse-header-text {
+    display: flex;
+    justify-content: flex-end;
   }
 `;
 const FilterWrapper = styled(Col)`
@@ -245,9 +251,10 @@ const ComparePage = () => {
           </SearchWrapper>
         </EntitySearchRow>
         <FiltersCollapse
+          expandIconPosition="end"
           disabled={!(comparingEntityIds[0] && comparingEntityIds[1])}
           collapsible={
-            comparingEntityIds[0] && comparingEntityIds[1] ? "head" : "disabled"
+            !(comparingEntityIds[0] && comparingEntityIds[1]) && "disabled"
           }
           activeKey={
             !(comparingEntityIds[0] && comparingEntityIds[1]) || collapseFilters

@@ -1,8 +1,9 @@
 import React from "react";
-import { useLocation } from "react-router-dom";
-import { Row, Col, Empty, Tooltip, Badge, List, Divider } from "antd";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Row, Col, Empty, Tooltip, Badge, List, Divider, Tag } from "antd";
 import styled from "styled-components";
-import { textBlue } from "../../palette";
+import { successGreen, textBlue } from "../../palette";
+import moment from "moment";
 
 const BodyWrapper = styled(Col)`
   padding: 42px;
@@ -45,7 +46,6 @@ const FirstLevelKeyTitle = styled.h2`
       ? `${props.additionalMargin}px 12px 0 0`
       : "4px 12px 0 0;"};
 `;
-const SecondLevelKeyTitle = styled.h4``;
 const StyledDivider = styled(Divider)`
   margin: 12px 0;
 `;
@@ -54,10 +54,33 @@ const StyledList = styled(List)`
     padding-block: 0px;
   }
 `;
+const EntityIdAsListItem = styled(List.Item)`
+  cursor: pointer;
+  color: ${textBlue};
+  width: fit-content;
+`;
+const LastNotificationTag = styled(Tag)`
+  margin: 12px 0 0 0;
+`;
+const LastNotificationCode = styled.span`
+  font-weight: bold;
+  margin-right: 4px;
+`;
 
 const SubscriptionPage = () => {
+  const navigate = useNavigate();
+
   // Get current search value from the Navbar
   const subscription = useLocation().state.subscription;
+
+  /**
+   * Navigate to entity page given its id
+   *
+   * @param {string} entityId
+   */
+  const goToEntity = (entityId) => {
+    navigate(`/entity/${entityId}`);
+  };
 
   return (
     <>
@@ -85,6 +108,36 @@ const SubscriptionPage = () => {
           <Badge count={subscription?.notification?.timesSent}>
             <FirstLevelKeyTitle>Notification</FirstLevelKeyTitle>
           </Badge>
+          <br />
+          <Tooltip
+            title={
+              subscription?.notification?.lastSuccess ? (
+                <span>
+                  <b>Success:</b> {subscription?.notification?.lastSuccessCode}
+                </span>
+              ) : subscription?.notification?.lastFailure ? (
+                <span>
+                  <b>Failure:</b> {subscription?.notification?.lastFailureCode}
+                </span>
+              ) : null
+            }
+            placement="right"
+          >
+            <LastNotificationTag
+              color={
+                subscription?.notification?.lastSuccess
+                  ? "success"
+                  : subscription?.notification?.lastFailure
+                  ? "error"
+                  : ""
+              }
+            >
+              <LastNotificationCode>Last Time Sent:</LastNotificationCode>
+              {moment(subscription?.notification?.lastSuccess).format(
+                "DD MMM YYYY (hh:mm:ss)"
+              )}
+            </LastNotificationTag>
+          </Tooltip>
           <h6>{subscription?.notification?.http?.url}</h6>
           <StyledDivider />
           <StyledList
@@ -101,13 +154,17 @@ const SubscriptionPage = () => {
             dataSource={subscription?.subject?.condition?.attrs}
             renderItem={(item) => <List.Item>{item}</List.Item>}
           />
-          <SecondLevelKeyTitle>Entities</SecondLevelKeyTitle>
-          <StyledDivider />
           <StyledList
             size="small"
-            header={<div>Attributes</div>}
-            dataSource={subscription?.subject?.condition?.attrs}
-            renderItem={(item) => <List.Item>{item}</List.Item>}
+            header={<h4>Entities</h4>}
+            dataSource={subscription?.subject?.entities?.map(
+              (entity) => entity.id
+            )}
+            renderItem={(item) => (
+              <EntityIdAsListItem onClick={() => goToEntity(item)}>
+                {item}
+              </EntityIdAsListItem>
+            )}
           />
         </BodyWrapper>
       ) : (
