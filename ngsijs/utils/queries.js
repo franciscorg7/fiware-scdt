@@ -17,13 +17,19 @@ const getEntityHistory = (mySQLConnection, entityId) =>
  *
  * @param {mysql.Connection} mySQLConnection
  * @param {String} entityId
- * @param {String} attrName
+ * @param {String} attrNames
  */
-const getEntityHistoryFromAttribute = (mySQLConnection, entityId, attrName) =>
-  cygnusMySQLToolkit.runQuery(
+const getEntityHistoryFromAttribute = (
+  mySQLConnection,
+  entityId,
+  attrNames
+) => {
+  const queryAttrNamesArray = `('${attrNames.join("', '")}')`;
+  return cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName = '${attrName}'`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName IN '${queryAttrNamesArray}'`
   );
+};
 
 /**
  * Get an entity history given its NGSIv2 id limiting the number of entries to be returned
@@ -68,13 +74,15 @@ const getEntityHistoryFromDateRanges = (
 const getEntityHistoryFromAttributeAndLimit = (
   mySQLConnection,
   entityId,
-  attrName,
+  attrNames,
   limit
-) =>
-  cygnusMySQLToolkit.runQuery(
+) => {
+  const queryAttrNamesArray = `('${attrNames.join("', '")}')`;
+  return cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName = '${attrName}' LIMIT ${limit}`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName IN '${queryAttrNamesArray}' LIMIT ${limit}`
   );
+};
 
 /**
  * Get an entity's attribute history given its name and its entity NGSIv2 id given a date range
@@ -88,14 +96,16 @@ const getEntityHistoryFromAttributeAndLimit = (
 const getEntityHistoryFromAttributeAndDateRanges = (
   mySQLConnection,
   entityId,
-  attrName,
+  attrNames,
   startDate,
   endDate
-) =>
-  cygnusMySQLToolkit.runQuery(
+) => {
+  const queryAttrNamesArray = `('${attrNames.join("', '")}')`;
+  return cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN '${startDate}' AND '${endDate}'`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName IN '${queryAttrNamesArray}' AND recvTime BETWEEN '${startDate}' AND '${endDate}'`
   );
+};
 
 /**
  * Get an entity history given its NGSIv2 id and a date range limiting the number of entries to be returned
@@ -131,15 +141,17 @@ const getEntityHistoryFromDateRangesAndLimit = (
 const getEntityHistoryFromAttributeAndDateRangesAndLimit = (
   mySQLConnection,
   entityId,
-  attrName,
+  attrNames,
   startDate,
   endDate,
   limit
-) =>
-  cygnusMySQLToolkit.runQuery(
+) => {
+  const queryAttrNamesArray = `('${attrNames.join("', '")}')`;
+  return cygnusMySQLToolkit.runQuery(
     mySQLConnection,
-    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName = '${attrName}' AND recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`
+    `SELECT attrName, attrValue, attrType, recvTime FROM ${entityId} WHERE attrName IN '${queryAttrNamesArray}' AND recvTime BETWEEN '${startDate}' AND '${endDate}' LIMIT ${limit}`
   );
+};
 
 /**
  *  Start a repetition by propagating this to the repetitions table

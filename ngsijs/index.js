@@ -276,17 +276,17 @@ app.get("/history/entity/:id", (req, res) => {
   const entityId = cygnusMySQLToolkit.matchMySQLTableName(req.params.id);
 
   // Possible query parameters
-  const attrName = req.query.attrName;
+  const attrNames = req.query.attrNames;
   const startDate = req.query.startDate;
   const endDate = req.query.endDate;
   const limit = req.query.limit;
 
-  if (attrName && startDate && endDate && limit)
+  if (attrNames && startDate && endDate && limit)
     cygnusMySQLQueries
       .getEntityHistoryFromAttributeAndDateRangesAndLimit(
         mySQLConnection,
         entityId,
-        attrName,
+        attrNames,
         startDate,
         endDate,
         limit
@@ -295,12 +295,12 @@ app.get("/history/entity/:id", (req, res) => {
         (results) => res.json({ results: results }),
         (err) => res.status(500).send(err)
       );
-  else if (attrName && startDate && endDate)
+  else if (attrNames && startDate && endDate)
     cygnusMySQLQueries
       .getEntityHistoryFromAttributeAndDateRanges(
         mySQLConnection,
         entityId,
-        attrName,
+        attrNames,
         startDate,
         endDate
       )
@@ -308,12 +308,12 @@ app.get("/history/entity/:id", (req, res) => {
         (results) => res.json({ results: results }),
         (err) => res.status(500).send(err)
       );
-  else if (attrName && limit)
+  else if (attrNames && limit)
     cygnusMySQLQueries
       .getEntityHistoryFromAttributeAndLimit(
         mySQLConnection,
         entityId,
-        attrName,
+        attrNames,
         limit
       )
       .then(
@@ -333,9 +333,9 @@ app.get("/history/entity/:id", (req, res) => {
         (results) => res.json({ results: results }),
         (err) => res.status(500).send(err)
       );
-  else if (attrName)
+  else if (attrNames)
     cygnusMySQLQueries
-      .getEntityHistoryFromAttribute(mySQLConnection, entityId, attrName)
+      .getEntityHistoryFromAttribute(mySQLConnection, entityId, attrNames)
       .then(
         (results) => res.json({ results: results }),
         (err) => res.status(500).send(err)
