@@ -1,7 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
-import { Modal, Button } from "antd";
+import { Modal, Button, Radio } from "antd";
 import { highlightOrange, textBlue } from "../../palette";
+import NewRepetitionForm from "../NewRepetitionForm";
+import {
+  CloudDownloadOutlined,
+  HistoryOutlined,
+  CalendarOutlined,
+  CaretRightOutlined,
+} from "@ant-design/icons";
 
 const StyledModal = styled(Modal)`
   max-width: 800px;
@@ -25,6 +32,8 @@ const ModalTitle = styled.span`
 const ModalContent = styled.div`
   width: 100%;
   display: flex;
+  flex-direction: column;
+  row-gap: 24px;
   column-gap: 42px;
 `;
 const CreateButton = styled(Button)`
@@ -37,7 +46,44 @@ const CreateButton = styled(Button)`
   }
 `;
 
-const NewRepetitionModal = ({ show, setShow, onSave, onSaveLoading }) => {
+const NewRepetitionModal = ({ show, setShow, onStart, onSaveLoading }) => {
+  const [repType, setRepetitionType] = useState(1);
+  const repetitionTypeOptions = [
+    {
+      value: 1,
+      label: (
+        <span>
+          <CloudDownloadOutlined /> From current context
+        </span>
+      ),
+    },
+    {
+      value: 2,
+      label: (
+        <span>
+          <HistoryOutlined /> From another repetition
+        </span>
+      ),
+    },
+    {
+      value: 3,
+      label: (
+        <span>
+          <CalendarOutlined /> From start date
+        </span>
+      ),
+    },
+  ];
+
+  /**
+   * Repetition type handler that propagates current type to the state
+   *
+   * @param {Event} event
+   */
+  const onTypeChange = (event) => {
+    if (event.target?.value) setRepetitionType(event.target.value);
+  };
+
   return (
     <StyledModal
       title={<ModalTitle>New repetition...</ModalTitle>}
@@ -47,16 +93,29 @@ const NewRepetitionModal = ({ show, setShow, onSave, onSaveLoading }) => {
       confirmLoading={onSaveLoading}
       footer={[
         <CreateButton
+          key="start-button"
           type="primary"
           loading={onSaveLoading}
-          onClick={() => onSave()}
+          icon={<CaretRightOutlined />}
+          onClick={() => onStart()}
         >
-          Create
+          Start
         </CreateButton>,
       ]}
       onCancel={() => setShow(false)}
     >
-      <ModalContent></ModalContent>
+      <ModalContent>
+        <Radio.Group
+          size="large"
+          options={repetitionTypeOptions}
+          onChange={onTypeChange}
+          defaultValue={1}
+          value={repType}
+          optionType="button"
+          buttonStyle="solid"
+        />
+        <NewRepetitionForm repType={repType} onStart={onStart} />
+      </ModalContent>
     </StyledModal>
   );
 };

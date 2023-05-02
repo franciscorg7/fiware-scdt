@@ -27,7 +27,7 @@ const Title = styled(Row)`
 const RepetitionListPage = () => {
   const [repetitions, setRepetitions] = useState(null);
   const [showNewRepetitionModal, setShowNewRepetitionModal] = useState(false);
-  const [onCreateRepetitionLoading, setOnCreateRepetitionLoading] =
+  const [onStartRepetitionLoading, setOnStartRepetitionLoading] =
     useState(false);
 
   useEffect(() => {
@@ -55,7 +55,10 @@ const RepetitionListPage = () => {
     setShowNewRepetitionModal(true);
   };
 
-  const handleCreateRepetition = () => {};
+  /**
+   *
+   */
+  const handleStartRepetition = () => {};
 
   return (
     <>
@@ -67,13 +70,13 @@ const RepetitionListPage = () => {
         <NewRepetitionModal
           show={showNewRepetitionModal}
           setShow={setShowNewRepetitionModal}
-          onSave={handleCreateRepetition}
-          onSaveLoading={onCreateRepetitionLoading}
+          onStart={handleStartRepetition}
+          onSaveLoading={onStartRepetitionLoading}
         />
         <ActionFloatButton
           onAction={onNewRepetition}
           actionLabel="New repetition"
-        ></ActionFloatButton>
+        />
       </BodyWrapper>
     </>
   );

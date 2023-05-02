@@ -273,6 +273,7 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
           <StyledPlusCircleFilled onClick={addAttr} />
         </Form>
         <ScrollableJsonViewer
+          rootName="newEntity"
           theme={"dark"}
           highlightUpdates={true}
           value={entityObj}
