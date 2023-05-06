@@ -35,6 +35,7 @@ const ModalContent = styled.div`
   flex-direction: column;
   row-gap: 24px;
   column-gap: 42px;
+  height: 600px;
 `;
 const CreateButton = styled(Button)`
   font-weight: bold;

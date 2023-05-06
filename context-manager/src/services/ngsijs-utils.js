@@ -17,4 +17,36 @@ const buildHistoryOptionsQueryString = (options) => {
   return queryString;
 };
 
-export { buildHistoryOptionsQueryString };
+/**
+ * Try to parse a string list of entities and return the JSON if successful
+ *
+ * @param {string} strListOfEntities
+ * @returns {Object} parsed JSON
+ */
+const parseJSONEntities = (strListOfEntities) => {
+  try {
+    return JSON.parse(strListOfEntities);
+  } catch (error) {
+    return null;
+  }
+};
+
+/**
+ * Try to beautify a list of JSON entities and return it if successful
+ *
+ * @param {string} strListOfEntities
+ * @returns {string} beauty stringified JSON
+ */
+const beautifyJSONEntities = (listOfEntitiesJSON) => {
+  try {
+    return JSON.stringify(listOfEntitiesJSON, null, 4);
+  } catch (error) {
+    return listOfEntitiesJSON;
+  }
+};
+
+export {
+  buildHistoryOptionsQueryString,
+  parseJSONEntities,
+  beautifyJSONEntities,
+};
