@@ -5,6 +5,9 @@ const ngsijs = axios.create({
   baseURL: process.env.REACT_APP_API_VILA_REAL_BASE_URL,
 });
 
+/**
+ * Get the entity list
+ */
 const getEntityList = async (options) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -15,6 +18,9 @@ const getEntityList = async (options) =>
     }
   });
 
+/**
+ * Get an entity by its identifier
+ */
 const getEntityById = async (id) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -25,6 +31,9 @@ const getEntityById = async (id) =>
     }
   });
 
+/**
+ * Create a new entity
+ */
 const createEntity = (entityObj) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -35,6 +44,9 @@ const createEntity = (entityObj) =>
     }
   });
 
+/**
+ * Get entity history (w/ filter options)
+ */
 const getEntityHistory = (id, options) =>
   new Promise(async (resolve, reject) => {
     try {
@@ -56,6 +68,9 @@ const getEntityHistory = (id, options) =>
     }
   });
 
+/**
+ * Get the list of all repetitions
+ */
 const getRepetitionList = () =>
   new Promise(async (resolve, reject) => {
     try {
@@ -66,6 +81,25 @@ const getRepetitionList = () =>
     }
   });
 
+/**
+ * Start a new repetition from given object
+ */
+const startRepetition = (newRepetitionObj) =>
+  new Promise(async (resolve, reject) => {
+    try {
+      const response = await ngsijs.post(
+        `/history/repetition`,
+        newRepetitionObj
+      );
+      resolve(response.data.results);
+    } catch (error) {
+      reject(error);
+    }
+  });
+
+/**
+ * Get the list of all subscriptions
+ */
 const getSubscriptionList = () =>
   new Promise(async (resolve, reject) => {
     try {
@@ -83,6 +117,7 @@ const ngsiJSService = {
   getEntityHistory,
   getRepetitionList,
   getSubscriptionList,
+  startRepetition,
 };
 
 export default ngsiJSService;

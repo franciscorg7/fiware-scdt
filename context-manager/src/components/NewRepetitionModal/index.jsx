@@ -49,6 +49,7 @@ const CreateButton = styled(Button)`
 
 const NewRepetitionModal = ({ show, setShow, onStart, onSaveLoading }) => {
   const [repType, setRepetitionType] = useState(1);
+  const [newRepetitionObj, setNewRepetitionObj] = useState({});
   const repetitionTypeOptions = [
     {
       value: 1,
@@ -82,7 +83,7 @@ const NewRepetitionModal = ({ show, setShow, onStart, onSaveLoading }) => {
    * @param {Event} event
    */
   const onTypeChange = (event) => {
-    if (event.target?.value) setRepetitionType(event.target.value);
+    if (event.target?.value) setRepetitionType(event.target?.value);
   };
 
   return (
@@ -98,7 +99,7 @@ const NewRepetitionModal = ({ show, setShow, onStart, onSaveLoading }) => {
           type="primary"
           loading={onSaveLoading}
           icon={<CaretRightOutlined />}
-          onClick={() => onStart()}
+          onClick={() => onStart(newRepetitionObj)}
         >
           Start
         </CreateButton>,
@@ -115,7 +116,11 @@ const NewRepetitionModal = ({ show, setShow, onStart, onSaveLoading }) => {
           optionType="button"
           buttonStyle="solid"
         />
-        <NewRepetitionForm repType={repType} onStart={onStart} />
+        <NewRepetitionForm
+          repType={repType}
+          newRepetitionObj={newRepetitionObj}
+          setNewRepetitionObj={setNewRepetitionObj}
+        />
       </ModalContent>
     </StyledModal>
   );

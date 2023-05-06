@@ -1,5 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Row, Col, Empty, Collapse, DatePicker, Select } from "antd";
+import React, { useState } from "react";
+import {
+  Row,
+  Col,
+  Empty,
+  Collapse,
+  DatePicker,
+  Select,
+  notification,
+} from "antd";
 import styled from "styled-components";
 import { textBlue } from "../../palette";
 import CompareCard from "../../components/CompareCard";
@@ -93,6 +101,7 @@ const ComparePage = () => {
   const [attributeNameFilters, setAttributeNameFilters] = useState([]);
   const [startDateFilter, setStartDateFilter] = useState(null);
   const [endDateFilter, setEndDateFilter] = useState(null);
+  const [notifAPI, contextHolder] = notification.useNotification();
 
   /**
    * Each time the first entity to be compared gets selected,
@@ -107,7 +116,10 @@ const ComparePage = () => {
           setComparingEntitySet(currentEntitySet);
         },
         (error) => {
-          //TODO: handle error
+          notifAPI["error"]({
+            message: <b>{error.message ?? "There was a problem"}</b>,
+            description: "Couldn't fetch the first entity history.",
+          });
         }
       );
     } else {
@@ -130,7 +142,10 @@ const ComparePage = () => {
           setComparingEntitySet(currentEntitySet);
         },
         (error) => {
-          //TODO: handle error
+          notifAPI["error"]({
+            message: <b>{error.message ?? "There was a problem"}</b>,
+            description: "Couldn't fetch the second entity history.",
+          });
         }
       );
     } else {
@@ -170,12 +185,18 @@ const ComparePage = () => {
                     setComparingEntitySet(currentEntitySet);
                   },
                   (error) => {
-                    //TODO: handle error
+                    notifAPI["error"]({
+                      message: <b>{error.message ?? "There was a problem"}</b>,
+                      description: "Couldn't fetch the second entity history.",
+                    });
                   }
                 );
           },
           (error) => {
-            //TODO: handle error
+            notifAPI["error"]({
+              message: <b>{error.message ?? "There was a problem"}</b>,
+              description: "Couldn't fetch the first entity history.",
+            });
           }
         );
   }, [attributeNameFilters, startDateFilter, endDateFilter]);
@@ -231,81 +252,85 @@ const ComparePage = () => {
   };
 
   return (
-    <BodyWrapper>
-      <EntityTitle>
-        <h1>Compare</h1>
-      </EntityTitle>
-      <ComparingContainer>
-        <EntitySearchRow>
-          <SearchWrapper>
-            <CompareEntitySearch
-              onChange={(value) => handleSelection(1, value)}
-              onClear={() => handleSelectionClear(1)}
-            />
-          </SearchWrapper>
-          <SearchWrapper>
-            <CompareEntitySearch
-              onChange={(value) => handleSelection(2, value)}
-              onClear={() => handleSelectionClear(2)}
-            />
-          </SearchWrapper>
-        </EntitySearchRow>
-        <FiltersCollapse
-          expandIconPosition="end"
-          disabled={!(comparingEntityIds[0] && comparingEntityIds[1])}
-          collapsible={
-            !(comparingEntityIds[0] && comparingEntityIds[1]) && "disabled"
-          }
-          activeKey={
-            !(comparingEntityIds[0] && comparingEntityIds[1]) || collapseFilters
-              ? "-1"
-              : "1"
-          }
-          ghost
-          expandIcon={() =>
-            collapseFilters ? <FilterOutlined /> : <FilterFilled />
-          }
-          onChange={() => setCollapseFilters(!collapseFilters)}
-        >
-          <Panel key="1" header="Filters">
-            <FilterWrapper>
-              <span>Attributes</span>
-              <AttributeSelect
-                mode="tags"
-                tokenSeparators={[","]}
-                onChange={handleAttributeChange}
-                options={attributeNameOptions}
+    <>
+      {contextHolder}
+      <BodyWrapper>
+        <EntityTitle>
+          <h1>Compare</h1>
+        </EntityTitle>
+        <ComparingContainer>
+          <EntitySearchRow>
+            <SearchWrapper>
+              <CompareEntitySearch
+                onChange={(value) => handleSelection(1, value)}
+                onClear={() => handleSelectionClear(1)}
               />
-            </FilterWrapper>
-            <FilterWrapper>
-              <span>Date Interval</span>
-              <RangePicker
-                allowEmpty
-                format={"DD MMM YYYY"}
-                onChange={handleRangeChange}
+            </SearchWrapper>
+            <SearchWrapper>
+              <CompareEntitySearch
+                onChange={(value) => handleSelection(2, value)}
+                onClear={() => handleSelectionClear(2)}
               />
-            </FilterWrapper>
-          </Panel>
-        </FiltersCollapse>
-        <EntityCardsRow>
-          {comparingEntitySet.map(
-            (entityData, idx) =>
-              entityData && (
-                <EntityCardWrapper key={`${comparingEntityIds[idx]}:${idx}`}>
-                  <CompareCard
-                    entityId={comparingEntityIds[idx]}
-                    entityData={entityData.results}
-                  />
-                </EntityCardWrapper>
-              )
-          )}
-          {comparingEntitySet.length === 0 ||
-          !(comparingEntitySet[0] || comparingEntitySet[1]) ? (
-            <StyledEmpty description="Compare repetitions history." />
-          ) : null}
-        </EntityCardsRow>
-      </ComparingContainer>
-    </BodyWrapper>
+            </SearchWrapper>
+          </EntitySearchRow>
+          <FiltersCollapse
+            expandIconPosition="end"
+            disabled={!(comparingEntityIds[0] && comparingEntityIds[1])}
+            collapsible={
+              !(comparingEntityIds[0] && comparingEntityIds[1]) && "disabled"
+            }
+            activeKey={
+              !(comparingEntityIds[0] && comparingEntityIds[1]) ||
+              collapseFilters
+                ? "-1"
+                : "1"
+            }
+            ghost
+            expandIcon={() =>
+              collapseFilters ? <FilterOutlined /> : <FilterFilled />
+            }
+            onChange={() => setCollapseFilters(!collapseFilters)}
+          >
+            <Panel key="1" header="Filters">
+              <FilterWrapper>
+                <span>Attributes</span>
+                <AttributeSelect
+                  mode="tags"
+                  tokenSeparators={[","]}
+                  onChange={handleAttributeChange}
+                  options={attributeNameOptions}
+                />
+              </FilterWrapper>
+              <FilterWrapper>
+                <span>Date Interval</span>
+                <RangePicker
+                  allowEmpty
+                  format={"DD MMM YYYY"}
+                  onChange={handleRangeChange}
+                />
+              </FilterWrapper>
+            </Panel>
+          </FiltersCollapse>
+          <EntityCardsRow>
+            {comparingEntitySet.map(
+              (entityData, idx) =>
+                entityData && (
+                  <EntityCardWrapper key={`${comparingEntityIds[idx]}:${idx}`}>
+                    <CompareCard
+                      entityId={comparingEntityIds[idx]}
+                      entityData={entityData.results}
+                    />
+                  </EntityCardWrapper>
+                )
+            )}
+            {comparingEntitySet.length === 0 ||
+            !(comparingEntitySet[0] || comparingEntitySet[1]) ? (
+              <StyledEmpty description="Compare repetitions history." />
+            ) : null}
+          </EntityCardsRow>
+        </ComparingContainer>
+      </BodyWrapper>
+    </>
   );
 };
 

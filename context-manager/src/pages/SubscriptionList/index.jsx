@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ngsiJSService from "../../services/ngsijs";
-import { Row, Col } from "antd";
+import { Row, Col, notification } from "antd";
 import styled from "styled-components";
 import { textBlue } from "../../palette";
 import SubscriptionTable from "../../components/SubscriptionTable";
@@ -24,6 +24,7 @@ const Title = styled(Row)`
 
 const SubscriptionListPage = () => {
   const [subscriptions, setSubscriptions] = useState(null);
+  const [notifAPI, contextHolder] = notification.useNotification();
   useEffect(() => {
     handleGetSubscriptionList();
   }, []);
@@ -37,12 +38,16 @@ const SubscriptionListPage = () => {
         setSubscriptions(results);
       },
       (error) => {
-        //TODO: handle getRepetitionList error situation
+        notifAPI["error"]({
+          message: <b>{error.message ?? "There was a problem"}</b>,
+          description: "Couldn't fetch the subscription list.",
+        });
       }
     );
   };
   return (
     <>
+      {contextHolder}
       <BodyWrapper>
         <Title>
           <h1>Subscriptions</h1>

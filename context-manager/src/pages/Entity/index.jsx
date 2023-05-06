@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ngsiJSService from "../../services/ngsijs";
-import { Row, Col, Empty, Tag, Descriptions, Switch } from "antd";
+import { Row, Col, Empty, Tag, Descriptions, Switch, notification } from "antd";
 import styled from "styled-components";
 import { highlightOrange, textBlue } from "../../palette";
 import typeTagService from "../../services/type-tag";
@@ -64,6 +64,7 @@ const EntityPage = () => {
   const [entityAttrs, setEntityAttrs] = useState(null);
   const [entityHistory, setEntityHistory] = useState(null);
   const [seeHistory, setSeeHistory] = useState(false);
+  const [notifAPI, contextHolder] = notification.useNotification();
 
   /**
    * Whenever entity view changes, handle corresponding data
@@ -93,7 +94,10 @@ const EntityPage = () => {
           );
         },
         (error) => {
-          // TODO: deal with getEntityById error
+          notifAPI["error"]({
+            message: <b>{error.message ?? "There was a problem"}</b>,
+            description: "Couldn't fetch the required entity data.",
+          });
         }
       );
   };
@@ -111,7 +115,10 @@ const EntityPage = () => {
           setSeeHistory(true);
         },
         (error) => {
-          // TODO: deal with getHistory error
+          notifAPI["error"]({
+            message: <b>{error.message ?? "There was a problem"}</b>,
+            description: "Couldn't fetch the required entity historical data.",
+          });
         }
       );
   };
@@ -125,6 +132,7 @@ const EntityPage = () => {
 
   return (
     <>
+      {contextHolder}
       {entity ? (
         <BodyWrapper>
           <EntityTitle>

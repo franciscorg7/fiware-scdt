@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import ngsiJSService from "../../services/ngsijs";
-import { Row, Col } from "antd";
+import { Row, Col, notification } from "antd";
 import styled from "styled-components";
 import { textBlue } from "../../palette";
 import RepetitionTable from "../../components/RepetitionTable";
 import ActionFloatButton from "../../components/ActionFloatButton";
 import NewRepetitionModal from "../../components/NewRepetitionModal";
+import OnCreateRepetitionModal from "../../components/OnStartRepetitionModal";
 
 const BodyWrapper = styled(Col)`
   padding: 42px;
@@ -27,15 +28,23 @@ const Title = styled(Row)`
 const RepetitionListPage = () => {
   const [repetitions, setRepetitions] = useState(null);
   const [showNewRepetitionModal, setShowNewRepetitionModal] = useState(false);
+  const [showOnStartRepetitionModal, setShowOnStartRepetitionModal] =
+    useState(false);
   const [onStartRepetitionLoading, setOnStartRepetitionLoading] =
     useState(false);
+  const [newRepetitionObj, setNewRepetitionObj] = useState(null);
+  const [startRepetitionSuccess, setStartRepetitionSuccess] = useState(false);
+  const [notifAPI, contextHolder] = notification.useNotification();
 
+  /**
+   * Whenever component renders call the handler that gets the repetition list 📄
+   */
   useEffect(() => {
     handleGetRepetitionList();
   }, []);
 
   /**
-   * Handle repetitions getter by calling ngsiJSService
+   * Handle repetitions getter by calling ngsiJSService 📁
    */
   const handleGetRepetitionList = () => {
     ngsiJSService.getRepetitionList().then(
@@ -43,7 +52,10 @@ const RepetitionListPage = () => {
         setRepetitions(results);
       },
       (error) => {
-        //TODO: handle getRepetitionList error situation
+        notifAPI["error"]({
+          message: <b>{error.message ?? "There was a problem"}</b>,
+          description: "Couldn't fetch the repetition list.",
+        });
       }
     );
   };
@@ -56,12 +68,27 @@ const RepetitionListPage = () => {
   };
 
   /**
+   *  Call ngsiJS service to start a new repetition from given object
    *
    */
-  const handleStartRepetition = () => {};
+  const handleStartRepetition = (newRepetitionObj) => {
+    ngsiJSService.startRepetition(newRepetitionObj).then(
+      (result) => {
+        setShowNewRepetitionModal(false);
+        setStartRepetitionSuccess(true);
+        setShowOnStartRepetitionModal(true);
+      },
+      (error) => {
+        setShowNewRepetitionModal(false);
+        setStartRepetitionSuccess(false);
+        setShowOnStartRepetitionModal(true);
+      }
+    );
+  };
 
   return (
     <>
+      {contextHolder}
       <BodyWrapper>
         <Title>
           <h1>Repetitions</h1>
@@ -72,6 +99,12 @@ const RepetitionListPage = () => {
           setShow={setShowNewRepetitionModal}
           onStart={handleStartRepetition}
           onSaveLoading={onStartRepetitionLoading}
+        />
+        <OnCreateRepetitionModal
+          show={showOnStartRepetitionModal}
+          setShow={setShowOnStartRepetitionModal}
+          newRepetitionObj={newRepetitionObj}
+          success={startRepetitionSuccess}
         />
         <ActionFloatButton
           onAction={onNewRepetition}

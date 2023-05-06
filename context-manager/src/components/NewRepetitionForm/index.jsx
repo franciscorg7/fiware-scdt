@@ -1,6 +1,14 @@
 import React, { useState, useMemo, useEffect } from "react";
 import styled from "styled-components";
-import { Form, Input, Select, DatePicker, Row, Button, Tooltip } from "antd";
+import {
+  Form,
+  Input,
+  Select,
+  DatePicker,
+  Row,
+  Button,
+  notification,
+} from "antd";
 import { highlightCyan, textBlue } from "../../palette";
 import ngsiJSService from "../../services/ngsijs";
 import { JsonViewer } from "@textea/json-viewer";
@@ -82,7 +90,12 @@ const BeautifyRow = styled(Row)`
   justify-content: flex-end;
 `;
 
-const NewRepetitionForm = ({ repType, onStart }) => {
+const NewRepetitionForm = ({
+  repType,
+  newRepetitionObj,
+  setNewRepetitionObj,
+}) => {
+  const [notifAPI, contextHolder] = notification.useNotification();
   const [repetitionList, setRepetitionList] = useState([]);
   const [pastRepetitionId, setPastRepetitionId] = useState(null);
   const [startDate, setStartDate] = useState(null);
@@ -91,16 +104,15 @@ const NewRepetitionForm = ({ repType, onStart }) => {
     useState("");
   const [entitiesModifiedInputStatus, setEntitiesModifiedInputStatus] =
     useState("");
-  const [newRepetitionObj, setNewRepetitionObj] = useState({});
 
   /**
    * Handle entities modified JSON builder changes
    * and propagate them to state with a 400ms debounce ⌛️
    *
-   * @param {Event} e
+   * @param {Event} event
    */
-  const onEntitiesModifiedChange = (e) => {
-    setEntitiesModifiedStringValue(e.target?.value);
+  const onEntitiesModifiedChange = (event) => {
+    setEntitiesModifiedStringValue(event.target?.value);
   };
 
   // Debounce over entitiesModified input ☝🏼
@@ -157,7 +169,10 @@ const NewRepetitionForm = ({ repType, onStart }) => {
         setRepetitionList(keyedResults);
       },
       (error) => {
-        // TODO: deal with error
+        notifAPI["error"]({
+          message: <b>{error.message ?? "There was a problem"}</b>,
+          description: "Couldn't fetch the repetition list.",
+        });
       }
     );
   }, []);
@@ -177,8 +192,10 @@ const NewRepetitionForm = ({ repType, onStart }) => {
    * Whenever repetition type changes, form should re-render the form
    * so we need to reset form data 🔄
    */
-  useMemo(() => {
-    if (repType) setNewRepetitionObj({});
+  useEffect(() => {
+    setNewRepetitionObj({ entitiesModified });
+    setStartDate(null);
+    setPastRepetitionId(null);
   }, [repType]);
 
   /**
@@ -209,6 +226,7 @@ const NewRepetitionForm = ({ repType, onStart }) => {
 
   return (
     <>
+      {contextHolder}
       {repType === 1 ? (
         <FormWrapper>
           <StyledForm name="new_repetition_1">

@@ -5,7 +5,7 @@ import { useState } from "react";
 import EntityList from "../../components/EntityList";
 import NewEntityModal from "../../components/NewEntityModal";
 import OnSaveEntityModal from "../../components/OnCreateEntityModal";
-import { Empty, Row } from "antd";
+import { Empty, Row, notification } from "antd";
 import { useLocation } from "react-router-dom";
 import { textBlue } from "../../palette";
 
@@ -37,6 +37,7 @@ const EntityListPage = () => {
   const [onCreateEntityLoading, setOnCreateEntityLoading] = useState(false);
   const [showOnCreateEntityModal, setShowOnCreateEntityModal] = useState(false);
   const [createEntitySuccess, setCreateEntitySuccess] = useState(false);
+  const [notifAPI, contextHolder] = notification.useNotification();
 
   // Get current search value from the Navbar
   const searchValue = useLocation().state;
@@ -71,7 +72,10 @@ const EntityListPage = () => {
           setEntityList(results);
         },
         (error) => {
-          //TODO: deal with entityList error
+          notifAPI["error"]({
+            message: <b>{error.message ?? "There was a problem"}</b>,
+            description: "Couldn't fetch the entity list.",
+          });
         }
       );
   };
@@ -116,6 +120,7 @@ const EntityListPage = () => {
 
   return (
     <>
+      {contextHolder}
       {entityList ? (
         <BodyWrapper>
           <Title>
