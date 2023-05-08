@@ -37,14 +37,15 @@ const RepetitionListPage = () => {
   const [notifAPI, contextHolder] = notification.useNotification();
 
   /**
-   * Whenever component renders call the handler that gets the repetition list 📄
+   * Whenever component renders call the handler that gets the repetition list
    */
   useEffect(() => {
     handleGetRepetitionList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
-   * Handle repetitions getter by calling ngsiJSService 📁
+   * Handle repetitions getter by calling ngsiJSService
    */
   const handleGetRepetitionList = () => {
     ngsiJSService.getRepetitionList().then(

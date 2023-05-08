@@ -7,7 +7,7 @@ import { highlightOrange, textBlue } from "../../palette";
 import typeTagService from "../../services/type-tag";
 import EntityHistoryTable from "../../components/EntityHistoryTable";
 import AttributeTypeTag from "../../components/AttributeTypeTag";
-import { HistoryOutlined } from "@ant-design/icons";
+import { DatabaseOutlined, HistoryOutlined } from "@ant-design/icons";
 
 const BodyWrapper = styled(Col)`
   padding: 42px;
@@ -25,7 +25,7 @@ const EntityTitle = styled(Row)`
     height: fit-content;
   }
 `;
-const HistorySwitchWrapper = styled(Col)`
+const FiltersSwitchWrapper = styled(Col)`
   margin-left: auto;
   & span {
     font-weight: bold;
@@ -40,6 +40,10 @@ const HistorySwitchWrapper = styled(Col)`
     animation-name: rotate;
     animation-duration: 1s;
     animation-fill-mode: forwards;
+  }
+
+  & #history-span {
+    margin-left: 24px;
   }
 
   @keyframes rotate {
@@ -64,6 +68,7 @@ const EntityPage = () => {
   const [entityAttrs, setEntityAttrs] = useState(null);
   const [entityHistory, setEntityHistory] = useState(null);
   const [seeHistory, setSeeHistory] = useState(false);
+  const [seeRepetition, setSeeRepetition] = useState(false);
   const [notifAPI, contextHolder] = notification.useNotification();
 
   /**
@@ -75,7 +80,7 @@ const EntityPage = () => {
       seeHistory ? handleGetHistory() : handleGetEntityById();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, seeHistory]);
+  }, [id, seeHistory, seeRepetition]);
 
   /**
    * Handle entity history getter by calling ngsiJSService
@@ -83,23 +88,22 @@ const EntityPage = () => {
    * details are not yet in state).
    */
   const handleGetEntityById = () => {
-    !entity &&
-      ngsiJSService.getEntityById(id).then(
-        (result) => {
-          setEntity(result.entity);
-          setEntityAttrs(
-            Object.keys(result.entity).filter(
-              (key) => key !== "id" && key !== "type"
-            )
-          );
-        },
-        (error) => {
-          notifAPI["error"]({
-            message: <b>{error.message ?? "There was a problem"}</b>,
-            description: "Couldn't fetch the required entity data.",
-          });
-        }
-      );
+    ngsiJSService.getEntityById(!seeRepetition ? id : `${id}:dummy`).then(
+      (result) => {
+        setEntity(result.entity);
+        setEntityAttrs(
+          Object.keys(result.entity).filter(
+            (key) => key !== "id" && key !== "type"
+          )
+        );
+      },
+      (error) => {
+        notifAPI["error"]({
+          message: <b>{error.message ?? "There was a problem"}</b>,
+          description: "Couldn't fetch the required entity data.",
+        });
+      }
+    );
   };
 
   /**
@@ -108,26 +112,32 @@ const EntityPage = () => {
    * history is not yet in state).
    */
   const handleGetHistory = () => {
-    !entityHistory &&
-      ngsiJSService.getEntityHistory(id).then(
-        (results) => {
-          setEntityHistory(results);
-          setSeeHistory(true);
-        },
-        (error) => {
-          notifAPI["error"]({
-            message: <b>{error.message ?? "There was a problem"}</b>,
-            description: "Couldn't fetch the required entity historical data.",
-          });
-        }
-      );
+    ngsiJSService.getEntityHistory(!seeRepetition ? id : `${id}:dummy`).then(
+      (results) => {
+        setEntityHistory(results);
+        setSeeHistory(true);
+      },
+      (error) => {
+        notifAPI["error"]({
+          message: <b>{error.message ?? "There was a problem"}</b>,
+          description: "Couldn't fetch the required entity historical data.",
+        });
+      }
+    );
   };
 
   /**
    * Switch between entity details and entity history view
    */
-  const switchView = () => {
+  const switchHistoryView = () => {
     setSeeHistory(!seeHistory);
+  };
+
+  /**
+   * Switch between entity data to entity dummy view
+   */
+  const switchRepetitionView = () => {
+    setSeeRepetition(!seeRepetition);
   };
 
   return (
@@ -136,20 +146,27 @@ const EntityPage = () => {
       {entity ? (
         <BodyWrapper>
           <EntityTitle>
-            <h1>{entity?.id}</h1>
+            <h1>{id}</h1>
             <StyledTag
               bordered="false"
               color={typeTagService.getTypeTagColor(entity?.type)}
             >
               {entity?.type}
             </StyledTag>
-            <HistorySwitchWrapper>
+            <FiltersSwitchWrapper>
               <span>
-                <HistoryOutlined className={seeHistory ? "rotate-once" : ""} />
-                History
+                <HistoryOutlined
+                  className={seeRepetition ? "rotate-once" : ""}
+                />
+                View Repetition
               </span>
-              <Switch checked={seeHistory} onClick={switchView} />
-            </HistorySwitchWrapper>
+              <Switch checked={seeRepetition} onClick={switchRepetitionView} />
+              <span id="history-span">
+                <DatabaseOutlined />
+                View History
+              </span>
+              <Switch checked={seeHistory} onClick={switchHistoryView} />
+            </FiltersSwitchWrapper>
           </EntityTitle>
           {seeHistory ? (
             <EntityHistoryTable history={entityHistory} />

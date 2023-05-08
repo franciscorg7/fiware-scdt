@@ -107,7 +107,7 @@ const NewRepetitionForm = ({
 
   /**
    * Handle entities modified JSON builder changes
-   * and propagate them to state with a 400ms debounce ⌛️
+   * and propagate them to state with a 400ms debounce
    *
    * @param {Event} event
    */
@@ -136,7 +136,7 @@ const NewRepetitionForm = ({
   );
 
   /**
-   * Handle start date picker updates and propagate them to state 📆
+   * Handle start date picker updates and propagate them to state
    *
    * @param {dayjs} date
    */
@@ -145,7 +145,7 @@ const NewRepetitionForm = ({
   };
 
   /**
-   *  Handle past repetition id updates and propagate them to state 🆔
+   *  Handle past repetition id updates and propagate them to state
    * @param {string} id
    */
   const onPastRepetitionIdChange = (id) => {
@@ -158,7 +158,7 @@ const NewRepetitionForm = ({
   };
 
   /**
-   * On component render, get the repetition list from ngsiJS proxy 📄
+   * On component render, get the repetition list from ngsiJS proxy
    */
   useMemo(() => {
     ngsiJSService.getRepetitionList().then(
@@ -175,32 +175,35 @@ const NewRepetitionForm = ({
         });
       }
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
    * Whenever entitiesModified object gets updated update the current
-   * newRepetitionObj with it ⤵️
+   * newRepetitionObj with it
    */
   useEffect(() => {
     setNewRepetitionObj({
       ...newRepetitionObj,
       entitiesModified: entitiesModified,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entitiesModified]);
 
   /**
    * Whenever repetition type changes, form should re-render the form
-   * so we need to reset form data 🔄
+   * so we need to reset form data
    */
   useEffect(() => {
     setNewRepetitionObj({ entitiesModified });
     setStartDate(null);
     setPastRepetitionId(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [repType]);
 
   /**
    * Whenever startDate gets updated update the current
-   * newRepetitionObj with it 📆
+   * newRepetitionObj with it
    */
   useMemo(() => {
     startDate &&
@@ -213,7 +216,7 @@ const NewRepetitionForm = ({
 
   /**
    * Whenever pastRepetitionId gets updated update the current
-   * newRepetitionObj with it 🔂
+   * newRepetitionObj with it
    */
   useMemo(() => {
     pastRepetitionId &&
