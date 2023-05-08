@@ -374,7 +374,7 @@ app.get("/history/entity/:id", (req, res) => {
 
 // Notify Orion Context Broker and Cygnus of a simulation repetition
 app.post("/history/repetition", async (req, res) => {
-  const entitiesModified = req.body.entities || [];
+  const entitiesModified = req.body.entitiesModified || [];
   const startDate = req.body.startDate;
   const fromRepetition = req.body.fromRepetition;
 
@@ -396,7 +396,7 @@ app.post("/history/repetition", async (req, res) => {
 
   // Get all simulation involved entities
   ngsiConnection.v2
-    .listEntities({ idPattern: ".*:dummy$" }) // get all the dummy entities in the simulation
+    .listEntities() // get all the dummy entities in the simulation
     .then(async (response) => {
       globalEntities = response.results;
 
