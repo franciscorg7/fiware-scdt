@@ -285,8 +285,6 @@ app.get("/history/entity/:id", (req, res) => {
   const endDate = req.query.endDate;
   const limit = req.query.limit;
 
-  console.log(attrNames, startDate, endDate, limit);
-
   if (attrNames && startDate && endDate && limit)
     cygnusMySQLQueries
       .getEntityHistoryFromAttributeAndDateRangesAndLimit(
@@ -493,28 +491,25 @@ app.post("/history/repetition", async (req, res) => {
           };
 
           // Update entity instance with past date historical data (regarding possibile input modifications)
-          entityOnPastRepetition.map(
-            (attr) =>
-              (buildEntity[attr.attrName] = {
-                value: cygnusMySQLToolkit.parseMySQLAttrValue(
-                  attr.attrValue,
-                  attr.attrType
-                ),
-                type: attr.attrType,
-              })
+          entityOnPastRepetition.map((attr) =>
+            attr.attrName !== "repetition"
+              ? (buildEntity[attr.attrName] = {
+                  value: cygnusMySQLToolkit.parseMySQLAttrValue(
+                    attr.attrValue,
+                    attr.attrType
+                  ),
+                  type: attr.attrType,
+                })
+              : (buildEntity["repetition"] = {
+                  value: nextRepetitionId,
+                  type: "Integer",
+                })
           );
           return buildEntity;
         });
 
         // Wait for all global entities mapping before returning the result
         globalEntities = await Promise.all(mappedGlobalEntities);
-
-        // Get context after repetition modifications
-        globalEntities = await cygnusMySQLToolkit.getContextOnRepetition(
-          globalEntities,
-          entitiesModified,
-          nextRepetitionId
-        );
 
         // Update all the entities given the repetition configuration
         await Promise.all(
