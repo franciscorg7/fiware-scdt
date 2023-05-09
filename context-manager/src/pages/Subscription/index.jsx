@@ -2,7 +2,7 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Row, Col, Empty, Tooltip, Badge, List, Divider, Tag } from "antd";
 import styled from "styled-components";
-import { successGreen, textBlue } from "../../palette";
+import { textBlue } from "../../palette";
 import moment from "moment";
 
 const BodyWrapper = styled(Col)`
@@ -134,7 +134,7 @@ const SubscriptionPage = () => {
             >
               <LastNotificationCode>Last Time Sent:</LastNotificationCode>
               {moment(subscription?.notification?.lastSuccess).format(
-                "DD MMM YYYY (hh:mm:ss)"
+                "DD MMM YYYY (HH:mm:ss)"
               )}
             </LastNotificationTag>
           </Tooltip>
