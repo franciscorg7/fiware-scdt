@@ -426,18 +426,19 @@ app.post("/history/repetition", async (req, res) => {
           };
 
           // Update entity instance with past date historical data (regarding possibile input modifications)
-          entityOnClosestRecvTime.map(
-            (attr) =>
-              (buildEntity[attr.attrName] = {
-                value:
-                  attr.attrName === "repetition"
-                    ? nextRepetitionId
-                    : cygnusMySQLToolkit.parseMySQLAttrValue(
-                        attr.attrValue,
-                        attr.attrType
-                      ),
-                type: attr.attrType,
-              })
+          entityOnClosestRecvTime.map((attr) =>
+            attr.attrName !== "repetition"
+              ? (buildEntity[attr.attrName] = {
+                  value: cygnusMySQLToolkit.parseMySQLAttrValue(
+                    attr.attrValue,
+                    attr.attrType
+                  ),
+                  type: attr.attrType,
+                })
+              : (buildEntity["repetition"] = {
+                  value: nextRepetitionId,
+                  type: "Integer",
+                })
           );
           return buildEntity;
         });
