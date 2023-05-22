@@ -2,8 +2,6 @@ import React from "react";
 import EntityCard from "../EntityCard";
 import { Empty, List } from "antd";
 import styled from "styled-components";
-import { PlusOutlined } from "@ant-design/icons";
-import ActionFloatButton from "../ActionFloatButton";
 
 const CenteredEmpty = styled(Empty)`
   top: 40%;
@@ -12,7 +10,7 @@ const CenteredEmpty = styled(Empty)`
   transform: translate(-50%, -50%);
 `;
 
-const EntityList = ({ entityList, onNewEntity }) => {
+const EntityList = ({ entityList }) => {
   // List grid responsiveness configuration
   const gridConfig = {
     xs: 1,
@@ -25,22 +23,16 @@ const EntityList = ({ entityList, onNewEntity }) => {
   };
   return (
     <>
-      {entityList?.length !== 0 ? (
-        <>
-          <List
-            grid={gridConfig}
-            dataSource={entityList}
-            renderItem={(entity, idx) => (
-              <List.Item key={`${entity.id}:idx`}>
-                <EntityCard entity={entity}></EntityCard>
-              </List.Item>
-            )}
-          />
-          <ActionFloatButton
-            onAction={onNewEntity}
-            actionLabel="New entity"
-          ></ActionFloatButton>
-        </>
+      {entityList && entityList?.length !== 0 ? (
+        <List
+          grid={gridConfig}
+          dataSource={entityList}
+          renderItem={(entity) => (
+            <List.Item key={`${entity.id}:idx`}>
+              <EntityCard entity={entity}></EntityCard>
+            </List.Item>
+          )}
+        />
       ) : (
         <CenteredEmpty description="No entities found." />
       )}

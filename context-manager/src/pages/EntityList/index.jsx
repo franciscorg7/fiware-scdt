@@ -6,6 +6,7 @@ import EntityList from "../../components/EntityList";
 import NewEntityModal from "../../components/NewEntityModal";
 import OnSaveEntityModal from "../../components/OnCreateEntityModal";
 import { Empty, Row, notification } from "antd";
+import ActionFloatButton from "../../components/ActionFloatButton";
 import { useLocation } from "react-router-dom";
 import { textBlue } from "../../palette";
 
@@ -23,12 +24,6 @@ const Title = styled(Row)`
   & .ant-tag {
     height: fit-content;
   }
-`;
-const CenteredEmpty = styled(Empty)`
-  top: 40%;
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, -50%);
 `;
 
 const EntityListPage = () => {
@@ -121,27 +116,27 @@ const EntityListPage = () => {
   return (
     <>
       {contextHolder}
-      {entityList ? (
-        <BodyWrapper>
-          <Title>
-            <h1>Entities</h1>
-          </Title>
-          <EntityList entityList={entityList} onNewEntity={onNewEntity} />
-          <NewEntityModal
-            show={showNewEntityModal}
-            setShow={setShowNewEntityModal}
-            onSave={handleCreateEntity}
-            onSaveLoading={onCreateEntityLoading}
-          />
-          <OnSaveEntityModal
-            show={showOnCreateEntityModal}
-            setShow={setShowOnCreateEntityModal}
-            success={createEntitySuccess}
-          />
-        </BodyWrapper>
-      ) : (
-        <CenteredEmpty />
-      )}
+      <BodyWrapper>
+        <Title>
+          <h1>Entities</h1>
+        </Title>
+        <EntityList entityList={entityList} onNewEntity={onNewEntity} />
+        <NewEntityModal
+          show={showNewEntityModal}
+          setShow={setShowNewEntityModal}
+          onSave={handleCreateEntity}
+          onSaveLoading={onCreateEntityLoading}
+        />
+        <OnSaveEntityModal
+          show={showOnCreateEntityModal}
+          setShow={setShowOnCreateEntityModal}
+          success={createEntitySuccess}
+        />
+        <ActionFloatButton
+          onAction={onNewEntity}
+          actionLabel="New entity"
+        ></ActionFloatButton>
+      </BodyWrapper>
     </>
   );
 };
