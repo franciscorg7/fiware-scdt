@@ -554,6 +554,7 @@ app.post("/history/repetition", async (req, res) => {
     });
 });
 
+// Lists all repetitions registered
 app.get("/history/repetition/list", (_, res) => {
   cygnusMySQLQueries.getRepetitionList(mySQLConnection).then(
     (results) => res.json({ results: results }),
