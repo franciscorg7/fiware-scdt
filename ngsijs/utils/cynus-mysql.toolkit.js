@@ -39,7 +39,7 @@ const matchMySQLTableName = (id) =>
  */
 const runQuery = (mysqlConnection, query) =>
   new Promise((resolve, reject) => {
-    mysqlConnection.query(query, (error, results, fields) => {
+    mysqlConnection.query(query, (error, results, _) => {
       if (error) {
         reject(error);
       } else {

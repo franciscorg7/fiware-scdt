@@ -48,7 +48,7 @@ const buildEntity = (entity) => {
 const buildEntityDummy = (entity) => {
   const build = { ...entity };
   build["id"] = `${build["id"]}:dummy`;
-  build["repetition"] = { value: null, type: "Integer" };
+  build["repetition"] = { value: 0, type: "Integer" };
   return build;
 };
 
