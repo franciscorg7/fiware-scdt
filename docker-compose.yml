@@ -81,20 +81,10 @@ services:
     healthcheck:
       test: curl --fail -s http://localhost:5080/v1/version || exit 1
 
-  # Data Visualization
-  grafana:
-    image: grafana/grafana
-    hostname: grafana
-    container_name: grafana
-    depends_on:
-      - mysql-db
-    ports:
-      - 3000:3000
-
-  # ngsiJS Proxy Server
-  ngsijs-proxy:
-    image: ngsijs-proxy
-    container_name: ngsijs-proxy
+  # ngsiJS Service
+  ngsijs:
+    image: ngsijs
+    container_name: ngsijs
     build:
       context: ./ngsijs
     ports:
