@@ -131,7 +131,7 @@ app.post("/entity/create", (req, res) => {
 app.post("/entity/create-batch", (req, res) => {
   let entityCreationPromiseList = [];
   let responseList = [];
-  for (const entityObj of req.body.batch) {
+  for (const entityObj of req.body) {
     const createEntityPromise = new Promise(() => {
       const entity = contextBrokerToolkit.buildEntity(entityObj);
       const dummy = contextBrokerToolkit.buildEntityDummy(entityObj);
