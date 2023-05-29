@@ -127,6 +127,7 @@ app.post("/entity/create", (req, res) => {
   );
 });
 
+// FIXME: create-batch is giving error on creating dummy history
 // Loops through entity batch creating every
 app.post("/entity/create-batch", (req, res) => {
   let entityCreationPromiseList = [];
@@ -545,7 +546,7 @@ app.post("/history/repetition", async (req, res) => {
             ngsiConnection.v2.updateEntityAttributes(entity).then(
               () => {},
               (error) => {
-                reject(error.message);
+                Promise.reject(error.message);
               }
             )
           )
@@ -611,7 +612,7 @@ app.post("/history/repetition", async (req, res) => {
             ngsiConnection.v2.updateEntityAttributes(entity).then(
               () => {},
               (error) => {
-                reject(error.message);
+                Promise.reject(error.message);
               }
             )
           )
@@ -632,7 +633,7 @@ app.post("/history/repetition", async (req, res) => {
             ngsiConnection.v2.updateEntityAttributes(entity).then(
               () => {},
               (error) => {
-                reject(error.message);
+                Promise.reject(error.message);
               }
             )
           )
