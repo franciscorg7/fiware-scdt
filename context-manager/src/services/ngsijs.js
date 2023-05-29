@@ -91,7 +91,7 @@ const startRepetition = (newRepetitionObj) =>
         `/history/repetition`,
         newRepetitionObj
       );
-      resolve(response.data.results);
+      resolve(response.data);
     } catch (error) {
       reject(error);
     }

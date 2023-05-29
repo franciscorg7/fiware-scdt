@@ -32,7 +32,7 @@ const RepetitionListPage = () => {
     useState(false);
   const [onStartRepetitionLoading, setOnStartRepetitionLoading] =
     useState(false);
-  const [newRepetitionObj, setNewRepetitionObj] = useState(null);
+  const [newRepetitionResult, setNewRepetitionResult] = useState(null);
   const [startRepetitionSuccess, setStartRepetitionSuccess] = useState(false);
   const [notifAPI, contextHolder] = notification.useNotification();
 
@@ -78,6 +78,7 @@ const RepetitionListPage = () => {
         setShowNewRepetitionModal(false);
         setStartRepetitionSuccess(true);
         setShowOnStartRepetitionModal(true);
+        setNewRepetitionResult(result.data);
       },
       (error) => {
         setShowNewRepetitionModal(false);
@@ -104,8 +105,8 @@ const RepetitionListPage = () => {
         <OnCreateRepetitionModal
           show={showOnStartRepetitionModal}
           setShow={setShowOnStartRepetitionModal}
-          newRepetitionObj={newRepetitionObj}
           success={startRepetitionSuccess}
+          result={newRepetitionResult}
         />
         <ActionFloatButton
           onAction={onNewRepetition}
