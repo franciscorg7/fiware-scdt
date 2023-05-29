@@ -5,7 +5,7 @@ import { useState } from "react";
 import EntityList from "../../components/EntityList";
 import NewEntityModal from "../../components/NewEntityModal";
 import OnSaveEntityModal from "../../components/OnCreateEntityModal";
-import { Empty, Row, notification } from "antd";
+import { Row, notification } from "antd";
 import ActionFloatButton from "../../components/ActionFloatButton";
 import { useLocation } from "react-router-dom";
 import { textBlue } from "../../palette";

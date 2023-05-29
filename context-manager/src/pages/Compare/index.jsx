@@ -127,6 +127,7 @@ const ComparePage = () => {
       currentEntitySet[0] = null;
       setComparingEntitySet(currentEntitySet);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comparingEntityIds[0]]);
 
   /**
@@ -153,6 +154,7 @@ const ComparePage = () => {
       currentEntitySet[1] = null;
       setComparingEntitySet(currentEntitySet);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comparingEntityIds[1]]);
 
   /**
@@ -199,6 +201,7 @@ const ComparePage = () => {
             });
           }
         );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [attributeNameFilters, startDateFilter, endDateFilter]);
 
   /**

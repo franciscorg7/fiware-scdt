@@ -27,6 +27,7 @@ const SubscriptionListPage = () => {
   const [notifAPI, contextHolder] = notification.useNotification();
   useEffect(() => {
     handleGetSubscriptionList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**

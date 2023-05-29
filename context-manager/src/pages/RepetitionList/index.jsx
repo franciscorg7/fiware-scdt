@@ -73,17 +73,20 @@ const RepetitionListPage = () => {
    *
    */
   const handleStartRepetition = (newRepetitionObj) => {
+    setOnStartRepetitionLoading(true);
     ngsiJSService.startRepetition(newRepetitionObj).then(
       (result) => {
         setShowNewRepetitionModal(false);
         setStartRepetitionSuccess(true);
         setShowOnStartRepetitionModal(true);
         setNewRepetitionResult(result.data);
+        setOnStartRepetitionLoading(false);
       },
       (error) => {
         setShowNewRepetitionModal(false);
         setStartRepetitionSuccess(false);
         setShowOnStartRepetitionModal(true);
+        setOnStartRepetitionLoading(false);
       }
     );
   };
