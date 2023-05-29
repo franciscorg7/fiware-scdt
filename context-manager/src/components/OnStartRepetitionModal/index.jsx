@@ -40,14 +40,14 @@ const OnCreateRepetitionModal = ({ show, setShow, success, result }) => {
     >
       {success ? (
         <ModalContent>
-          <Row>
+          <Row key="success-img-row">
             <img src={successSVG} alt="success" />
           </Row>
-          <Row>
+          <Row key="result-content-row">
             <ContentWrapper>
               <ResultId>Repetition #{result?.id}</ResultId>
               <ResultDate>
-                {moment(result?.startDate).format("DD/MM/YYYY")}
+                {moment(result?.startDate).format("DD/MM/YYYY (HH:mm:ss)")}
               </ResultDate>
               <ResultMessage>{result?.message}</ResultMessage>
             </ContentWrapper>
