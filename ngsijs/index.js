@@ -127,6 +127,99 @@ app.post("/entity/create", (req, res) => {
   );
 });
 
+// Loops through entity batch creating every
+app.post("/entity/create-batch", (req, res) => {
+  let entityCreationPromiseList = [];
+  let responseList = [];
+  for (const entityObj of req.body.batch) {
+    const createEntityPromise = new Promise(() => {
+      const entity = contextBrokerToolkit.buildEntity(entityObj);
+      const dummy = contextBrokerToolkit.buildEntityDummy(entityObj);
+      // Call the create method for the new entity
+      ngsiConnection.v2.createEntity(entity).then(
+        (result) => {
+          // After being created the new entity, replicate the process for its dummy clone
+          ngsiConnection.v2.createEntity(dummy).then(
+            async (dummyResult) => {
+              // Try to build subscriptions for the entity and its dummy replication and register them in the Context Broker Server
+              try {
+                const entityCygnusSubscription =
+                  await contextBrokerToolkit.buildCygnusSubscription(
+                    entity,
+                    `${entity.id} updates listener`
+                  );
+                const dummyCygnusSubscription =
+                  await contextBrokerToolkit.buildCygnusSubscription(
+                    dummy,
+                    `${dummy.id} updates listener`
+                  );
+
+                // Create both entity and dummy subscription in parallel and once they both finish, resolve the promise with all the data
+                Promise.all([
+                  ngsiConnection.v2.createSubscription(
+                    entityCygnusSubscription
+                  ),
+                  ngsiConnection.v2.createSubscription(dummyCygnusSubscription),
+                ]).then(async (subscriptionResults) => {
+                  // After creating the subscriptions, update its reference inside the entity instance
+                  await ngsiConnection.v2.updateEntityAttributes({
+                    id: entity.id,
+                    subscriptions: {
+                      type: "Array",
+                      value: [subscriptionResults[0].subscription.id],
+                    },
+                  });
+                  // Do the same for its repetition dummy
+                  await ngsiConnection.v2.updateEntityAttributes({
+                    id: dummy.id,
+                    subscriptions: {
+                      type: "Array",
+                      value: [subscriptionResults[1].subscription.id],
+                    },
+                  });
+
+                  // Map entities subscription attribute response to match last context updates (prior to entity creation)
+                  result.entity.subscriptions.value = [
+                    subscriptionResults[0].subscription.id,
+                  ];
+                  dummyResult.entity.subscriptions.value = [
+                    subscriptionResults[1].subscription.id,
+                  ];
+                  const response = {
+                    entityResult: result,
+                    entitySubscriptionResult: subscriptionResults[0], // entity subscription result
+                    dummyResult: dummyResult,
+                    dummySubscriptionResult: subscriptionResults[1], // dummy subscription result
+                  };
+                  responseList.push(response);
+                });
+              } catch (subscriptionError) {
+                // Catch any possible error related to the subscriptions process
+                res.status(500).json({ error: { ...subscriptionError } });
+              }
+            },
+            // Catch any possible error related to the entity dummy replication process
+            (dummyError) => res.status(500).json({ error: { ...dummyError } })
+          );
+        },
+        // Catch any possible error related to the entity creation process
+        (entityError) => {
+          res.status(500).json({ error: { ...entityError } });
+        }
+      );
+    });
+    entityCreationPromiseList.push(createEntityPromise);
+  }
+
+  Promise.all(entityCreationPromiseList)
+    .then((_) => {
+      res.json({ results: responseList });
+    })
+    .catch((error) => {
+      res.status(500).json({ error: { ...error } });
+    });
+});
+
 // Updates attributes from an existing entity
 app.post("/entity/update", (req, res) => {
   const changes = req.body;
