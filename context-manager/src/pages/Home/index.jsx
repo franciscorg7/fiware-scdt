@@ -22,15 +22,15 @@ const MenuGrid = styled.div`
   display: grid;
   grid-template-rows: 1fr 1fr;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 14px;
+  grid-gap: 20px;
 `;
 const NavigationButton = styled(Card)`
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  width: 300px;
-  height: 300px;
+  width: 24vw;
+  height: 20vh;
   cursor: pointer;
   transition: transform 0.2s ease-in;
   text-decoration: none !important;

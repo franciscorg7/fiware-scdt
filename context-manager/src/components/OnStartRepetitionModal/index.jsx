@@ -55,7 +55,15 @@ const OnCreateRepetitionModal = ({ show, setShow, success, result }) => {
         </ModalContent>
       ) : (
         <ModalContent>
-          <img src={errorSVG} alt="error" />
+          <Row key="error-img-row">
+            <img src={errorSVG} alt="error" />
+          </Row>
+          <Row key="result-content-row">
+            <ContentWrapper>
+              <ResultId>Something went wrong.</ResultId>
+              <ResultMessage>{result?.message}</ResultMessage>
+            </ContentWrapper>
+          </Row>
         </ModalContent>
       )}
     </StyledModal>
