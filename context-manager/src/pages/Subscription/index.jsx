@@ -79,7 +79,9 @@ const SubscriptionPage = () => {
    * @param {string} entityId
    */
   const goToEntity = (entityId) => {
-    navigate(`/entity/${entityId}`);
+    entityId.endsWith(":dummy")
+      ? navigate(`/entity/${entityId.replace(":dummy", "")}`)
+      : navigate(`/entity/${entityId}`);
   };
 
   return (

@@ -2,7 +2,7 @@ import axios from "axios";
 import { buildHistoryOptionsQueryString } from "./ngsijs-utils";
 
 const ngsijs = axios.create({
-  baseURL: process.env.REACT_APP_API_PORTO_BASE_URL,
+  baseURL: process.env.REACT_APP_API_VILA_REAL_BASE_URL,
 });
 
 /**
