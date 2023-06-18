@@ -38,7 +38,7 @@ const createEntity = (entityObj) =>
   new Promise(async (resolve, reject) => {
     try {
       const response = await ngsijs.post(`/entity/create`, entityObj);
-      resolve(response.data.results);
+      resolve(response.data);
     } catch (error) {
       reject(error);
     }

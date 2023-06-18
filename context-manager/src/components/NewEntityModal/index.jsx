@@ -75,24 +75,6 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
 
   const [attrList, setAttrList] = useState([]);
 
-  // Use 1000ms debouncing to update entity id
-  useDebounce(
-    () => {
-      id && setEntityObj({ ...entityObj, id: id });
-    },
-    1000,
-    [id]
-  );
-
-  // Use 1000ms debouncing to update entity type
-  useDebounce(
-    () => {
-      type && setEntityObj({ ...entityObj, type: type });
-    },
-    1000,
-    [type]
-  );
-
   // Listen to id changes, in order to synchronously update entityObj
   useEffect(() => {
     id &&
@@ -139,7 +121,10 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
     entityObjKeysNames.forEach((objKeyName, index) => {
       setEntityObj((entityObj) => {
         const clone = { ...entityObj };
-        const keys = Object.keys(entityObj);
+        const keys = Object.keys(entityObj).filter(
+          (key) => key !== "id" && key !== "type"
+        );
+
         if (keys[index] !== objKeyName) {
           clone[keys[index]] = clone[objKeyName];
           delete clone[keys[index]];
@@ -166,8 +151,12 @@ const NewEntityModal = ({ show, setShow, onSave, onSaveLoading }) => {
     setAttrList((attrList) => attrList.filter((_, index) => index !== idx));
     setEntityObj((entityObj) => {
       let clone = { ...entityObj };
-      const keys = Object.keys(entityObj);
-      keys.length > 1 ? delete clone[keys[idx]] : (clone = {});
+      const keys = Object.keys(entityObj).filter(
+        (key) => key !== "id" && key !== "type"
+      );
+      keys.length > 1
+        ? delete clone[keys[idx]]
+        : (clone = { id: id, type: type });
       return clone;
     });
     setEntityObjKeysNames((entityObjKeysNames) =>

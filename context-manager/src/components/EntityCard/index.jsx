@@ -32,11 +32,16 @@ const TypeTag = styled(Tag)`
 `;
 const TitleWrapper = styled(Row)`
   justify-content: space-between;
+  & .entityId {
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 const EntityCardTitle = ({ entity }) => (
   <TitleWrapper>
-    <Col>{entity.id}</Col>
+    <Col className="entityId">{entity.id}</Col>
     <Col>
       <TypeTag color={typeTagService.getTypeTagColor(entity.type)}>
         {entity.type}

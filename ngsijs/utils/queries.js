@@ -270,6 +270,7 @@ const getNextRepetitionIndex = (mySQLConnection) =>
   });
 
 /**
+ * Gets the startDate of the corresponding repetition given its id
  *
  * @param {*} mySQLConnection
  * @param {*} repetitionId

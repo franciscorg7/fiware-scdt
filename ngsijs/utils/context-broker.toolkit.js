@@ -16,7 +16,7 @@ const parseStringToBoolean = (string) => string.toLowerCase() === "true";
  */
 const buildEntityListOptions = (query) => {
   const options = {};
-  const noDummies = parseStringToBoolean(query.noDummies ?? "false"); // TODO: check if this solves the issue of not getting noDummies in request body
+  const noDummies = parseStringToBoolean(query.noDummies ?? "false");
   const idPattern = query.idPattern;
   const attrs = query.attrs;
   if (attrs) options["attrs"] = attrs;

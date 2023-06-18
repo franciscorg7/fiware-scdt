@@ -4,7 +4,7 @@ import ngsiJSService from "../../services/ngsijs";
 import { useState } from "react";
 import EntityList from "../../components/EntityList";
 import NewEntityModal from "../../components/NewEntityModal";
-import OnSaveEntityModal from "../../components/OnCreateEntityModal";
+import OnCreateEntityModal from "../../components/OnCreateEntityModal";
 import { Row, notification } from "antd";
 import ActionFloatButton from "../../components/ActionFloatButton";
 import { useLocation } from "react-router-dom";
@@ -25,13 +25,25 @@ const Title = styled(Row)`
     height: fit-content;
   }
 `;
+const LoadMoreWrapper = styled(Row)`
+  justify-content: center;
+  padding: 20px 0;
+
+  & span {
+    cursor: pointer;
+  }
+`;
 
 const EntityListPage = () => {
-  const [entityList, setEntityList] = useState(null);
+  const DEFAULT_LOAD_COUNT = 12;
+  const [entityList, setEntityList] = useState([]);
   const [showNewEntityModal, setShowNewEntityModal] = useState(false);
   const [onCreateEntityLoading, setOnCreateEntityLoading] = useState(false);
   const [showOnCreateEntityModal, setShowOnCreateEntityModal] = useState(false);
+  const [createEntityResponse, setCreateEntityResponse] = useState(null);
   const [createEntitySuccess, setCreateEntitySuccess] = useState(false);
+  const [resultsLimit, setResultsLimit] = useState(DEFAULT_LOAD_COUNT);
+
   const [notifAPI, contextHolder] = notification.useNotification();
 
   // Get current search value from the Navbar
@@ -82,8 +94,8 @@ const EntityListPage = () => {
   const handleCreateEntity = async (entityObj) => {
     setOnCreateEntityLoading(true);
     ngsiJSService.createEntity(entityObj).then(
-      (response) => handleCreateEntitySuccess(),
-      (error) => handleCreateEntityError()
+      (response) => handleCreateEntitySuccess(response),
+      (error) => handleCreateEntityError(error)
     );
     setOnCreateEntityLoading(false);
   };
@@ -91,7 +103,8 @@ const EntityListPage = () => {
   /**
    * Propagate createEntity success to modals visibility
    */
-  const handleCreateEntitySuccess = () => {
+  const handleCreateEntitySuccess = (response) => {
+    setCreateEntityResponse(response);
     setCreateEntitySuccess(true);
     setShowNewEntityModal(false);
     setShowOnCreateEntityModal(true);
@@ -100,7 +113,8 @@ const EntityListPage = () => {
   /**
    * Propagate createEntity error to modals visibility
    */
-  const handleCreateEntityError = () => {
+  const handleCreateEntityError = (error) => {
+    setCreateEntityResponse(error);
     setCreateEntitySuccess(false);
     setShowNewEntityModal(false);
     setShowOnCreateEntityModal(true);
@@ -113,6 +127,13 @@ const EntityListPage = () => {
     setShowNewEntityModal(true);
   };
 
+  /**
+   * Shows more DEFAULT_LOAD_COUNT entities
+   */
+  const loadMore = (count) => {
+    setResultsLimit(Math.min(resultsLimit + count, entityList.length));
+  };
+
   return (
     <>
       {contextHolder}
@@ -120,16 +141,27 @@ const EntityListPage = () => {
         <Title>
           <h1>Entities</h1>
         </Title>
-        <EntityList entityList={entityList} onNewEntity={onNewEntity} />
-        <NewEntityModal
-          show={showNewEntityModal}
-          setShow={setShowNewEntityModal}
-          onSave={handleCreateEntity}
-          onSaveLoading={onCreateEntityLoading}
+        <EntityList
+          entityList={entityList?.slice(0, resultsLimit)}
+          onNewEntity={onNewEntity}
         />
-        <OnSaveEntityModal
+        {resultsLimit !== entityList.length ? (
+          <LoadMoreWrapper>
+            <span onClick={() => loadMore(DEFAULT_LOAD_COUNT)}>Load more</span>
+          </LoadMoreWrapper>
+        ) : null}
+        {showNewEntityModal ? (
+          <NewEntityModal
+            show={showNewEntityModal}
+            setShow={setShowNewEntityModal}
+            onSave={handleCreateEntity}
+            onSaveLoading={onCreateEntityLoading}
+          />
+        ) : null}
+        <OnCreateEntityModal
           show={showOnCreateEntityModal}
           setShow={setShowOnCreateEntityModal}
+          result={createEntityResponse}
           success={createEntitySuccess}
         />
         <ActionFloatButton
