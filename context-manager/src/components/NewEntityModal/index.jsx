@@ -9,7 +9,6 @@ import { Input, Modal, Button } from "antd";
 import { JsonViewer } from "@textea/json-viewer";
 import EntityAttribute from "../EntityAttribute";
 import { highlightOrange, textBlue } from "../../palette";
-import { useDebounce } from "../../hooks/useDebounce";
 
 const StyledModal = styled(Modal)`
   max-width: 800px;
