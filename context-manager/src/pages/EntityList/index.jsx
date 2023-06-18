@@ -31,6 +31,8 @@ const LoadMoreWrapper = styled(Row)`
 
   & span {
     cursor: pointer;
+    color: ${textBlue};
+    font-weight: bold;
   }
 `;
 
@@ -145,7 +147,7 @@ const EntityListPage = () => {
           entityList={entityList?.slice(0, resultsLimit)}
           onNewEntity={onNewEntity}
         />
-        {resultsLimit !== entityList.length ? (
+        {entityList.length > 0 && resultsLimit !== entityList.length ? (
           <LoadMoreWrapper>
             <span onClick={() => loadMore(DEFAULT_LOAD_COUNT)}>Load more</span>
           </LoadMoreWrapper>
