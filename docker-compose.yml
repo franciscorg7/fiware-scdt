@@ -79,7 +79,7 @@ services:
       - "CYGNUS_API_PORT=5080" # Port that Cygnus listens on for operational reasons
       - "CYGNUS_LOG_LEVEL=DEBUG"
     healthcheck:
-      test: curl --fail -s http://localhost:5080/v1/version || exit 1
+      test: curl --fail -s http://cygnus:5080/v1/version || exit 1
 
   # ngsiJS Service
   ngsijs:
@@ -87,6 +87,11 @@ services:
     container_name: ngsijs
     build:
       context: ./ngsijs
+    networks:
+      - default
+    depends_on:
+      - orion
+      - cygnus
     ports:
       - 8081:8081
 
@@ -94,6 +99,10 @@ services:
   context-manager:
     image: context-manager
     container_name: context-manager
+    networks:
+      - default
+    depends_on:
+      - ngsijs
     build:
       context: ./context-manager
     ports:
