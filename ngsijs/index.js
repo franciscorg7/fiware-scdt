@@ -26,17 +26,22 @@ app.listen(API_PORT, () => {
 // Lists all entities registered in the context broker server
 app.get("/entity/list", (req, res) => {
   const options = contextBrokerToolkit.buildEntityListOptions(req.query);
-  ngsiConnection.v2.listEntities(options).then(
-    (response) => {
-      res.json({
-        results: response.results,
-        numOfEntitiesFound: response.results.length,
-      });
-    },
-    (error) => {
-      res.status(503).json({ error: { ...error } });
-    }
-  );
+  ngsiConnection.v2
+    .listEntities({
+      ...options,
+      limit: contextBrokerToolkit.MAX_NUMBER_OF_RESULTS,
+    })
+    .then(
+      (response) => {
+        res.json({
+          results: response.results,
+          numOfEntitiesFound: response.results.length,
+        });
+      },
+      (error) => {
+        res.status(503).json({ error: { ...error } });
+      }
+    );
 });
 
 // Gets an entity from the context broker server given its id
@@ -394,11 +399,10 @@ app.post("/history/repetition", async (req, res) => {
 
   // Get all simulation involved entities
   ngsiConnection.v2
-    .listEntities() // get all the dummy entities in the simulation
+    .listEntities({ limit: contextBrokerToolkit.MAX_NUMBER_OF_RESULTS }) // get all the dummy entities in the simulation (noteice ngsiv2 API has 20 results set to default)
     .then(async (response) => {
       globalEntities = response.results;
 
-      // ! Repetition from startDate still not checking input entitiesModified
       // Create a new repetition around the simulation state at a current time
       if (startDate) {
         // Loop through all entities and get their closest history state to the given startDate (storing all the mapping promises in mappedGlobalEntities)
