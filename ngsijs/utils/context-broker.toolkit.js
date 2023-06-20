@@ -1,5 +1,7 @@
 const { CYGNUS_HOST, CYGNUS_PORT } = require("../config.js");
 
+const MAX_NUMBER_OF_RESULTS = 1000; // the maximum number of results possible for NGSIv2 API is 1000 (otherwise we need pagination)
+
 /**
  * Parse a string into a boolean value
  *
@@ -87,6 +89,7 @@ const buildCygnusSubscription = async (entity, description) => {
 };
 
 module.exports = {
+  MAX_NUMBER_OF_RESULTS,
   buildEntityListOptions,
   buildEntity,
   buildEntityDummy,
