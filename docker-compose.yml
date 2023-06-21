@@ -10,6 +10,8 @@ services:
       - mongo-db # For persisting entity information from the Context Broker
     networks:
       - default # Use a local network (default)
+    expose:
+      - 1026
     ports:
       - 1026:1026
     command: -dbhost mongo-db -logLevel DEBUG -noCache
@@ -84,6 +86,7 @@ services:
   # ngsiJS Service
   ngsijs:
     image: ngsijs
+    hostname: ngsijs
     container_name: ngsijs
     build:
       context: ./ngsijs
@@ -94,10 +97,13 @@ services:
       - cygnus
     ports:
       - 8081:8081
+    expose:
+      - 8081
 
   # Context Manager
   context-manager:
     image: context-manager
+    hostname: context-manager
     container_name: context-manager
     networks:
       - default
@@ -107,6 +113,8 @@ services:
       context: ./context-manager
     ports:
       - 1909:1909
+    expose:
+      - 1909
 
 networks:
   default:
