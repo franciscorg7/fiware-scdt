@@ -262,10 +262,12 @@ app.post("/subscription/update", (req, res) => {
 
 // Lists all subscriptions registered in the context broker server
 app.get("/subscription/list", (_, res) => {
-  ngsiConnection.v2.listSubscriptions().then(
-    (response) => res.send({ results: response.results }),
-    (error) => res.status(500).send(error)
-  );
+  ngsiConnection.v2
+    .listSubscriptions(contextBrokerToolkit.MAX_NUMBER_OF_RESULTS)
+    .then(
+      (response) => res.send({ results: response.results }),
+      (error) => res.status(500).send(error)
+    );
 });
 
 /**
