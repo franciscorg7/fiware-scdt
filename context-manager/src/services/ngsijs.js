@@ -4,7 +4,7 @@ import { buildHistoryOptionsQueryString } from "./ngsijs-utils";
 const NGSIJS_API_BASE_URL = "http://localhost:8081";
 
 const ngsijs = axios.create({
-  baseURL: process.env.REACT_APP_API_PORTO_BASE_URL,
+  baseURL: NGSIJS_API_BASE_URL,
 });
 
 /**

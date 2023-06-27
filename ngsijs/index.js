@@ -1,5 +1,5 @@
 const NGSI = require("ngsijs");
-const ngsiConnection = new NGSI.Connection("http://localhost:1026");
+const ngsiConnection = new NGSI.Connection("http://orion:1026");
 const express = require("express");
 const mysql = require("mysql");
 const contextBrokerToolkit = require("./utils/context-broker.toolkit");
@@ -14,10 +14,8 @@ app.use(express.json({ extended: true }));
 app.use(cors());
 
 app.listen(API_PORT, () => {
-  console.log(`ngsiJS server is running at: http://localhost:${API_PORT}/`);
+  console.log(`ngsiJS server is running at: http://ngsijs:${API_PORT}/`);
 });
-
-// TODO: Review endpoint responses and uniformize them
 
 /**
  * ORION CONTEXT BROKER ENTITIES
@@ -196,7 +194,7 @@ app.delete("/entity/:id/delete", async (req, res) => {
         try {
           await ngsiConnection.v2.deleteSubscription(id);
         } catch (error) {
-          console.log(error);
+          res.send(error);
         }
       });
       res.send({
