@@ -1,2 +1,0 @@
-To get mysql image instance running, run this command:
-docker exec -it  db-mysql mysql -h mysql-db -P 3306  -u root -p123

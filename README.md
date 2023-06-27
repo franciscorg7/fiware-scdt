@@ -45,8 +45,22 @@ docker-compose up -d
 
 ### Usage
 
-<!-- CONTACT -->
+Inside the root folder,
+
+1. To get the MySQL image instance running, run the bash script like:
+
+```
+./run-mysql-img.sh
+```
+
+2. If you want to reset the long term persistency, run:
+
+```
+./reset-long-term-persistency.sh
+```
 
 ## Contact
+
+If you have any doubt or any constructive comment to make, please feel free to reach me.
 
 Francisco Gonçalves - franciscorg.dev@gmail.com
