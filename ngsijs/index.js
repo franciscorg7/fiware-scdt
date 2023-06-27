@@ -1,11 +1,11 @@
+const { mySQLConfig, API_PORT, NGSI_HOST, NGSI_PORT } = require("./config.js");
 const NGSI = require("ngsijs");
-const ngsiConnection = new NGSI.Connection("http://orion:1026");
+const ngsiConnection = new NGSI.Connection(`${NGSI_HOST}:${NGSI_PORT}`);
 const express = require("express");
 const mysql = require("mysql");
 const contextBrokerToolkit = require("./utils/context-broker.toolkit");
 const cygnusMySQLToolkit = require("./utils/cynus-mysql.toolkit");
 const app = express();
-const { mySQLConfig, API_PORT } = require("./config.js");
 const cygnusMySQLQueries = require("./utils/queries.js");
 const cors = require("cors");
 
