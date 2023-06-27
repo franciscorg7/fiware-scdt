@@ -10,7 +10,7 @@ const StyledCard = styled(Card)`
 const CompareCard = ({ entityId, entityData }) => {
   return (
     <StyledCard title={entityId} bordered={false}>
-      <EntityHistoryTable history={entityData} />
+      <EntityHistoryTable seeRepetition history={entityData} />
     </StyledCard>
   );
 };
