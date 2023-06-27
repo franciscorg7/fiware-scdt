@@ -17,18 +17,24 @@ const InnerTypeTag = styled(Tag)`
   border: 0px;
 `;
 
-const EntityHistoryTable = ({ history }) => {
+const EntityHistoryTable = ({ seeRepetition, history }) => {
   // History columns definition
   const columns = [
     {
       title: "Attribute",
       dataIndex: "attrName",
       key: "attrName",
+      hidden: !seeRepetition,
     },
     {
       title: "Value",
       dataIndex: "attrValue",
       key: "attrValue",
+    },
+    {
+      title: "Repetition",
+      dataIndex: "repetition",
+      key: "repetition",
     },
     {
       title: "Type",
@@ -52,12 +58,37 @@ const EntityHistoryTable = ({ history }) => {
         return parsedRecvTime.format("DD MMM YYYY (HH:mm:ss.SSS)");
       },
     },
-  ];
+  ].filter((column) => !column.hidden);
+
   // Apply a key value to each history entry (let React identify table rows)
-  const keyedHistory = history?.map((entry, idx) => {
+  let keyedHistory = history?.map((entry, idx) => {
     entry["key"] = idx;
     return entry;
   });
+
+  // Process each entry repetition reference by aggregating them into groups of similar dates
+  if (seeRepetition) {
+    const aggregateByRecvTime = keyedHistory?.reduce((acc, entry) => {
+      const recvTime = entry.recvTime;
+      if (!acc[recvTime]) acc[recvTime] = [];
+      acc[recvTime].push(entry);
+      return acc;
+    }, {});
+    aggregateByRecvTime &&
+      Object.keys(aggregateByRecvTime).map((recvTime) => {
+        const rep = aggregateByRecvTime[recvTime].find(
+          (attr) => attr.attrName === "repetition"
+        )?.attrValue;
+        keyedHistory?.map((entry) => {
+          if (entry.recvTime === recvTime) entry.repetition = rep;
+        });
+      });
+
+    keyedHistory = keyedHistory?.filter((entry) => {
+      return entry.attrName !== "repetition";
+    });
+  }
+
   return <StyledTable dataSource={keyedHistory} columns={columns} />;
 };
 

@@ -169,7 +169,10 @@ const EntityPage = () => {
             </FiltersSwitchWrapper>
           </EntityTitle>
           {seeHistory ? (
-            <EntityHistoryTable history={entityHistory} />
+            <EntityHistoryTable
+              seeRepetition={seeRepetition}
+              history={entityHistory}
+            />
           ) : (
             <Descriptions layout="vertical" bordered>
               {entityAttrs?.map((attr, idx) => (
