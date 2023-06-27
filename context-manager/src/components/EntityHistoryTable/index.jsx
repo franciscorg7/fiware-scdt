@@ -24,7 +24,6 @@ const EntityHistoryTable = ({ seeRepetition, history }) => {
       title: "Attribute",
       dataIndex: "attrName",
       key: "attrName",
-      hidden: !seeRepetition,
     },
     {
       title: "Value",
@@ -35,6 +34,7 @@ const EntityHistoryTable = ({ seeRepetition, history }) => {
       title: "Repetition",
       dataIndex: "repetition",
       key: "repetition",
+      hidden: !seeRepetition,
     },
     {
       title: "Type",
